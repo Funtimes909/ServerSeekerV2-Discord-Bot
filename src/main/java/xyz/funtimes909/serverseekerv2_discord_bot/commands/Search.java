@@ -77,7 +77,7 @@ public class Search {
 
             // Add buttons for each returned server
             for (Map.Entry<Integer, Server> server : searchResults.entrySet()) {
-                buttons.add(Button.success("ServerButton" + server.getKey(), String.valueOf(server.getKey())));
+                buttons.add(Button.success("SearchButton" + server.getKey(), String.valueOf(server.getKey())));
             }
 
             if (firstRun) {
@@ -146,11 +146,15 @@ public class Search {
     }
 
     public static void buttonEvent(int row) {
+        System.out.println("Called!");
         try (Connection conn = DatabaseConnectionPool.getConnection()) {
             PreparedStatement statement = conn.prepareStatement("SELECT * FROM servers WHERE address = ? AND port = ?");
 
-            statement.setString(1, searchResults.get(row).getAddress());
-            statement.setInt(2, searchResults.get(row).getPort());
+            statement.setString(1, searchResults.get(row).address());
+            statement.setInt(2, searchResults.get(row).port());
+
+            System.out.println(searchResults.get(row).address());
+            System.out.println(searchResults.get(row).port());
 
             ResultSet resultSet = statement.executeQuery();
 

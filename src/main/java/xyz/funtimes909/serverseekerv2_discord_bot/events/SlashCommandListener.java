@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
 public class SlashCommandListener extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();) {
+        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
             Main.logger.info("Command: {} run by {} [{}]", event.getName(), event.getUser().getName(), event.getUser().getId());
 
             switch (event.getName()) {

@@ -16,10 +16,10 @@ public class SearchCommandBuilder {
         List<MessageEmbed.Field> fields = new ArrayList<>();
 
         servers.values().forEach(server -> {
-            StringBuilder address = new StringBuilder("``").append(server.getAddress()).append("``");
-            StringBuilder version = new StringBuilder("``").append(server.getVersion()).append("``");
-            String timestamp = "<t:" + server.getTimestamp() + ">";
-            address.insert(0, ":flag_" + server.getCountry().toLowerCase() + ": **:**");
+            StringBuilder address = new StringBuilder("``").append(server.address()).append("``");
+            StringBuilder version = new StringBuilder("``").append(server.version()).append("``");
+            String timestamp = "<t:" + server.timestamp() + ">";
+            address.insert(0, ":flag_" + server.country().toLowerCase() + ": **:**");
 
             // Make everything the same length
             if (version.length() > 17) {
