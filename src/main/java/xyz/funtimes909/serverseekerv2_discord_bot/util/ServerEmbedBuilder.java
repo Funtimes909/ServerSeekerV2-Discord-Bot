@@ -65,13 +65,13 @@ public class ServerEmbedBuilder {
             MessageEmbed.Field addressInformation = new MessageEmbed.Field("**__Address Information__**", addressInfo.toString(), false);
 
             // Build server information embed
-            return new EmbedBuilder()
+            MessageEmbed embed = new EmbedBuilder()
                     .setColor(new Color(0, 255, 0))
                     .setAuthor("ServerSeekerV2")
                     .setThumbnail("https://funtimes909.xyz/avatar-gif")
                     .setTitle(results.getString("address") + ":" + results.getString("port"))
                     .addField("**__Version__**", results.getString("version") + " (" + results.getString("protocol") + ")", false)
-                    .addField("**__Description__**", description, false)
+                    .addField("**__Description__**", "```" + description + "```", false)
                     .addField("**__Country__**", ":flag_" + country.toLowerCase() + ": " + country, false)
                     .addField("**__First Seen__**", "<t:" + results.getString("firstseen") + ">", false)
                     .addField("**__Last Seen__**", "<t:" + results.getString("lastseen") + ">", false)
@@ -80,6 +80,8 @@ public class ServerEmbedBuilder {
                     .addField(addressInformation)
                     .build();
 
+            results.close();
+            return embed;
         } catch (SQLException e) {
             e.printStackTrace();
             return null;

@@ -21,7 +21,6 @@ public class Register {
         searchOptions.add(new OptionData(OptionType.BOOLEAN, "enforcesecure", "Search for servers that enforce secure chat"));
         searchOptions.add(new OptionData(OptionType.BOOLEAN, "cracked", "Search for servers that are running in offline mode"));
         searchOptions.add(new OptionData(OptionType.STRING, "country", "Search for servers running in a specific country"));
-        searchOptions.add(new OptionData(OptionType.STRING, "playerhistory", "Search for playerhistory of a specific player"));
         searchOptions.add(new OptionData(OptionType.STRING, "iprange", "Search for servers running in this specific IP address range"));
         searchOptions.add(new OptionData(OptionType.INTEGER, "port", "Search for servers running on a specific port"));
         searchOptions.add(new OptionData(OptionType.STRING, "asn", "Search for servers running from a specific ASN"));
@@ -51,6 +50,9 @@ public class Register {
                 Commands.slash("notify", "Get notified through a webhook of player activity")
                         .addOption(OptionType.STRING, "player", "The player you want to recieve activity notifications for")
                         .addOption(OptionType.STRING, "url", "Webhook URL you want notifications sent to"),
+
+                Commands.slash("playerhistory", "Search for playerhistory of a specific player")
+                                .addOption(OptionType.STRING, "player", "The player you want to search for"),
 
                 Commands.slash("takedown", "Request for your server to be excluded from all future scans")
                         .addOption(OptionType.STRING, "address", "IP address of the server you want to takedown", true)

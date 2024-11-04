@@ -24,11 +24,12 @@ public class ButtonInteractionEventListener extends ListenerAdapter {
                 Search.buttonEvent(5);
                 break;
             case "PagePrevious":
-                Search.pagePrevious();
+                Search.scrollResults(-10, false);
                 break;
             case "PageNext":
-                Search.pageNext();
+                Search.scrollResults(0, false);
                 break;
         }
+        event.deferEdit().complete();
     }
 }

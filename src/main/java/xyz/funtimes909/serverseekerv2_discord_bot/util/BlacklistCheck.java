@@ -1,6 +1,5 @@
 package xyz.funtimes909.serverseekerv2_discord_bot.util;
 
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 
 import java.io.BufferedReader;
