@@ -1,0 +1,43 @@
+buildscript {
+    repositories {
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath 'com.gradleup.shadow:shadow-gradle-plugin:8.3.3'
+    }
+}
+
+apply plugin: 'com.gradleup.shadow'
+apply plugin: 'java'
+apply plugin: 'application'
+
+group = 'xyz.funtimes909.serverseekerv2_discord_bot'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    implementation 'com.google.code.gson:gson:2.11.0'
+    implementation 'net.dv8tion:JDA:5.1.2'
+    implementation 'org.postgresql:postgresql:42.7.4'
+    implementation 'org.apache.commons:commons-dbcp2:2.12.0'
+    implementation 'ch.qos.logback:logback-classic:1.5.6'
+    implementation group: 'commons-net', name: 'commons-net', version: '3.11.1'
+
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'xyz.funtimes909.serverseekerv2_discord_bot.Main'
+        )
+    }
+}
+
+test {
+    useJUnitPlatform()
+}

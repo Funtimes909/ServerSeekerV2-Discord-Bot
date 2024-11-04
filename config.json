@@ -1,0 +1,13 @@
+{
+  "discord_token": "BOT_TOKEN",
+  "postgres_url": "localhost:5432/",
+  "postgres_user": "postgres",
+  "postgres_password": ":3",
+  "masscan_exclude_file": "exclude.txt",
+  "owner_id": "OWNER_ID",
+  "trusted_users": [
+    "USER1",
+    "USER2",
+    "USER3"
+  ]
+}
