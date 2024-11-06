@@ -30,6 +30,10 @@ dependencies {
 
 }
 
+application {
+    mainClass.set("xyz.funtimes909.serverseekerv2_discord_bot.Main")
+}
+
 jar {
     manifest {
         attributes(

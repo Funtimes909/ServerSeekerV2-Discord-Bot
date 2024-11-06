@@ -28,7 +28,7 @@ public class Random {
             String query = "SELECT * FROM servers ORDER BY RANDOM() LIMIT 1";
             long endTime = System.currentTimeMillis();
             long duration = endTime - startTime;
-            Main.logger.info("Query took {}ms", duration);
+            Main.logger.debug("Query took {}ms", duration);
 
             ResultSet result = random.executeQuery(query);
 

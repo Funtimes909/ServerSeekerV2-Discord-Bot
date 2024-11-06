@@ -24,36 +24,21 @@ public class Search {
     private static ResultSet resultSet;
     public static HashMap<Integer, Server> searchResults = new HashMap<>();
     public static int rowCount;
+    public static int page = 1;
 
     public static void search(SlashCommandInteractionEvent interactionEvent) {
         event = interactionEvent;
         if (BlacklistCheck.check(event.getUser().getId())) {
             event.reply("Sorry! You're not authorized to use this command!").queue();
         }
-        event.deferReply().queue();
 
-        runQuery("SELECT * FROM servers WHERE port = 25565");
-    }
-
-    private static void runQuery(String query) {
-        try {
-            PreparedStatement statement = conn.prepareStatement(query, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            resultSet = statement.executeQuery();
-
-            // Count rows
-            resultSet.last();
-            rowCount = resultSet.getRow();
-
-            if (rowCount == 0) {
-                event.getHook().sendMessage("No results!").queue();
-            }
-
-            // Set position to the first result
-            resultSet.beforeFirst();
-            scrollResults(0, true);
-        } catch (SQLException e) {
-            Main.logger.error("Error while executing query: {}", query, e);
+        if (event.getOptions().isEmpty()) {
+            event.reply("You must provide some search queries!").queue();
+            return;
         }
+
+        event.deferReply().queue();
+        buildQuery(event.getOptions());
     }
 
     public static void scrollResults(int direction, boolean firstRun) {
@@ -72,7 +57,7 @@ public class Search {
                 rowCount++;
             }
 
-            MessageEmbed embed = SearchCommandBuilder.parse(searchResults);
+            MessageEmbed embed = SearchEmbedBuilder.parse(searchResults);
             List<ItemComponent> buttons = new ArrayList<>();
 
             // Add buttons for each returned server
@@ -80,6 +65,7 @@ public class Search {
                 buttons.add(Button.success("SearchButton" + server.getKey(), String.valueOf(server.getKey())));
             }
 
+            // Send a new message if it's the first interaction, edit the original if it's a new search page
             if (firstRun) {
                 if (searchResults.keySet().size() < 5) {
                     event.getHook().sendMessageEmbeds(embed).addActionRow(buttons).queue();
@@ -87,11 +73,7 @@ public class Search {
                     event.getHook().sendMessageEmbeds(embed).addActionRow(buttons).addActionRow(Button.primary("PagePrevious", Emoji.fromFormatted("U+2B05")), Button.primary("PageNext", Emoji.fromFormatted("U+27A1"))).queue();
                 }
             } else {
-                if (searchResults.keySet().size() < 5) {
-                    event.getHook().editOriginalEmbeds(embed).queue();
-                } else {
-                    event.getHook().editOriginalEmbeds(embed).queue();
-                }
+                event.getHook().editOriginalEmbeds(embed).queue();
             }
 
         } catch (SQLException e) {
@@ -99,65 +81,93 @@ public class Search {
         }
     }
 
-    private static String buildQuery(List<OptionMapping> options) {
-        Map<String, String> optionsMap = new HashMap<>();
+    private static void buildQuery(List<OptionMapping> options) {
+        Map<String, OptionMapping> positonalParameters = new HashMap<>();
         StringBuilder query = new StringBuilder("SELECT * FROM servers WHERE ");
 
         for (OptionMapping option : options) {
             switch (option.getName()) {
                 case "description":
-                    optionsMap.put("description", "motd = ? AND ");
+                    positonalParameters.put("motd", option);
                     break;
                 case "playercount":
-                    optionsMap.put("playercount", "onlinePlayers = ? AND ");
+                    positonalParameters.put("onlineplayers", option);
                     break;
                 case "hostname":
-                    optionsMap.put("hostname", "reverseDns = ? AND ");
+                    positonalParameters.put("reversedns", option);
                     break;
-                case "seenbefore":
-                    optionsMap.put("seenbefore", "lastseen <= ? AND ");
-                    break;
-                case "seenafter":
-                    optionsMap.put("seenafter", "lastseen >= ? AND ");
+                case "seenbefore", "seenafter":
+                    positonalParameters.put("lastseen", option);
                     break;
                 case "forge":
-                    if (option.getAsBoolean()) optionsMap.put("forge", "fmlnetworkversion IS NOT NULL AND ");
-                    else optionsMap.put("forge", "fmlnetworkversion IS NULL AND ");
+                    if (option.getAsBoolean()) query.append("fmlnetworkversion IS NOT NULL AND ");
+                    else query.append("fmlnetworkversion IS NULL AND ");
                     break;
                 case "icon":
-                    if (option.getAsBoolean()) optionsMap.put("icon", "icon IS NOT NULL AND ");
-                    else optionsMap.put("icon", "icon IS NULL AND ");
+                    if (option.getAsBoolean()) query.append("icon IS NOT NULL AND ");
+                    else query.append("icon IS NULL AND ");
                     break;
                 case "full":
-                    if (option.getAsBoolean()) optionsMap.put("full", "onlinePlayers >= maxPlayers AND ");
-                    else optionsMap.put("full", "onlinePlayers =< maxPlayers AND ");
+                    query.append("onlinePlayers >= maxPlayers AND ");
                     break;
                 default:
-                    optionsMap.put(option.getName(), " = ? AND ");
+                    positonalParameters.put(option.getName(), option);
                     break;
             }
         }
 
-        for (String key : optionsMap.keySet()) {
-            query.append(key).append(" = ? AND ");
-        }
+        try {
+            // Add each positional parameter, handle commands that use substring searching here
+            for (String key : positonalParameters.keySet()) {
+                query.append(key).append(" = ? AND ");
+            }
 
-        return query.toString();
+            // Create statement and assign values
+            query.replace(query.length() - 4, query.length(), "");
+            Connection conn = DatabaseConnectionPool.getConnection();
+            PreparedStatement statement = conn.prepareStatement(query.toString(), ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+
+            int index = 1;
+            for (Map.Entry<String, OptionMapping> option : positonalParameters.entrySet()) {
+                // Check if the column name exists
+                switch (option.getValue().getType()) {
+                    case STRING -> statement.setString(index, option.getValue().getAsString());
+                    case INTEGER -> statement.setInt(index, option.getValue().getAsInt());
+                    case BOOLEAN -> statement.setBoolean(index, option.getValue().getAsBoolean());
+                    default -> System.out.println("Option has not been handled!");
+                }
+                index++;
+            }
+
+            // Execute query and count the rows
+            System.out.println(statement);
+            long startTime = System.currentTimeMillis();
+            resultSet = statement.executeQuery();
+            long endTime = System.currentTimeMillis();
+            Main.logger.debug("Search command took {}ms to execute!", (endTime - startTime));
+            resultSet.last();
+            rowCount = resultSet.getRow();
+
+            if (rowCount == 0) {
+                event.getHook().sendMessage("No results!").queue();
+            }
+
+            // Set position to the first result
+            resultSet.beforeFirst();
+            scrollResults(0, true);
+        } catch (SQLException e) {
+            Main.logger.error("Error while executing query!", e);
+        }
     }
 
     public static void buttonEvent(int row) {
-        System.out.println("Called!");
         try (Connection conn = DatabaseConnectionPool.getConnection()) {
             PreparedStatement statement = conn.prepareStatement("SELECT * FROM servers WHERE address = ? AND port = ?");
 
             statement.setString(1, searchResults.get(row).address());
             statement.setInt(2, searchResults.get(row).port());
 
-            System.out.println(searchResults.get(row).address());
-            System.out.println(searchResults.get(row).port());
-
             ResultSet resultSet = statement.executeQuery();
-
             MessageEmbed embed = ServerEmbedBuilder.build(resultSet);
 
             if (embed == null) {

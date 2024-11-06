@@ -31,8 +31,9 @@ public class Register {
         searchOptions.add(new OptionData(OptionType.STRING, "mods", "Search for forge servers running a specific ModID"));
         searchOptions.add(new OptionData(OptionType.BOOLEAN, "full", "Search for servers with a full player count"));
         searchOptions.add(new OptionData(OptionType.INTEGER, "protocol", "Search for servers using a specific protocol"));
-        searchOptions.add(new OptionData(OptionType.INTEGER, "forgeversion", "Search for servers running a specific FML Network version"));
         searchOptions.add(new OptionData(OptionType.BOOLEAN, "forge", "Search for servers running Forge"));
+        searchOptions.add(new OptionData(OptionType.INTEGER, "forgeversion", "Search for servers running a specific FML Network version"));
+        searchOptions.add(new OptionData(OptionType.STRING, "hostname", "Reverse DNS name of the server"));
         searchOptions.add(new OptionData(OptionType.BOOLEAN, "compact", "Show results in a compact or bold style (default: compact)"));
 
         List<OptionData> blacklistOptions = new ArrayList<>();
