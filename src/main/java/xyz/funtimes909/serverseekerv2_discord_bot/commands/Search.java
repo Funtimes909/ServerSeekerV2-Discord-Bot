@@ -82,75 +82,82 @@ public class Search {
     }
 
     private static void buildQuery(List<OptionMapping> options) {
-        Map<String, OptionMapping> positonalParameters = new HashMap<>();
-        StringBuilder query = new StringBuilder("SELECT * FROM servers WHERE ");
-
+        Map<String, OptionMapping> parameters = new HashMap<>();
+        StringBuilder baseQuery = new StringBuilder("SELECT * FROM servers WHERE ");
         for (OptionMapping option : options) {
             switch (option.getName()) {
                 case "description":
-                    positonalParameters.put("motd", option);
+                    parameters.put("motd", option);
                     break;
                 case "playercount":
-                    positonalParameters.put("onlineplayers", option);
+                    parameters.put("onlineplayers", option);
                     break;
                 case "hostname":
-                    positonalParameters.put("reversedns", option);
+                    parameters.put("reversedns", option);
                     break;
                 case "seenbefore", "seenafter":
-                    positonalParameters.put("lastseen", option);
-                    break;
-                case "forge":
-                    if (option.getAsBoolean()) query.append("fmlnetworkversion IS NOT NULL AND ");
-                    else query.append("fmlnetworkversion IS NULL AND ");
-                    break;
-                case "icon":
-                    if (option.getAsBoolean()) query.append("icon IS NOT NULL AND ");
-                    else query.append("icon IS NULL AND ");
+                    parameters.put("lastseen", option);
                     break;
                 case "full":
-                    query.append("onlinePlayers >= maxPlayers AND ");
+                    if (option.getAsBoolean()) {
+                        baseQuery.append("onlinePlayers >= maxPlayers AND ");
+                    } else {
+                        baseQuery.append("onlinePlayers < maxPlayers AND ");
+                    }
+                    break;
+                case "forge":
+                    if (option.getAsBoolean()) {
+                        baseQuery.append("fmlnetworkversion IS NOT NULL AND ");
+                    } else {
+                        baseQuery.append("fmlnetworkversion IS NULL AND ");
+                    }
+                    break;
+                case "icon":
+                    if (option.getAsBoolean()) {
+                        baseQuery.append("icon IS NOT NULL AND ");
+                    } else {
+                        baseQuery.append("icon IS NULL AND ");
+                    }
                     break;
                 default:
-                    positonalParameters.put(option.getName(), option);
+                    parameters.put(option.getName(), option);
                     break;
             }
         }
 
-        try {
-            // Add each positional parameter, handle commands that use substring searching here
-            for (String key : positonalParameters.keySet()) {
-                query.append(key).append(" = ? AND ");
+        parameters.forEach((key, value) -> {
+            switch (value.getName()) {
+                case "seenbefore" -> baseQuery.append("lastseen <= ? AND ");
+                case "seenafter" -> baseQuery.append("lastseen >= ? AND ");
+                case "reversedns" -> baseQuery.append("hostname = ? AND ");
+                default -> baseQuery.append(key).append(" = ? AND ");
             }
+        });
 
+        try {
             // Create statement and assign values
-            query.replace(query.length() - 4, query.length(), "");
+            baseQuery.replace(baseQuery.length() - 4, baseQuery.length(), "");
             Connection conn = DatabaseConnectionPool.getConnection();
-            PreparedStatement statement = conn.prepareStatement(query.toString(), ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = conn.prepareStatement(baseQuery.toString(), ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 
             int index = 1;
-            for (Map.Entry<String, OptionMapping> option : positonalParameters.entrySet()) {
-                // Check if the column name exists
+            for (Map.Entry<String, OptionMapping> option : parameters.entrySet()) {
                 switch (option.getValue().getType()) {
                     case STRING -> statement.setString(index, option.getValue().getAsString());
                     case INTEGER -> statement.setInt(index, option.getValue().getAsInt());
                     case BOOLEAN -> statement.setBoolean(index, option.getValue().getAsBoolean());
-                    default -> System.out.println("Option has not been handled!");
                 }
                 index++;
             }
 
             // Execute query and count the rows
-            System.out.println(statement);
             long startTime = System.currentTimeMillis();
             resultSet = statement.executeQuery();
             long endTime = System.currentTimeMillis();
             Main.logger.debug("Search command took {}ms to execute!", (endTime - startTime));
             resultSet.last();
             rowCount = resultSet.getRow();
-
-            if (rowCount == 0) {
-                event.getHook().sendMessage("No results!").queue();
-            }
+            if (rowCount == 0) event.getHook().sendMessage("No results!").queue();
 
             // Set position to the first result
             resultSet.beforeFirst();
