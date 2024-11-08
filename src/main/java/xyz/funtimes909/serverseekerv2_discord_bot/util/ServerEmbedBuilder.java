@@ -89,6 +89,7 @@ public class ServerEmbedBuilder {
         StringBuilder miscInfo = new StringBuilder();
         StringBuilder addressInfo = new StringBuilder();
         StringBuilder playerInfo = new StringBuilder();
+        StringBuilder title = new StringBuilder(address + ":" + port);
 
         // Get first seen time and the amount of times this server has been seen
         if (rescanned) {
@@ -102,6 +103,7 @@ public class ServerEmbedBuilder {
                 resultSet.next();
                 firstseen = resultSet.getLong("firstseen");
                 timesSeen = resultSet.getInt("timesseen");
+                title.append(" (Rescan)");
             } catch (SQLException e) {
                 Main.logger.error("Failed to execute rescan query!", e);
             }
@@ -164,12 +166,12 @@ public class ServerEmbedBuilder {
                 .setColor(new Color(0, 255, 0))
                 .setAuthor("ServerSeekerV2")
                 .setThumbnail("https://funtimes909.xyz/avatar-gif")
-                .setTitle(address + ":" + port)
+                .setTitle(title.toString())
                 .addField("** -- __Version__ -- **", version + " (" + protocol + ")", false)
                 .addField(descriptionField)
                 .addField(countryField)
-                .addField("** -- __First Seen__ -- **", "<t:" + firstseen + ">", false)
-                .addField("** -- __Last Seen__ -- **", "<t:" + System.currentTimeMillis() / 1000 + ">", false)
+                .addField("** -- __First Seen__ -- **", "<t:" + firstseen + ":R>", false)
+                .addField("** -- __Last Seen__ -- **", "<t:" + System.currentTimeMillis() / 1000 + ":R>", false)
                 .addField(miscField)
                 .addField(playerField)
                 .addField(addressField)

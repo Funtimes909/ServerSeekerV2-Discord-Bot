@@ -20,7 +20,7 @@ public class SearchEmbedBuilder {
         servers.values().forEach(server -> {
             StringBuilder address = new StringBuilder("``").append(server.address()).append("``");
             StringBuilder version = new StringBuilder("``").append(server.version()).append("``");
-            String timestamp = "<t:" + server.timestamp() + ">";
+            String timestamp = "<t:" + server.timestamp() + ":R>";
 
             if (server.country() != null) {
                 address.insert(0, ":flag_" + server.country().toLowerCase() + ": **:**");
