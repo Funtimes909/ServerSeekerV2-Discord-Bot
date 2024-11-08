@@ -7,6 +7,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
+import xyz.funtimes909.serverseekerv2_discord_bot.Records.Server;
+import xyz.funtimes909.serverseekerv2_discord_bot.Records.ServerEmbed;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.*;
 
 import java.sql.Connection;
@@ -19,12 +21,14 @@ import java.util.List;
 import java.util.Map;
 
 public class Search {
+    public static HashMap<Integer, ServerEmbed> searchResults = new HashMap<>();
+    public static String rescanAddress;
+    public static short rescanPort;
+    public static int rowCount;
+    public static int page = 1;
     private static final Connection conn = DatabaseConnectionPool.getConnection();
     private static SlashCommandInteractionEvent event;
     private static ResultSet resultSet;
-    public static HashMap<Integer, Server> searchResults = new HashMap<>();
-    public static int rowCount;
-    public static int page = 1;
 
     public static void search(SlashCommandInteractionEvent interactionEvent) {
         event = interactionEvent;
@@ -53,7 +57,7 @@ public class Search {
                 long timestamp = resultSet.getLong("lastseen");
                 short port = resultSet.getShort("port");
 
-                searchResults.put(rowCount + 1, new Server(address, country, version, timestamp, port));
+                searchResults.put(rowCount + 1, new ServerEmbed(address, country, version, timestamp, port));
                 rowCount++;
             }
 
@@ -61,7 +65,7 @@ public class Search {
             List<ItemComponent> buttons = new ArrayList<>();
 
             // Add buttons for each returned server
-            for (Map.Entry<Integer, Server> server : searchResults.entrySet()) {
+            for (Map.Entry<Integer, ServerEmbed> server : searchResults.entrySet()) {
                 buttons.add(Button.success("SearchButton" + server.getKey(), String.valueOf(server.getKey())));
             }
 
@@ -167,26 +171,45 @@ public class Search {
         }
     }
 
-    public static void buttonEvent(int row) {
+    public static void serverSelectedButtonEvent(int row) {
         try (Connection conn = DatabaseConnectionPool.getConnection()) {
             PreparedStatement statement = conn.prepareStatement("SELECT * FROM servers WHERE address = ? AND port = ?");
 
-            statement.setString(1, searchResults.get(row).address());
-            statement.setInt(2, searchResults.get(row).port());
+            String address = searchResults.get(row).address();
+            short port = searchResults.get(row).port();
+
+            statement.setString(1, address);
+            statement.setInt(2, port);
+            rescanAddress = address;
+            rescanPort = port;
 
             ResultSet resultSet = statement.executeQuery();
-            MessageEmbed embed = ServerEmbedBuilder.build(resultSet);
+            ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(resultSet, false);
+            MessageEmbed embed = embedBuilder.build();
 
             if (embed == null) {
                 event.getHook().sendMessage("Something went wrong executing that command!").queue();
                 return;
             }
 
-            event.getHook().sendMessageEmbeds(embed).queue();
+            event.getHook().sendMessageEmbeds(embed).addActionRow(Button.success("Rescan", "Rescan")).queue();
+
         } catch (SQLException e) {
             Main.logger.error("Error while executing query!", e);
         }
+    }
 
+    public static void rescan() {
+        Server server = Rescan.rescan();
+
+        if (server == null) {
+            event.getHook().sendMessage("Something went wrong running that command!").queue();
+            return;
+        }
+
+        ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server, true);
+        MessageEmbed embed = embedBuilder.build();
+
+        event.getHook().editOriginalEmbeds(embed).queue();
     }
 }
-

@@ -30,11 +30,11 @@ public class Random {
             long duration = endTime - startTime;
             Main.logger.debug("Query took {}ms", duration);
 
-            ResultSet result = random.executeQuery(query);
+            ResultSet results = random.executeQuery(query);
+            ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(results, false);
+            MessageEmbed embed = embedBuilder.build();
 
-            MessageEmbed embed = ServerEmbedBuilder.build(result);
             if (embed != null) event.getHook().sendMessageEmbeds(embed).queue();
-
         } catch (SQLException e) {
             e.printStackTrace();
         }

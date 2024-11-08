@@ -2,6 +2,7 @@ package xyz.funtimes909.serverseekerv2_discord_bot.util;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import xyz.funtimes909.serverseekerv2_discord_bot.Records.ServerEmbed;
 import xyz.funtimes909.serverseekerv2_discord_bot.commands.Search;
 
 import java.awt.*;
@@ -12,7 +13,7 @@ import java.util.List;
 public class SearchEmbedBuilder {
     public static boolean compact = true;
 
-    public static MessageEmbed parse(HashMap<Integer, Server> servers) {
+    public static MessageEmbed parse(HashMap<Integer, ServerEmbed> servers) {
         List<MessageEmbed.Field> fields = new ArrayList<>();
 
         final int[] index = {1};
@@ -47,7 +48,6 @@ public class SearchEmbedBuilder {
                 }
             }
 
-
             MessageEmbed.Field addressField = new MessageEmbed.Field(index[0] + ". " + address + " **-** ", "_ _", true);
             MessageEmbed.Field versionField = new MessageEmbed.Field(version + " **-** ", "_ _", true);
             MessageEmbed.Field timestampField = new MessageEmbed.Field(timestamp, "_ _", true);
@@ -62,6 +62,9 @@ public class SearchEmbedBuilder {
         EmbedBuilder embed = new EmbedBuilder()
                 .setTitle("Pages: (" + Search.page + "/" + Search.rowCount / 5 + ")")
                 .setAuthor("ServerSeekerV2", "https://discord.gg/WEErxAP8kz", "https://funtimes909.xyz/I-wake-up-mad.jpg")
+                .addField("**Address**", "_ _", true)
+                .addField("**Version**", "_ _", true)
+                .addField("**Last Seen**", "_ _", true)
                 .setFooter("Funtimes909", "https://funtimes909.xyz/avatar-gif")
                 .setColor(new Color(5, 106, 5));
 
