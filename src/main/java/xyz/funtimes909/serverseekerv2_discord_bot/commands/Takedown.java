@@ -12,9 +12,9 @@ public class Takedown {
         try {
             InetAddress address = Inet4Address.getByName(event.getOption("address").getAsString());
             Main.logger.info("Adding {} to the exclude list! Requested by {}", address, event.getUser().getName());
-            event.reply("Added " + address + " to the exclude list!").queue();
+            event.reply("Added " + address + " to the exclude list!").setEphemeral(true).queue();
         } catch (UnknownHostException e) {
-            event.reply("This isn't a valid address!").queue();
+            event.reply("This isn't a valid address!").setEphemeral(true).queue();
         }
     }
 }
