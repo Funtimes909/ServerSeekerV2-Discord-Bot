@@ -55,7 +55,9 @@ public class ServerEmbedBuilder {
             cracked = results.getBoolean("cracked");
             preventsReports = results.getBoolean("preventsReports");
             fmlNetworkVersion = results.getInt("fmlNetworkVersion");
-            players.add(new Player(results.getString("playername"), results.getString("playeruuid")));
+            if (results.getString("playername") != null && results.getString("playeruuid") != null) {
+                players.add(new Player(results.getString("playername"), results.getString("playeruuid")));
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -110,11 +112,35 @@ public class ServerEmbedBuilder {
         }
 
         // Misc information
-        if (whitelist != null) miscInfo.append("Whitelist: **").append(whitelist).append("**\n");
-        if (cracked != null) miscInfo.append("Cracked: **").append(cracked).append("**\n");
-        if (preventsReports != null) miscInfo.append("Prevents Chat Reports: **").append(preventsReports).append("**\n");
-        if (enforceSecure!= null) miscInfo.append("Enforces Secure Chat: **").append(enforceSecure).append("**\n");
-        if (fmlNetworkVersion != 0) miscInfo.append("Forge: **True** \n");
+        if (whitelist != null) {
+            miscInfo.append("Whitelist: **").append(whitelist).append("**\n");
+        } else {
+            miscInfo.append("Whitelist: **").append("N/A").append("**\n");
+        }
+
+        if (cracked != null) {
+            miscInfo.append("Cracked: **").append(cracked).append("**\n");
+        } else {
+            miscInfo.append("Cracked: **").append("N/A").append("**\n");
+        }
+
+        if (preventsReports != null) {
+            miscInfo.append("Prevents Chat Reports: **").append(preventsReports).append("**\n");
+        } else {
+            miscInfo.append("Prevents Chat Reports: **").append("N/A").append("**\n");
+        }
+
+        if (enforceSecure!= null) {
+            miscInfo.append("Enforces Secure Chat: **").append(enforceSecure).append("**\n");
+        } else {
+            miscInfo.append("Enforces Secure Chat: **").append("N/A").append("**\n");
+        }
+
+        if (fmlNetworkVersion != 0) {
+            miscInfo.append("Forge: **True** \n");
+        } else {
+            miscInfo.append("Forge: **False** \n");
+        }
 
         // Address information
         if (asn != null) {
@@ -136,7 +162,7 @@ public class ServerEmbedBuilder {
         }
 
         if (players.isEmpty()) {
-            playerInfo.append("```No players found!```");
+            playerInfo.append("No players found!");
         } else {
             for (Player player : players) {
                 playerInfo.append("\n").append(player.name()).append("\n").append(player.uuid()).append("\n");
