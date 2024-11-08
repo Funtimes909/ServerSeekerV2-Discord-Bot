@@ -3,11 +3,16 @@ package xyz.funtimes909.serverseekerv2_discord_bot.util;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
+import xyz.funtimes909.serverseekerv2_discord_bot.Records.Player;
 import xyz.funtimes909.serverseekerv2_discord_bot.Records.Server;
 
 import java.awt.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ServerEmbedBuilder {
     private static String address;
@@ -27,6 +32,8 @@ public class ServerEmbedBuilder {
     private static Boolean cracked;
     private static Boolean preventsReports;
     private static int fmlNetworkVersion;
+    private static List<Player> players = new ArrayList<>();
+    private static boolean rescanned;
 
     public ServerEmbedBuilder(ResultSet results, boolean rescan) {
         try (results) {
@@ -48,9 +55,11 @@ public class ServerEmbedBuilder {
             cracked = results.getBoolean("cracked");
             preventsReports = results.getBoolean("preventsReports");
             fmlNetworkVersion = results.getInt("fmlNetworkVersion");
+            players.add(new Player(results.getString("playername"), results.getString("playeruuid")));
         } catch (SQLException e) {
-            Main.logger.warn(e.getMessage());
+            e.printStackTrace();
         }
+        rescanned = rescan;
     }
 
     public ServerEmbedBuilder(Server server, boolean rescan) {
@@ -69,6 +78,8 @@ public class ServerEmbedBuilder {
         enforceSecure = server.getEnforceSecure();
         cracked = server.getCracked();
         preventsReports = server.getPreventsReports();
+        players = server.getPlayers();
+        rescanned = rescan;
 
         if (server.getFmlNetworkVersion() == null) fmlNetworkVersion = 0;
         else fmlNetworkVersion = server.getFmlNetworkVersion();
@@ -77,6 +88,24 @@ public class ServerEmbedBuilder {
     public MessageEmbed build() {
         StringBuilder miscInfo = new StringBuilder();
         StringBuilder addressInfo = new StringBuilder();
+        StringBuilder playerInfo = new StringBuilder();
+
+        // Get first seen time and the amount of times this server has been seen
+        if (rescanned) {
+            try (Connection conn = DatabaseConnectionPool.getConnection()) {
+                // Join players table here for online players
+                PreparedStatement statement = conn.prepareStatement("SELECT firstseen, timesseen FROM servers WHERE address = ? AND port = ?");
+                statement.setString(1, address);
+                statement.setShort(2, port);
+
+                ResultSet resultSet = statement.executeQuery();
+                resultSet.next();
+                firstseen = resultSet.getLong("firstseen");
+                timesSeen = resultSet.getInt("timesseen");
+            } catch (SQLException e) {
+                Main.logger.error("Failed to execute rescan query!", e);
+            }
+        }
 
         // Misc information
         if (whitelist != null) miscInfo.append("Whitelist: **").append(whitelist).append("**\n");
@@ -104,14 +133,30 @@ public class ServerEmbedBuilder {
             addressInfo.append("Organization: **N/A** \n");
         }
 
-        MessageEmbed.Field miscField = new MessageEmbed.Field("** -- __Miscellaneous__ -- **", miscInfo.toString(), false);
-        MessageEmbed.Field addressField = new MessageEmbed.Field("** -- __Address Information__ -- **", addressInfo.toString(), false);
+        if (players.isEmpty()) {
+            playerInfo.append("```No players found!```");
+        } else {
+            for (Player player : players) {
+                playerInfo.append("\n").append(player.name()).append("\n").append(player.uuid()).append("\n");
+            }
+        }
+
         MessageEmbed.Field countryField;
+        MessageEmbed.Field descriptionField;
+        MessageEmbed.Field miscField = new MessageEmbed.Field("** -- __Miscellaneous__ -- **", miscInfo.toString(), false);
+        MessageEmbed.Field playerField = new MessageEmbed.Field("** -- __Players__ -- **",  "```\n" + playerInfo + "```", false);
+        MessageEmbed.Field addressField = new MessageEmbed.Field("** -- __Address Information__ -- **", addressInfo.toString(), false);
 
         if (country != null) {
             countryField = new MessageEmbed.Field("** -- __Country__ -- **", ":flag_" + country.toLowerCase() + ": " + country, false);
         } else {
             countryField = new MessageEmbed.Field("** -- __Country__ -- **", ":x: No country information available", false);
+        }
+
+        if (description != null && !description.isBlank()) {
+            descriptionField = new MessageEmbed.Field("** -- __Description__ -- **", "```" + description + "```", false);
+        } else {
+            descriptionField = new MessageEmbed.Field("** -- __Description__ -- **", "```No description found!```", false);
         }
 
         // Build server information embed
@@ -121,11 +166,12 @@ public class ServerEmbedBuilder {
                 .setThumbnail("https://funtimes909.xyz/avatar-gif")
                 .setTitle(address + ":" + port)
                 .addField("** -- __Version__ -- **", version + " (" + protocol + ")", false)
-                .addField("** -- __Description__ -- **", "```" + description + "```", false)
+                .addField(descriptionField)
                 .addField(countryField)
                 .addField("** -- __First Seen__ -- **", "<t:" + firstseen + ">", false)
                 .addField("** -- __Last Seen__ -- **", "<t:" + System.currentTimeMillis() / 1000 + ">", false)
                 .addField(miscField)
+                .addField(playerField)
                 .addField(addressField)
                 .build();
     }

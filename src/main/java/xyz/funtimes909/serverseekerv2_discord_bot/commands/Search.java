@@ -155,9 +155,9 @@ public class Search {
             }
 
             // Execute query and count the rows
-            long startTime = System.currentTimeMillis();
+            long startTime = System.currentTimeMillis() / 1000L;
             resultSet = statement.executeQuery();
-            long endTime = System.currentTimeMillis();
+            long endTime = System.currentTimeMillis() / 1000L;
             Main.logger.debug("Search command took {}ms to execute!", (endTime - startTime));
             resultSet.last();
             rowCount = resultSet.getRow();
@@ -173,7 +173,7 @@ public class Search {
 
     public static void serverSelectedButtonEvent(int row) {
         try (Connection conn = DatabaseConnectionPool.getConnection()) {
-            PreparedStatement statement = conn.prepareStatement("SELECT * FROM servers WHERE address = ? AND port = ?");
+            PreparedStatement statement = conn.prepareStatement("SELECT * FROM servers LEFT JOIN playerhistory ON servers.address = playerhistory.address AND servers.port = playerhistory.port WHERE servers.address = ? AND servers.port = ?");
 
             String address = searchResults.get(row).address();
             short port = searchResults.get(row).port();
@@ -210,6 +210,6 @@ public class Search {
         ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server, true);
         MessageEmbed embed = embedBuilder.build();
 
-        event.getHook().editOriginalEmbeds(embed).queue();
+        event.getHook().sendMessageEmbeds(embed).queue();
     }
 }
