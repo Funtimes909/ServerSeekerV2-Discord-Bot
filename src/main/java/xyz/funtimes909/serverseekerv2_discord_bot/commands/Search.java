@@ -52,13 +52,7 @@ public class Search {
             searchResults.clear();
             resultSet.relative(direction);
             while (rowCount < 5 && resultSet.next()) {
-                String address = resultSet.getString("address");
-                String country = resultSet.getString("country");
-                String version = resultSet.getString("version");
-                long timestamp = resultSet.getLong("lastseen");
-                short port = resultSet.getShort("port");
-
-                searchResults.put(rowCount + 1, new ServerEmbed(address, country, version, timestamp, port));
+                searchResults.put(rowCount + 1, new ServerEmbed(resultSet.getString("address"), resultSet.getString("country"), resultSet.getString("version"), resultSet.getLong("lastseen"), resultSet.getShort("port")));
                 rowCount++;
             }
 
@@ -143,6 +137,7 @@ public class Search {
         try {
             // Create statement and assign values
             query.replace(query.length() - 4, query.length(), "");
+            query.append(" ORDER BY lastseen DESC");
             Connection conn = DatabaseConnectionPool.getConnection();
             PreparedStatement statement = conn.prepareStatement(query.toString(), ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 
@@ -212,6 +207,6 @@ public class Search {
         ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server, true);
         MessageEmbed embed = embedBuilder.build();
 
-        event.getHook().sendMessageEmbeds(embed).queue();
+        event.getHook().sendMessageEmbeds(embed).addActionRow(Button.success("Rescanned", "Rescan")).queue();
     }
 }

@@ -2,6 +2,7 @@ package xyz.funtimes909.serverseekerv2_discord_bot.util;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 
 import java.awt.*;
 import java.sql.ResultSet;
@@ -11,7 +12,7 @@ import java.util.List;
 
 public class PlayerhistoryEmbedBuilder {
     private record PlayerEmbed(String address, String playername, String uuid, long lastseen) {}
-    private static List<PlayerEmbed> players = new ArrayList<>();
+    private static final List<PlayerEmbed> players = new ArrayList<>();
 
     public static MessageEmbed build(ResultSet results) {
         try (results) {
@@ -30,7 +31,7 @@ public class PlayerhistoryEmbedBuilder {
 
             return embed.build();
         } catch (SQLException e) {
-            e.printStackTrace();
+            Main.logger.warn("Failed to execute playerhistory command!", e);
         }
         return null;
     }

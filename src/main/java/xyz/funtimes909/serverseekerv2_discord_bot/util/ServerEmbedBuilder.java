@@ -104,6 +104,7 @@ public class ServerEmbedBuilder {
                 resultSet.next();
                 firstseen = resultSet.getLong("firstseen");
                 timesSeen = resultSet.getInt("timesseen");
+                lastseen = System.currentTimeMillis() / 1000;
                 title.append(" (Rescanned)");
             } catch (SQLException e) {
                 Main.logger.error("Failed to execute rescan query!", e);
@@ -196,7 +197,7 @@ public class ServerEmbedBuilder {
                 .addField(descriptionField)
                 .addField(countryField)
                 .addField("** -- __First Seen__ -- **", "<t:" + firstseen + ":R>", false)
-                .addField("** -- __Last Seen__ -- **", "<t:" + System.currentTimeMillis() / 1000 + ":R>", false)
+                .addField("** -- __Last Seen__ -- **", "<t:" + lastseen + ":R>", false)
                 .addField(miscField)
                 .addField(playerField)
                 .addField(addressField)
