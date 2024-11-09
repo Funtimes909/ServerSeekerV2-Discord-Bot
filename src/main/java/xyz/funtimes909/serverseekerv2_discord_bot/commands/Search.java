@@ -85,7 +85,7 @@ public class Search {
 
     private static void buildQuery(List<OptionMapping> options) {
         Map<String, OptionMapping> parameters = new HashMap<>();
-        StringBuilder baseQuery = new StringBuilder("SELECT * FROM servers WHERE ");
+        StringBuilder query = new StringBuilder("SELECT address, country, version, lastseen, port FROM servers WHERE ");
         for (OptionMapping option : options) {
             switch (option.getName()) {
                 case "description":
@@ -102,23 +102,23 @@ public class Search {
                     break;
                 case "full":
                     if (option.getAsBoolean()) {
-                        baseQuery.append("onlinePlayers >= maxPlayers AND ");
+                        query.append("onlinePlayers >= maxPlayers AND ");
                     } else {
-                        baseQuery.append("onlinePlayers < maxPlayers AND ");
+                        query.append("onlinePlayers < maxPlayers AND ");
                     }
                     break;
                 case "forge":
                     if (option.getAsBoolean()) {
-                        baseQuery.append("fmlnetworkversion IS NOT NULL AND ");
+                        query.append("fmlnetworkversion IS NOT NULL AND ");
                     } else {
-                        baseQuery.append("fmlnetworkversion IS NULL AND ");
+                        query.append("fmlnetworkversion IS NULL AND ");
                     }
                     break;
                 case "icon":
                     if (option.getAsBoolean()) {
-                        baseQuery.append("icon IS NOT NULL AND ");
+                        query.append("icon IS NOT NULL AND ");
                     } else {
-                        baseQuery.append("icon IS NULL AND ");
+                        query.append("icon IS NULL AND ");
                     }
                     break;
                 default:
@@ -129,18 +129,18 @@ public class Search {
 
         parameters.forEach((key, value) -> {
             switch (value.getName()) {
-                case "seenbefore" -> baseQuery.append("lastseen <= ? AND ");
-                case "seenafter" -> baseQuery.append("lastseen >= ? AND ");
-                case "reversedns" -> baseQuery.append("hostname = ? AND ");
-                default -> baseQuery.append(key).append(" = ? AND ");
+                case "seenbefore" -> query.append("lastseen <= ? AND ");
+                case "seenafter" -> query.append("lastseen >= ? AND ");
+                case "reversedns" -> query.append("hostname = ? AND ");
+                default -> query.append(key).append(" = ? AND ");
             }
         });
 
         try {
             // Create statement and assign values
-            baseQuery.replace(baseQuery.length() - 4, baseQuery.length(), "");
+            query.replace(query.length() - 4, query.length(), "");
             Connection conn = DatabaseConnectionPool.getConnection();
-            PreparedStatement statement = conn.prepareStatement(baseQuery.toString(), ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            PreparedStatement statement = conn.prepareStatement(query.toString(), ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 
             int index = 1;
             for (OptionMapping option : parameters.values()) {
