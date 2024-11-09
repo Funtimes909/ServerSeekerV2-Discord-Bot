@@ -25,7 +25,7 @@ public class SearchEmbedBuilder {
             if (server.country() != null) {
                 address.insert(0, ":flag_" + server.country().toLowerCase() + ": **:**");
             } else {
-                address.insert(0, ":x: **:**");
+                address.insert(0, ":x:**:**");
             }
 
             // Make everything the same length
@@ -43,7 +43,7 @@ public class SearchEmbedBuilder {
                     address.insert(address.length() - 2, " ");
                 }
             } else {
-                while (address.length() < 28) {
+                while (address.length() < 27) {
                     address.insert(address.length() - 2, " ");
                 }
             }
@@ -61,7 +61,7 @@ public class SearchEmbedBuilder {
 
         EmbedBuilder embed = new EmbedBuilder()
                 .setTitle("Pages: (" + Search.page + "/" + Search.rowCount / 5 + ")")
-                .setAuthor("ServerSeekerV2", "https://discord.gg/WEErxAP8kz", "https://funtimes909.xyz/I-wake-up-mad.jpg")
+                .setAuthor("ServerSeekerV2", "https://discord.gg/WEErxAP8kz", "https://funtimes909.xyz/assets/images/serverseekerv2-icon-cropped.png")
                 .addField("**Address**", "_ _", true)
                 .addField("**Version**", "_ _", true)
                 .addField("**Last Seen**", "_ _", true)

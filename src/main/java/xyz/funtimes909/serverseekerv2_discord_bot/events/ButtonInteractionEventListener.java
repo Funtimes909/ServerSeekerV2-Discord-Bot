@@ -3,7 +3,6 @@ package xyz.funtimes909.serverseekerv2_discord_bot.events;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import xyz.funtimes909.serverseekerv2_discord_bot.commands.Search;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.Rescan;
 
 public class ButtonInteractionEventListener extends ListenerAdapter {
     @Override

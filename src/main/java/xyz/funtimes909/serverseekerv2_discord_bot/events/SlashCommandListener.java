@@ -36,6 +36,9 @@ public class SlashCommandListener extends ListenerAdapter {
                 case "blacklist":
                     executor.submit(() -> {Blacklist.blacklist(event);});
                     break;
+                case "playerhistory":
+                    executor.submit(() -> {Playerhistory.playerhistory(event);});
+                    break;
             }
         }
     }

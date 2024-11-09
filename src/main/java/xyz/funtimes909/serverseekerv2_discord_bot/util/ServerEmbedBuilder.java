@@ -56,7 +56,7 @@ public class ServerEmbedBuilder {
             preventsReports = results.getBoolean("preventsReports");
             fmlNetworkVersion = results.getInt("fmlNetworkVersion");
             if (results.getString("playername") != null && results.getString("playeruuid") != null) {
-                players.add(new Player(results.getString("playername"), results.getString("playeruuid")));
+                players.add(new Player(results.getString("playername"), results.getString("playeruuid"), results.getLong("lastseen")));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -190,7 +190,7 @@ public class ServerEmbedBuilder {
         // Build server information embed
         return new EmbedBuilder()
                 .setColor(new Color(0, 255, 0))
-                .setAuthor("ServerSeekerV2")
+                .setAuthor("ServerSeekerV2", "https://funtimes909.xyz/assets/images/serverseekerv2-icon-cropped.png")
                 .setThumbnail("https://funtimes909.xyz/avatar-gif")
                 .setTitle(title.toString())
                 .addField("** -- __Version__ -- **", version + " (" + protocol + ")", false)

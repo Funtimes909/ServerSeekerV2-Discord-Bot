@@ -32,9 +32,7 @@ public class Search {
 
     public static void search(SlashCommandInteractionEvent interactionEvent) {
         event = interactionEvent;
-        if (BlacklistCheck.check(event.getUser().getId())) {
-            event.reply("Sorry! You're not authorized to use this command!").queue();
-        }
+        if (BlacklistCheck.check(event.getUser().getId())) event.reply("Sorry! You're not authorized to use this command!").queue();
 
         if (event.getOptions().isEmpty()) {
             event.reply("You must provide some search queries!").queue();
@@ -193,7 +191,6 @@ public class Search {
             }
 
             event.getHook().sendMessageEmbeds(embed).addActionRow(Button.success("Rescan", "Rescan")).queue();
-
         } catch (SQLException e) {
             Main.logger.error("Error while executing query!", e);
         }

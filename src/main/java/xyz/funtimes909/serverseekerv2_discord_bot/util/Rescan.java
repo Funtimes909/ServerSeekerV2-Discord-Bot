@@ -3,7 +3,6 @@ package xyz.funtimes909.serverseekerv2_discord_bot.util;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 import xyz.funtimes909.serverseekerv2_discord_bot.Records.Player;
 import xyz.funtimes909.serverseekerv2_discord_bot.Records.Server;
@@ -95,7 +94,7 @@ public class Rescan {
                             String uuid = playerJson.getAsJsonObject().get("id").getAsString();
                             // Offline mode servers use v3 UUID's for players, while regular servers use v4, this is a really easy way to check if a server is offline mode
                             if (UUID.fromString(uuid).version() == 3) cracked = true;
-                            Player player = new Player(name, uuid);
+                            Player player = new Player(name, uuid, System.currentTimeMillis() / 1000 );
                             playerList.add(player);
                         }
                     }
