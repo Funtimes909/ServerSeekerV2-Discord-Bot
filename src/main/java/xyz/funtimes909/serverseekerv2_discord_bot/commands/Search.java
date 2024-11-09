@@ -32,7 +32,10 @@ public class Search {
 
     public static void search(SlashCommandInteractionEvent interactionEvent) {
         event = interactionEvent;
-        if (BlacklistCheck.check(event.getUser().getId())) event.reply("Sorry! You're not authorized to use this command!").queue();
+        if (BlacklistCheck.check(event.getUser().getId())) {
+            event.reply("Sorry! You're not authorized to use this command!").queue();
+            return;
+        }
 
         if (event.getOptions().isEmpty()) {
             event.reply("You must provide some search queries!").queue();
@@ -153,8 +156,6 @@ public class Search {
                 index++;
             }
 
-            System.out.println(statement);
-
             // Execute query and count the rows
             long startTime = System.currentTimeMillis() / 1000L;
             resultSet = statement.executeQuery();
@@ -193,14 +194,15 @@ public class Search {
                 return;
             }
 
-            event.getHook().sendMessageEmbeds(embed).addActionRow(Button.success("Rescan", "Rescan")).queue();
+            event.getHook().sendMessageEmbeds(embed).addActionRow(Button.success("Rescanned", "Rescan")).queue();
         } catch (SQLException e) {
             Main.logger.error("Error while executing query!", e);
         }
     }
 
     public static void rescan() {
-        Server server = Rescan.rescan();
+        PingUtils pingUtils = new PingUtils(rescanAddress, rescanPort);
+        Server server = pingUtils.parse();
 
         if (server == null) {
             event.getHook().sendMessage("Something went wrong running that command!").queue();

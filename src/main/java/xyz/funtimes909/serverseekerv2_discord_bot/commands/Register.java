@@ -48,11 +48,11 @@ public class Register {
                         .addOptions(blacklistOptions),
 
                 Commands.slash("notify", "Get notified through a webhook of player activity")
-                        .addOption(OptionType.STRING, "player", "The player you want to recieve activity notifications for")
-                        .addOption(OptionType.STRING, "url", "Webhook URL you want notifications sent to"),
+                        .addOption(OptionType.STRING, "player", "The player you want to recieve activity notifications for", true)
+                        .addOption(OptionType.STRING, "url", "Webhook URL you want notifications sent to", true),
 
                 Commands.slash("playerhistory", "Search for playerhistory of a specific player")
-                                .addOption(OptionType.STRING, "player", "The player you want to search for"),
+                                .addOption(OptionType.STRING, "player", "The player you want to search for", true),
 
                 Commands.slash("takedown", "Request for your server to be excluded from all future scans")
                         .addOption(OptionType.STRING, "address", "IP address of the server you want to takedown", true)
@@ -62,7 +62,7 @@ public class Register {
                 Commands.slash("stats", "Shows stats about the bot"),
                 Commands.slash("ping", "Ping a specific server.")
                         .addOption(OptionType.STRING, "address", "IP address of the server", true)
-                        .addOption(OptionType.INTEGER, "port", "Port of the server", true)
+                        .addOption(OptionType.INTEGER, "port", "Port of the server")
         ).queue();
     }
 }

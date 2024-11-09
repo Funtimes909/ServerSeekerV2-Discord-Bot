@@ -17,7 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class Rescan {
+public class PingUtils {
+    private final String address;
+    private final short port;
     private static final byte[] REQUEST = new byte[] {
             6, // Size: Amount of proceeding bytes [varint]
             0, // ID: Has to be 0
@@ -29,9 +31,14 @@ public class Rescan {
             0, // ID
     };
 
-    public static Server rescan() {
+    public PingUtils(String address, short port) {
+        this.address = address;
+        this.port = port;
+    }
+
+    public Server parse() {
         try (Socket conn = new Socket()) {
-            conn.connect(new InetSocketAddress(Search.rescanAddress, Search.rescanPort));
+            conn.connect(new InetSocketAddress(address, port));
             String json = ping(conn);
             if (json == null) return null;
 
@@ -92,6 +99,7 @@ public class Rescan {
                         if (playerJson.getAsJsonObject().has("name") && playerJson.getAsJsonObject().has("id")) {
                             String name = playerJson.getAsJsonObject().get("name").getAsString();
                             String uuid = playerJson.getAsJsonObject().get("id").getAsString();
+
                             // Offline mode servers use v3 UUID's for players, while regular servers use v4, this is a really easy way to check if a server is offline mode
                             if (UUID.fromString(uuid).version() == 3) cracked = true;
                             Player player = new Player(name, uuid, System.currentTimeMillis() / 1000 );
@@ -103,8 +111,8 @@ public class Rescan {
 
             // Build server
             return new Server.Builder()
-                    .setAddress(Search.rescanAddress)
-                    .setPort(Search.rescanPort)
+                    .setAddress(address)
+                    .setPort(port)
                     .setTimestamp(System.currentTimeMillis() / 1000)
                     .setVersion(version)
                     .setProtocol(protocol)
@@ -118,13 +126,11 @@ public class Rescan {
                     .setOnlinePlayers(onlinePlayers)
                     .setPlayers(playerList)
                     .build();
-        } catch (IOException e) {
-            Main.logger.error("Failed to rescan", e);
-        }
+        } catch (IOException ignored) {}
         return null;
     }
 
-    private static String ping(Socket connection) {
+    public String ping(Socket connection) {
         try (OutputStream out = connection.getOutputStream()) {
             out.write(REQUEST);
             InputStream in = connection.getInputStream();

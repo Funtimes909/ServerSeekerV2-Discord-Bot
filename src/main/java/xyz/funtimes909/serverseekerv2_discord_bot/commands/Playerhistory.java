@@ -14,7 +14,10 @@ import java.sql.SQLException;
 
 public class Playerhistory {
     public static void playerhistory(SlashCommandInteractionEvent event) {
-        if (BlacklistCheck.check(event.getUser().getId())) event.reply("Sorry! You're not authorized to use this command!").queue();
+        if (BlacklistCheck.check(event.getUser().getId())) {
+            event.reply("Sorry! You're not authorized to use this command!").queue();
+            return;
+        }
 
         if (event.getOptions().isEmpty()) {
             event.reply("You must provide a user to search for!").queue();

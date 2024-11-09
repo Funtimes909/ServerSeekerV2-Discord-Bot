@@ -96,7 +96,6 @@ public class ServerEmbedBuilder {
         // Get first seen time and the amount of times this server has been seen
         if (rescanned) {
             try (Connection conn = DatabaseConnectionPool.getConnection()) {
-                // Join players table here for online players
                 PreparedStatement statement = conn.prepareStatement("SELECT firstseen, timesseen FROM servers WHERE address = ? AND port = ?");
                 statement.setString(1, address);
                 statement.setShort(2, port);
@@ -105,7 +104,7 @@ public class ServerEmbedBuilder {
                 resultSet.next();
                 firstseen = resultSet.getLong("firstseen");
                 timesSeen = resultSet.getInt("timesseen");
-                title.append(" (Rescan)");
+                title.append(" (Rescanned)");
             } catch (SQLException e) {
                 Main.logger.error("Failed to execute rescan query!", e);
             }

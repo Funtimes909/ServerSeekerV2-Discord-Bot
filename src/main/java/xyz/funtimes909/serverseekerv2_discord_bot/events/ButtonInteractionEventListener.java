@@ -31,7 +31,7 @@ public class ButtonInteractionEventListener extends ListenerAdapter {
                 if (Search.page != Search.rowCount / 5) Search.page += 1;
                 Search.scrollResults(0, false);
                 break;
-            case "Rescan":
+            case "Rescanned":
                 Search.rescan();
                 break;
         }
