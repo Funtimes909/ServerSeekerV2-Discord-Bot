@@ -143,11 +143,11 @@ public class Search {
             PreparedStatement statement = conn.prepareStatement(baseQuery.toString(), ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 
             int index = 1;
-            for (Map.Entry<String, OptionMapping> option : parameters.entrySet()) {
-                switch (option.getValue().getType()) {
-                    case STRING -> statement.setString(index, option.getValue().getAsString());
-                    case INTEGER -> statement.setInt(index, option.getValue().getAsInt());
-                    case BOOLEAN -> statement.setBoolean(index, option.getValue().getAsBoolean());
+            for (OptionMapping option : parameters.values()) {
+                switch (option.getType()) {
+                    case STRING -> statement.setString(index, option.getAsString());
+                    case INTEGER -> statement.setInt(index, option.getAsInt());
+                    case BOOLEAN -> statement.setBoolean(index, option.getAsBoolean());
                 }
                 index++;
             }
