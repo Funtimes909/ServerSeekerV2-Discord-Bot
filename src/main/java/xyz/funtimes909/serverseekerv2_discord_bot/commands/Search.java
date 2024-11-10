@@ -129,6 +129,7 @@ public class Search {
                 case "seenbefore" -> query.append("lastseen <= ? AND ");
                 case "seenafter" -> query.append("lastseen >= ? AND ");
                 case "reversedns" -> query.append("hostname = ? AND ");
+                case "forgeversion" -> query.append("fmlnetworkversion = ? AND ");
                 case "description" -> query.append("motd ILIKE '%' || ? || '%' AND ");
                 default -> query.append(key).append(" = ? AND ");
             }
