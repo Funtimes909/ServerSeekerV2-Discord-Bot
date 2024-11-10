@@ -83,12 +83,12 @@ public class Search {
 
     private static void buildQuery(List<OptionMapping> options) {
         Map<String, OptionMapping> parameters = new HashMap<>();
-        StringBuilder query = new StringBuilder("SELECT address, country, version, lastseen, port FROM servers WHERE ");
+        StringBuilder query = new StringBuilder("SELECT servers.address, servers.country, servers.version, servers.lastseen, servers.port FROM servers ");
 
-        if (event.getOption("player") != null) {
-            Connection conn = DatabaseConnectionPool.getConnection();
-            query.replace(0, query.length(), "SELECT servers.address, servers.port, servers.country, servers.version, servers.lastseen, playerhistory.playername FROM playerhistory LEFT JOIN servers ON playerhistory.address = servers.address AND playerhistory.port = servers.port WHERE ");
-        }
+        // Player and ModId searching
+        if (event.getOption("player") != null) query.append("JOIN playerhistory ON servers.address = playerhistory.address AND servers.port = playerhistory.port");
+        if (event.getOption("mods") != null) query.append("JOIN mods ON servers.address = mods.address and servers.port = mods.port");
+        query.append(" WHERE ");
 
         for (OptionMapping option : options) {
             switch (option.getName()) {
@@ -138,7 +138,8 @@ public class Search {
                 case "reversedns" -> query.append("hostname = ? AND ");
                 case "forgeversion" -> query.append("fmlnetworkversion = ? AND ");
                 case "description" -> query.append("motd ILIKE '%' || ? || '%' AND ");
-                case "player" -> query.append("playerhistory.playername ILIKE '%' || ? || '%' AND ");
+                case "player" -> query.append("playername ILIKE '%' || ? || '%' AND ");
+                case "mods" -> query.append("modid = ? AND ");
                 default -> query.append(key).append(" = ? AND ");
             }
         });
@@ -160,8 +161,6 @@ public class Search {
                 }
                 index++;
             }
-
-            System.out.println(statement);
 
             // Execute query and count the rows
             long startTime = System.currentTimeMillis() / 1000L;
