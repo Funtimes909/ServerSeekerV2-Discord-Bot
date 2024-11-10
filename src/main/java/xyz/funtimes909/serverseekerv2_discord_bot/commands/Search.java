@@ -32,7 +32,7 @@ public class Search {
 
     public static void search(SlashCommandInteractionEvent interactionEvent) {
         event = interactionEvent;
-        if (BlacklistCheck.check(event.getUser().getId())) {
+        if (PermissionsCheck.blacklistCheck(event.getUser().getId())) {
             event.reply("Sorry! You're not authorized to use this command!").queue();
             return;
         }

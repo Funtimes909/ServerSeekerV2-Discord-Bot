@@ -27,7 +27,7 @@ public class PlayerhistoryEmbedBuilder {
                     .setAuthor("ServerSeekerV2", "https://discord.gg/WEErxAP8kz", "https://funtimes909.xyz/assets/images/serverseekerv2-icon-cropped.png")
                     .addField("Players", playersInfo.toString(), false)
                     .setFooter("Funtimes909", "https://funtimes909.xyz/avatar-gif")
-                    .setColor(new Color(5, 106, 5));
+                    .setColor(new Color(5, 66, 248));
 
             return embed.build();
         } catch (SQLException e) {

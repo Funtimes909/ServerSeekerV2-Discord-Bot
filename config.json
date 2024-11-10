@@ -4,10 +4,5 @@
   "postgres_user": "postgres",
   "postgres_password": ":3",
   "masscan_exclude_file": "exclude.txt",
-  "owner_id": "OWNER_ID",
-  "trusted_users": [
-    "USER1",
-    "USER2",
-    "USER3"
-  ]
+  "owner_id": "OWNER_ID"
 }

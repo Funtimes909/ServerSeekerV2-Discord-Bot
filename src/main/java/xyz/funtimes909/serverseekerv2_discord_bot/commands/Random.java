@@ -2,10 +2,9 @@ package xyz.funtimes909.serverseekerv2_discord_bot.commands;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.BlacklistCheck;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.DatabaseConnectionPool;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.PermissionsCheck;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.ServerEmbedBuilder;
 
 import java.sql.Connection;
@@ -15,7 +14,7 @@ import java.sql.Statement;
 
 public class Random {
     public static void random(SlashCommandInteractionEvent event) {
-        if (BlacklistCheck.check(event.getUser().getId())) {
+        if (PermissionsCheck.blacklistCheck(event.getUser().getId())) {
             event.reply("Sorry! You're not authorized to use this command!").queue();
             return;
         }
