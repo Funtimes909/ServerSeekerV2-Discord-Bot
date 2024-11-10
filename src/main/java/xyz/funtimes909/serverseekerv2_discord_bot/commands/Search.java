@@ -11,6 +11,7 @@ import xyz.funtimes909.serverseekerv2_discord_bot.Records.Server;
 import xyz.funtimes909.serverseekerv2_discord_bot.Records.ServerEmbed;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.*;
 
+import javax.xml.transform.Result;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -83,6 +84,12 @@ public class Search {
     private static void buildQuery(List<OptionMapping> options) {
         Map<String, OptionMapping> parameters = new HashMap<>();
         StringBuilder query = new StringBuilder("SELECT address, country, version, lastseen, port FROM servers WHERE ");
+
+        if (event.getOption("player") != null) {
+            Connection conn = DatabaseConnectionPool.getConnection();
+            query.replace(0, query.length(), "SELECT servers.address, servers.port, servers.country, servers.version, servers.lastseen, playerhistory.playername FROM playerhistory LEFT JOIN servers ON playerhistory.address = servers.address AND playerhistory.port = servers.port WHERE ");
+        }
+
         for (OptionMapping option : options) {
             switch (option.getName()) {
                 case "description":
@@ -131,6 +138,7 @@ public class Search {
                 case "reversedns" -> query.append("hostname = ? AND ");
                 case "forgeversion" -> query.append("fmlnetworkversion = ? AND ");
                 case "description" -> query.append("motd ILIKE '%' || ? || '%' AND ");
+                case "player" -> query.append("playerhistory.playername ILIKE '%' || ? || '%' AND ");
                 default -> query.append(key).append(" = ? AND ");
             }
         });
@@ -139,6 +147,7 @@ public class Search {
             // Create statement and assign values
             query.replace(query.length() - 4, query.length(), "");
             query.append(" ORDER BY lastseen DESC");
+            System.out.println(query);
             Connection conn = DatabaseConnectionPool.getConnection();
             PreparedStatement statement = conn.prepareStatement(query.toString(), ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 
@@ -151,6 +160,8 @@ public class Search {
                 }
                 index++;
             }
+
+            System.out.println(statement);
 
             // Execute query and count the rows
             long startTime = System.currentTimeMillis() / 1000L;

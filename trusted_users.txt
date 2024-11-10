@@ -1,3 +1,0 @@
-[userid1]
-[userid2]
-[userid3]
