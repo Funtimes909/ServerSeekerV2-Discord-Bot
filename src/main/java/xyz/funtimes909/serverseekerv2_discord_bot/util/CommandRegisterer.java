@@ -33,6 +33,7 @@ public class CommandRegisterer {
         searchOptions.add(new OptionData(OptionType.BOOLEAN, "forge", "Search for servers running Forge"));
         searchOptions.add(new OptionData(OptionType.INTEGER, "forgeversion", "Search for servers running a specific FML Network version"));
         searchOptions.add(new OptionData(OptionType.STRING, "hostname", "Reverse DNS name of the server"));
+        searchOptions.add(new OptionData(OptionType.INTEGER, "limit", "Limit how many results are returned"));
         searchOptions.add(new OptionData(OptionType.BOOLEAN, "compact", "Show results in a compact or bold style (default: compact)"));
 
         List<OptionData> blacklistOptions = new ArrayList<>();

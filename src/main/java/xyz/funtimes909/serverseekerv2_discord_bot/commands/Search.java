@@ -82,11 +82,11 @@ public class Search {
 
     private static void buildQuery(List<OptionMapping> options) {
         Map<String, OptionMapping> parameters = new HashMap<>();
-        StringBuilder query = new StringBuilder("SELECT servers.address, servers.country, servers.version, servers.lastseen, servers.port FROM servers ");
+        StringBuilder query = new StringBuilder("SELECT servers.address, servers.country, servers.version, servers.lastseen, servers.port FROM servers");
 
         // Player and ModId searching
-        if (event.getOption("player") != null) query.append("JOIN playerhistory ON servers.address = playerhistory.address AND servers.port = playerhistory.port");
-        if (event.getOption("mods") != null) query.append("JOIN mods ON servers.address = mods.address and servers.port = mods.port");
+        if (event.getOption("player") != null) query.append(" JOIN playerhistory ON servers.address = playerhistory.address AND servers.port = playerhistory.port");
+        if (event.getOption("mods") != null) query.append(" JOIN mods ON servers.address = mods.address and servers.port = mods.port");
         query.append(" WHERE ");
 
         for (OptionMapping option : options) {
@@ -124,6 +124,8 @@ public class Search {
                         query.append("icon IS NULL AND ");
                     }
                     break;
+                case "limit":
+                    break;
                 default:
                     parameters.put(option.getName(), option);
                     break;
@@ -147,6 +149,7 @@ public class Search {
             // Create statement and assign values
             query.replace(query.length() - 4, query.length(), "");
             query.append(" ORDER BY lastseen DESC");
+            if (event.getOption("limit") != null) query.append(" LIMIT ?");
             Connection conn = DatabaseConnectionPool.getConnection();
             PreparedStatement statement = conn.prepareStatement(query.toString(), ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 
@@ -159,6 +162,7 @@ public class Search {
                 }
                 index++;
             }
+            if (event.getOption("limit") != null) statement.setInt(index, event.getOption("limit").getAsInt());
 
             // Execute query and count the rows
             long startTime = System.currentTimeMillis() / 1000L;
