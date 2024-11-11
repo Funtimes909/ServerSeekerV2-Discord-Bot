@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import xyz.funtimes909.serverseekerv2_discord_bot.Records.Server;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PermissionsCheck;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PingUtils;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.ServerEmbedBuilder;
+import xyz.funtimes909.serverseekerv2_discord_bot.builders.ServerEmbedBuilder;
 
 public class Ping {
     public static void ping(SlashCommandInteractionEvent event) {

@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import xyz.funtimes909.serverseekerv2_discord_bot.commands.Register;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.CommandRegisterer;
 import xyz.funtimes909.serverseekerv2_discord_bot.events.ButtonInteractionEventListener;
 import xyz.funtimes909.serverseekerv2_discord_bot.events.SlashCommandListener;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.DatabaseConnectionPool;
@@ -57,8 +57,8 @@ public class Main {
                     .addEventListeners(new ButtonInteractionEventListener())
                     .build();
 
-            // Register commands
-            Register.registerCommands(client);
+            // CommandRegisterer commands
+            CommandRegisterer.registerCommands(client);
         } catch (IOException e) {
             System.out.println("Failed to read config file: " + e.getMessage());
         }

@@ -1,4 +1,4 @@
-package xyz.funtimes909.serverseekerv2_discord_bot.commands;
+package xyz.funtimes909.serverseekerv2_discord_bot.util;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Register {
+public class CommandRegisterer {
     public static void registerCommands(JDA client) {
 
         List<OptionData> searchOptions = new ArrayList<>();

@@ -1,4 +1,4 @@
-package xyz.funtimes909.serverseekerv2_discord_bot.util;
+package xyz.funtimes909.serverseekerv2_discord_bot.builders;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
