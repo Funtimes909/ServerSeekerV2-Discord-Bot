@@ -33,9 +33,8 @@ public class ServerEmbedBuilder {
     private static Boolean preventsReports;
     private static int fmlNetworkVersion;
     private static List<Player> players = new ArrayList<>();
-    private static boolean rescanned;
 
-    public ServerEmbedBuilder(ResultSet results, boolean rescan) {
+    public ServerEmbedBuilder(ResultSet results) {
         players.clear();
         try (results) {
             results.next();
@@ -62,10 +61,9 @@ public class ServerEmbedBuilder {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        rescanned = rescan;
     }
 
-    public ServerEmbedBuilder(Server server, boolean rescan) {
+    public ServerEmbedBuilder(Server server) {
         players.clear();
         address = server.getAddress();
         port = server.getPort();
@@ -83,7 +81,6 @@ public class ServerEmbedBuilder {
         cracked = server.getCracked();
         preventsReports = server.getPreventsReports();
         players = server.getPlayers();
-        rescanned = rescan;
 
         if (server.getFmlNetworkVersion() == null) fmlNetworkVersion = 0;
         else fmlNetworkVersion = server.getFmlNetworkVersion();
@@ -93,26 +90,9 @@ public class ServerEmbedBuilder {
         StringBuilder miscInfo = new StringBuilder();
         StringBuilder addressInfo = new StringBuilder();
         StringBuilder playerInfo = new StringBuilder();
-        String title = rescanned ? address + ":" + port + " (Rescanned)" : address + ":" + port;
-
-        // Get first seen time and the amount of times this server has been seen
-        if (rescanned) {
-            try (Connection conn = DatabaseConnectionPool.getConnection()) {
-                PreparedStatement statement = conn.prepareStatement("SELECT firstseen, timesseen FROM servers WHERE address = ? AND port = ?");
-                statement.setString(1, address);
-                statement.setShort(2, port);
-
-                ResultSet resultSet = statement.executeQuery();
-                resultSet.next();
-                firstseen = resultSet.getLong("firstseen");
-                timesSeen = resultSet.getInt("timesseen");
-                lastseen = System.currentTimeMillis() / 1000;
-            } catch (SQLException e) {
-                Main.logger.error("Failed to execute rescan query!", e);
-            }
-        }
 
         // Miscellaneous info
+        miscInfo.append("Times Seen: **").append(timesSeen).append("**\n");
         miscInfo.append("Whitelist: **").append(whitelist != null ? whitelist + "**\n" : "N/A**\n");
         miscInfo.append("Cracked: **").append(cracked != null ? cracked + "**\n" : "N/A**\n");
         miscInfo.append("Prevents Chat Reports: **").append(preventsReports != null ? preventsReports + "**\n" : "N/A**\n");
@@ -142,7 +122,7 @@ public class ServerEmbedBuilder {
         return new EmbedBuilder()
                 .setColor(new Color(0, 255, 0))
                 .setAuthor("ServerSeekerV2", "https://funtimes909.xyz/assets/images/serverseekerv2-icon-cropped.png")
-                .setTitle(title)
+                .setTitle(address + ":" + port)
                 .setThumbnail("https://funtimes909.xyz/avatar-gif")
                 .addField("** -- __Version__ -- **", version + " (" + protocol + ")", false)
                 .addField(descriptionField)

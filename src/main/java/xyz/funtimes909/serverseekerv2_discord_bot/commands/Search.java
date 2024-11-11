@@ -191,7 +191,7 @@ public class Search {
             rescanPort = port;
 
             ResultSet resultSet = statement.executeQuery();
-            ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(resultSet, false);
+            ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(resultSet);
             MessageEmbed embed = embedBuilder.build();
 
             if (embed == null) {
@@ -199,24 +199,9 @@ public class Search {
                 return;
             }
 
-            event.getHook().sendMessageEmbeds(embed).addActionRow(Button.success("Rescanned", "Rescan")).queue();
+            event.getHook().sendMessageEmbeds(embed).queue();
         } catch (SQLException e) {
             Main.logger.error("Error while executing query!", e);
         }
-    }
-
-    public static void rescan() {
-        PingUtils pingUtils = new PingUtils(rescanAddress, rescanPort);
-        Server server = pingUtils.parse();
-
-        if (server == null) {
-            event.getHook().sendMessage("Something went wrong running that command!").queue();
-            return;
-        }
-
-        ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server, true);
-        MessageEmbed embed = embedBuilder.build();
-
-        event.getHook().sendMessageEmbeds(embed).addActionRow(Button.success("Rescanned", "Rescan")).queue();
     }
 }

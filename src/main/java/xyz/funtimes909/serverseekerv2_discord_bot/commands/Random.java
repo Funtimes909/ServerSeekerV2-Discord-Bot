@@ -31,7 +31,7 @@ public class Random {
             Main.logger.debug("Query took {}ms", duration);
 
             ResultSet results = random.executeQuery(query);
-            ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(results, false);
+            ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(results);
             MessageEmbed embed = embedBuilder.build();
 
             if (embed != null) event.getHook().sendMessageEmbeds(embed).queue();

@@ -35,7 +35,7 @@ public class Ping {
             return;
         }
 
-        ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server, false);
+        ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server);
         MessageEmbed embed = embedBuilder.build();
 
         if (embed != null) {
