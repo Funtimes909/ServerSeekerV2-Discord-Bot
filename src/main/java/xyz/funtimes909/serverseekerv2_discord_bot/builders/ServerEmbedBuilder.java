@@ -101,6 +101,8 @@ public class ServerEmbedBuilder {
         addressInfo.append("Hostname: **").append(hostname != null ? hostname + "**\n" : "N/A**\n");
         addressInfo.append("Organization: **").append(organization != null ? organization + "**\n" : "N/A**\n");
 
+        if (firstseen == 0) firstseen = System.currentTimeMillis() / 1000;
+
         if (players.isEmpty()) {
             playerInfo.append("No players found!");
         } else {

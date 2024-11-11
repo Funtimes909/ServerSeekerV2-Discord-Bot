@@ -66,7 +66,7 @@ public class SearchEmbedBuilder {
                 .addField("**Version**", "_ _", true)
                 .addField("**Last Seen**", "_ _", true)
                 .setFooter("Funtimes909", "https://funtimes909.xyz/avatar-gif")
-                .setColor(new Color(5, 106, 5));
+                .setColor(new Color(8, 25, 238));
 
         for (MessageEmbed.Field field : fields) {
             embed.addField(field);
