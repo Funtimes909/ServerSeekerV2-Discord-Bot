@@ -148,7 +148,6 @@ public class Search {
             // Create statement and assign values
             query.replace(query.length() - 4, query.length(), "");
             query.append(" ORDER BY lastseen DESC");
-            System.out.println(query);
             Connection conn = DatabaseConnectionPool.getConnection();
             PreparedStatement statement = conn.prepareStatement(query.toString(), ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 
@@ -187,7 +186,7 @@ public class Search {
             short port = searchResults.get(row).port();
 
             statement.setString(1, address);
-            statement.setInt(2, port);
+            statement.setShort(2, port);
             rescanAddress = address;
             rescanPort = port;
 

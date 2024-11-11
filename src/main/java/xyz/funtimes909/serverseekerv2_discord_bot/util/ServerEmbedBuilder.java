@@ -36,6 +36,7 @@ public class ServerEmbedBuilder {
     private static boolean rescanned;
 
     public ServerEmbedBuilder(ResultSet results, boolean rescan) {
+        players.clear();
         try (results) {
             results.next();
             address = results.getString("address");
@@ -65,6 +66,7 @@ public class ServerEmbedBuilder {
     }
 
     public ServerEmbedBuilder(Server server, boolean rescan) {
+        players.clear();
         address = server.getAddress();
         port = server.getPort();
         description = server.getMotd();
@@ -91,7 +93,7 @@ public class ServerEmbedBuilder {
         StringBuilder miscInfo = new StringBuilder();
         StringBuilder addressInfo = new StringBuilder();
         StringBuilder playerInfo = new StringBuilder();
-        StringBuilder title = new StringBuilder(address + ":" + port);
+        String title = rescanned ? address + ":" + port + " (Rescanned)" : address + ":" + port;
 
         // Get first seen time and the amount of times this server has been seen
         if (rescanned) {
@@ -105,61 +107,22 @@ public class ServerEmbedBuilder {
                 firstseen = resultSet.getLong("firstseen");
                 timesSeen = resultSet.getInt("timesseen");
                 lastseen = System.currentTimeMillis() / 1000;
-                title.append(" (Rescanned)");
             } catch (SQLException e) {
                 Main.logger.error("Failed to execute rescan query!", e);
             }
         }
 
-        // Misc information
-        if (whitelist != null) {
-            miscInfo.append("Whitelist: **").append(whitelist).append("**\n");
-        } else {
-            miscInfo.append("Whitelist: **").append("N/A").append("**\n");
-        }
-
-        if (cracked != null) {
-            miscInfo.append("Cracked: **").append(cracked).append("**\n");
-        } else {
-            miscInfo.append("Cracked: **").append("N/A").append("**\n");
-        }
-
-        if (preventsReports != null) {
-            miscInfo.append("Prevents Chat Reports: **").append(preventsReports).append("**\n");
-        } else {
-            miscInfo.append("Prevents Chat Reports: **").append("N/A").append("**\n");
-        }
-
-        if (enforceSecure!= null) {
-            miscInfo.append("Enforces Secure Chat: **").append(enforceSecure).append("**\n");
-        } else {
-            miscInfo.append("Enforces Secure Chat: **").append("N/A").append("**\n");
-        }
-
-        if (fmlNetworkVersion != 0) {
-            miscInfo.append("Forge: **True** \n");
-        } else {
-            miscInfo.append("Forge: **False** \n");
-        }
+        // Miscellaneous info
+        miscInfo.append("Whitelist: **").append(whitelist != null ? whitelist + "**\n" : "N/A**\n");
+        miscInfo.append("Cracked: **").append(cracked != null ? cracked + "**\n" : "N/A**\n");
+        miscInfo.append("Prevents Chat Reports: **").append(preventsReports != null ? preventsReports + "**\n" : "N/A**\n");
+        miscInfo.append("Enforces Secure Chat: **").append(enforceSecure != null ? enforceSecure + "**\n" : "N/A**\n");
+        miscInfo.append("Forge: **").append(fmlNetworkVersion != 0 ? "true**\n" : "false**\n");
 
         // Address information
-        if (asn != null) {
-            addressInfo.append("ASN: **").append(asn).append("** \n");
-        } else {
-            addressInfo.append("ASN: **N/A** \n");
-        }
-
-        if (hostname != null) {
-            addressInfo.append("Hostname: **").append(hostname).append("** \n");
-        } else {
-            addressInfo.append("Hostname: **N/A** \n");
-        }
-
-        if (organization != null) {
-            addressInfo.append("Organization: **").append(organization).append("** \n");
-        } else {
-            addressInfo.append("Organization: **N/A** \n");
-        }
+        addressInfo.append("ASN: **").append(asn != null ? asn + "**\n" : "N/A**\n");
+        addressInfo.append("Hostname: **").append(hostname != null ? hostname + "**\n" : "N/A**\n");
+        addressInfo.append("Organization: **").append(organization != null ? organization + "**\n" : "N/A**\n");
 
         if (players.isEmpty()) {
             playerInfo.append("No players found!");
@@ -169,30 +132,18 @@ public class ServerEmbedBuilder {
             }
         }
 
-        MessageEmbed.Field countryField;
-        MessageEmbed.Field descriptionField;
+        MessageEmbed.Field countryField = new MessageEmbed.Field("** -- __Country__ -- **", country != null ? ":flag_" + country.toLowerCase() + ":" + country : ":x: No country information available", false);
+        MessageEmbed.Field descriptionField = new MessageEmbed.Field("** -- __Description__ -- **", description != null ? "```" + description + "```" : "```No description found!```", false);
         MessageEmbed.Field miscField = new MessageEmbed.Field("** -- __Miscellaneous__ -- **", miscInfo.toString(), false);
         MessageEmbed.Field playerField = new MessageEmbed.Field("** -- __Players__ -- **",  "```\n" + playerInfo + "```", false);
         MessageEmbed.Field addressField = new MessageEmbed.Field("** -- __Address Information__ -- **", addressInfo.toString(), false);
-
-        if (country != null) {
-            countryField = new MessageEmbed.Field("** -- __Country__ -- **", ":flag_" + country.toLowerCase() + ": " + country, false);
-        } else {
-            countryField = new MessageEmbed.Field("** -- __Country__ -- **", ":x: No country information available", false);
-        }
-
-        if (description != null && !description.isBlank()) {
-            descriptionField = new MessageEmbed.Field("** -- __Description__ -- **", "```" + description + "```", false);
-        } else {
-            descriptionField = new MessageEmbed.Field("** -- __Description__ -- **", "```No description found!```", false);
-        }
 
         // Build server information embed
         return new EmbedBuilder()
                 .setColor(new Color(0, 255, 0))
                 .setAuthor("ServerSeekerV2", "https://funtimes909.xyz/assets/images/serverseekerv2-icon-cropped.png")
+                .setTitle(title)
                 .setThumbnail("https://funtimes909.xyz/avatar-gif")
-                .setTitle(title.toString())
                 .addField("** -- __Version__ -- **", version + " (" + protocol + ")", false)
                 .addField(descriptionField)
                 .addField(countryField)
