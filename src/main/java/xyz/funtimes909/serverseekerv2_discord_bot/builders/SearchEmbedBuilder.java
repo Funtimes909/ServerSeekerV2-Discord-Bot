@@ -16,8 +16,7 @@ public class SearchEmbedBuilder {
     public static MessageEmbed parse(HashMap<Integer, ServerEmbed> servers) {
         List<MessageEmbed.Field> fields = new ArrayList<>();
 
-        final int[] index = {1};
-        servers.values().forEach(server -> {
+        servers.forEach((index, server) -> {
             StringBuilder address = new StringBuilder("``").append(server.address()).append("``");
             StringBuilder version = new StringBuilder("``").append(server.version()).append("``");
             String timestamp = "<t:" + server.timestamp() + ":R>";
@@ -48,15 +47,13 @@ public class SearchEmbedBuilder {
                 }
             }
 
-            MessageEmbed.Field addressField = new MessageEmbed.Field(index[0] + ". " + address + " **-** ", "_ _", true);
+            MessageEmbed.Field addressField = new MessageEmbed.Field(index + ". " + address + " **-** ", "_ _", true);
             MessageEmbed.Field versionField = new MessageEmbed.Field(version + " **-** ", "_ _", true);
             MessageEmbed.Field timestampField = new MessageEmbed.Field(timestamp, "_ _", true);
 
             fields.add(addressField);
             fields.add(versionField);
             fields.add(timestampField);
-
-            index[0]++;
         });
 
         EmbedBuilder embed = new EmbedBuilder()
