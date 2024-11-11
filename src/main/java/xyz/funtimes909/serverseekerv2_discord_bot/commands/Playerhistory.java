@@ -18,12 +18,6 @@ public class Playerhistory {
             event.reply("Sorry! You're not authorized to use this command!").queue();
             return;
         }
-
-        if (event.getOptions().isEmpty()) {
-            event.reply("You must provide a user to search for!").queue();
-            return;
-        }
-
         event.deferReply().queue();
 
         try (Connection conn = DatabaseConnectionPool.getConnection()) {
@@ -32,21 +26,16 @@ public class Playerhistory {
             ResultSet results = statement.executeQuery();
 
             results.last();
-            int rows = results.getRow();
-            if (rows == 0) {
+            if (results.getRow() == 0) {
                 event.getHook().sendMessage("No playerhistory found!").queue();
                 return;
             }
 
             results.beforeFirst();
             MessageEmbed embed = PlayerhistoryEmbedBuilder.build(results);
-
-            if (embed != null) {
-                event.getHook().sendMessageEmbeds(embed).queue();
-            }
-
+            if (embed != null) event.getHook().sendMessageEmbeds(embed).queue();
         } catch (SQLException e) {
-            event.reply("Something went wrong executing this command!").queue();
+            event.getHook().sendMessage("Something went wrong executing this command!").queue();
             Main.logger.warn("Exception when running the playerhistory command!", e);
         }
     }
