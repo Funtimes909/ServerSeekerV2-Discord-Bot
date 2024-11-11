@@ -23,8 +23,6 @@ import java.util.Map;
 
 public class Search {
     public static HashMap<Integer, ServerEmbed> searchResults = new HashMap<>();
-    public static String rescanAddress;
-    public static short rescanPort;
     public static int rowCount;
     public static int page = 1;
     private static final Connection conn = DatabaseConnectionPool.getConnection();
@@ -187,8 +185,6 @@ public class Search {
 
             statement.setString(1, address);
             statement.setShort(2, port);
-            rescanAddress = address;
-            rescanPort = port;
 
             ResultSet resultSet = statement.executeQuery();
             ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(resultSet);

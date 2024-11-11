@@ -14,32 +14,29 @@ public class Ping {
             return;
         }
 
-        event.deferReply().queue();
-        String address = event.getOption("address").getAsString();
         short port = 25565;
-
-        if (event.getOption("address") == null) {
-            event.getHook().sendMessage("You need to provide an address to ping!").queue();
-            return;
-        }
+        event.deferReply().queue();
 
         if (event.getOption("port") != null) {
             port = (short) event.getOption("port").getAsInt();
         }
 
-        PingUtils ping = new PingUtils(address, port);
+        PingUtils ping = new PingUtils(event.getOption("address").getAsString(), port);
         Server server = ping.parse();
 
         if (server == null) {
-            event.getHook().sendMessage("Connection failed!").queue();
+            event.getHook().sendMessage("Server did not connect!").queue();
             return;
         }
 
         ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server);
         MessageEmbed embed = embedBuilder.build();
 
-        if (embed != null) {
-            event.getHook().sendMessageEmbeds(embed).queue();
+        if (embed == null) {
+            event.getHook().sendMessage("Something went wrong running this command!").queue();
+            return;
         }
+
+        event.getHook().sendMessageEmbeds(embed).queue();
     }
 }
