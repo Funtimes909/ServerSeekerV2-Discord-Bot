@@ -98,8 +98,13 @@ public class ServerEmbedBuilder {
 
         // Address information
         addressInfo.append("ASN: **").append(asn != null ? asn + "**\n" : "N/A**\n");
-        addressInfo.append("Hostname: **").append(hostname != null ? hostname + "**\n" : "N/A**\n");
         addressInfo.append("Organization: **").append(organization != null ? organization + "**\n" : "N/A**\n");
+
+        if (hostname == null || hostname.isBlank()) {
+            addressInfo.append("Hostname: **").append("N/A**\n");
+        } else {
+            addressInfo.append("Hostname: **").append(hostname + "**\n");
+        }
 
         if (firstseen == 0) firstseen = System.currentTimeMillis() / 1000;
 
