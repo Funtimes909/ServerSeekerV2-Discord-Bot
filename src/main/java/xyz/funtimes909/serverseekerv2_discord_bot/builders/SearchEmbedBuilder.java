@@ -22,9 +22,9 @@ public class SearchEmbedBuilder {
             String timestamp = "<t:" + server.timestamp() + ":R>";
 
             if (server.country() != null) {
-                address.insert(0, ":flag_" + server.country().toLowerCase() + ": **:**");
+                address.insert(0, ":flag_" + server.country().toLowerCase() + ": **:** ");
             } else {
-                address.insert(0, ":x:**:**");
+                address.insert(0, ":x:**:** ");
             }
 
             // Make everything the same length

@@ -181,15 +181,12 @@ public class Search {
         }
     }
 
-    public static void serverSelectedButtonEvent(int row) {
+    public static void serverSelectedButtonEvent(String address, short port) {
         try (Connection conn = DatabaseConnectionPool.getConnection()) {
             PreparedStatement statement = conn.prepareStatement("SELECT * FROM servers LEFT JOIN playerhistory ON servers.address = playerhistory.address AND servers.port = playerhistory.port WHERE servers.address = ? AND servers.port = ?");
-
-            String address = searchResults.get(row).address();
-            short port = searchResults.get(row).port();
-
             statement.setString(1, address);
             statement.setShort(2, port);
+            System.out.println(address);
 
             ResultSet resultSet = statement.executeQuery();
             ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(resultSet);
