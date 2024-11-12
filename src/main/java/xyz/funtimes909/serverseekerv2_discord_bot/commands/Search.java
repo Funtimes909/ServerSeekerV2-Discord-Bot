@@ -60,9 +60,9 @@ public class Search {
             List<ItemComponent> buttons = new ArrayList<>();
 
             // Add buttons for each returned server
-            for (Map.Entry<Integer, ServerEmbed> server : searchResults.entrySet()) {
-                buttons.add(Button.success("SearchButton" + server.getKey(), String.valueOf(server.getKey())));
-            }
+            searchResults.forEach((key, value) -> {
+                buttons.add(Button.success("SearchButton" + key, String.valueOf(key)));
+            });
 
             // Send a new message if it's the first interaction, edit the original if it's a new search page
             if (firstRun) {
@@ -76,7 +76,7 @@ public class Search {
             }
 
         } catch (SQLException e) {
-            Main.logger.error("Error while executing query!", e);
+            Main.logger.error("Error while scrolling results!", e);
         }
     }
 
@@ -104,25 +104,13 @@ public class Search {
                     parameters.put("lastseen", option);
                     break;
                 case "full":
-                    if (option.getAsBoolean()) {
-                        query.append("onlinePlayers >= maxPlayers AND ");
-                    } else {
-                        query.append("onlinePlayers < maxPlayers AND ");
-                    }
+                    query.append(option.getAsBoolean() ? "onlinePlayers >= maxPlayers AND " : "onlinePlayers < maxPlayers AND ");
                     break;
                 case "forge":
-                    if (option.getAsBoolean()) {
-                        query.append("fmlnetworkversion IS NOT NULL AND ");
-                    } else {
-                        query.append("fmlnetworkversion IS NULL AND ");
-                    }
+                    query.append(option.getAsBoolean() ? "fmlnetworkversion IS NOT NULL AND " : "fmlnetworkversion IS NULL AND ");
                     break;
                 case "icon":
-                    if (option.getAsBoolean()) {
-                        query.append("icon IS NOT NULL AND ");
-                    } else {
-                        query.append("icon IS NULL AND ");
-                    }
+                    query.append(option.getAsBoolean() ? "icon IS NOT NULL AND " : "icon IS NULL AND ");
                     break;
                 case "limit":
                     break;
@@ -164,20 +152,19 @@ public class Search {
             }
             if (event.getOption("limit") != null) statement.setInt(index, event.getOption("limit").getAsInt());
 
-            // Execute query and count the rows
+            // Time query duration
             long startTime = System.currentTimeMillis() / 1000L;
             resultSet = statement.executeQuery();
             long endTime = System.currentTimeMillis() / 1000L;
             Main.logger.debug("Search command took {}ms to execute!", (endTime - startTime));
+
             resultSet.last();
             rowCount = resultSet.getRow();
             if (rowCount == 0) event.getHook().sendMessage("No results!").queue();
-
-            // Set position to the first result
             resultSet.beforeFirst();
             scrollResults(0, true);
         } catch (SQLException e) {
-            Main.logger.error("Error while executing query!", e);
+            Main.logger.error("Error while forming search query!", e);
         }
     }
 
@@ -186,7 +173,6 @@ public class Search {
             PreparedStatement statement = conn.prepareStatement("SELECT * FROM servers LEFT JOIN playerhistory ON servers.address = playerhistory.address AND servers.port = playerhistory.port WHERE servers.address = ? AND servers.port = ?");
             statement.setString(1, address);
             statement.setShort(2, port);
-            System.out.println(address);
 
             ResultSet resultSet = statement.executeQuery();
             ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(resultSet);
