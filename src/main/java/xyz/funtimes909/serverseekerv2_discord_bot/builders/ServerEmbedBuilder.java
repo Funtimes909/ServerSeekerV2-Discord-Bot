@@ -111,12 +111,6 @@ public class ServerEmbedBuilder {
             }
         }
 
-        MessageEmbed.Field countryField = new MessageEmbed.Field("** -- __Country__ -- **", country != null ? ":flag_" + country.toLowerCase() + ":" + country : ":x: No country information available", false);
-        MessageEmbed.Field descriptionField = new MessageEmbed.Field("** -- __Description__ -- **", description != null ? "```" + description + "```" : "```No description found!```", false);
-        MessageEmbed.Field miscField = new MessageEmbed.Field("** -- __Miscellaneous__ -- **", miscInfo.toString(), false);
-        MessageEmbed.Field playerField = new MessageEmbed.Field("** -- __Players__ -- **",  "```\n" + playerInfo + "```", false);
-        MessageEmbed.Field addressField = new MessageEmbed.Field("** -- __Address Information__ -- **", addressInfo.toString(), false);
-
         // Build server information embed
         return new EmbedBuilder()
                 .setColor(new Color(0, 255, 0))
@@ -124,13 +118,13 @@ public class ServerEmbedBuilder {
                 .setTitle(address + ":" + port)
                 .setThumbnail("https://funtimes909.xyz/avatar-gif")
                 .addField("** -- __Version__ -- **", version + " (" + protocol + ")", false)
-                .addField(descriptionField)
-                .addField(countryField)
+                .addField("** -- __Description__ -- **", description != null ? "```" + description + "```" : "```No description found!```", false)
+                .addField("** -- __Country__ -- **", country != null ? ":flag_" + country.toLowerCase() + ":" + country : ":x: No country information available", false)
                 .addField("** -- __First Seen__ -- **", "<t:" + firstseen + ":R>", false)
                 .addField("** -- __Last Seen__ -- **", "<t:" + lastseen + ":R>", false)
-                .addField(miscField)
-                .addField(playerField)
-                .addField(addressField)
+                .addField("** -- __Miscellaneous__ -- **", miscInfo.toString(), false)
+                .addField("** -- __Players__ -- **",  "```\n" + playerInfo + "```", false)
+                .addField("** -- __Address Information__ -- **", addressInfo.toString(), false)
                 .build();
     }
 }
