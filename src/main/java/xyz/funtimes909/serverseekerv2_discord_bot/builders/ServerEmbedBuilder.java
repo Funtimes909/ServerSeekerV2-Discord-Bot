@@ -92,7 +92,7 @@ public class ServerEmbedBuilder {
         StringBuilder playerInfo = new StringBuilder();
 
         // Miscellaneous info
-        miscInfo.append("Times Seen: **").append(timesSeen).append("**\n");
+        if (!ping) miscInfo.append("Times Seen: **").append(timesSeen).append("**\n");
         miscInfo.append("Whitelist: **").append(whitelist != null ? whitelist + "**\n" : "N/A**\n");
         miscInfo.append("Cracked: **").append(cracked != null ? cracked + "**\n" : "N/A**\n");
         miscInfo.append("Prevents Chat Reports: **").append(preventsReports != null ? preventsReports + "**\n" : "N/A**\n");
