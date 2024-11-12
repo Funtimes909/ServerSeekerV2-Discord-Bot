@@ -32,7 +32,7 @@ public class Random {
 
             ResultSet results = random.executeQuery(query);
             ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(results);
-            MessageEmbed embed = embedBuilder.build();
+            MessageEmbed embed = embedBuilder.build(false);
 
             if (embed != null) event.getHook().sendMessageEmbeds(embed).queue();
         } catch (SQLException e) {

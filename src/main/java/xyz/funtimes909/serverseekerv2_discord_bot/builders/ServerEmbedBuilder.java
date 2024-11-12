@@ -1,9 +1,12 @@
 package xyz.funtimes909.serverseekerv2_discord_bot.builders;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import xyz.funtimes909.serverseekerv2_discord_bot.Records.Player;
 import xyz.funtimes909.serverseekerv2_discord_bot.Records.Server;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.IpLookup;
 
 import java.awt.*;
 import java.sql.ResultSet;
@@ -83,7 +86,7 @@ public class ServerEmbedBuilder {
         else fmlNetworkVersion = server.getFmlNetworkVersion();
     }
 
-    public MessageEmbed build() {
+    public MessageEmbed build(boolean ping) {
         StringBuilder miscInfo = new StringBuilder();
         StringBuilder addressInfo = new StringBuilder();
         StringBuilder playerInfo = new StringBuilder();
@@ -97,6 +100,18 @@ public class ServerEmbedBuilder {
         miscInfo.append("Forge: **").append(fmlNetworkVersion != 0 ? "true**\n" : "false**\n");
 
         // Address information
+
+        if (ping) {
+            String primaryResponse = IpLookup.run(address);
+            if (primaryResponse != null) {
+                JsonObject parsedPrimaryResponse = JsonParser.parseString(primaryResponse).getAsJsonObject();
+                if (parsedPrimaryResponse.has("reverse")) hostname = parsedPrimaryResponse.get("reverse").getAsString();
+                if (parsedPrimaryResponse.has("countryCode")) country = parsedPrimaryResponse.get("countryCode").getAsString();
+                if (parsedPrimaryResponse.has("org")) organization = parsedPrimaryResponse.get("org").getAsString();
+                if (parsedPrimaryResponse.has("as")) asn = parsedPrimaryResponse.get("as").getAsString();
+            }
+        }
+
         addressInfo.append("ASN: **").append(asn != null ? asn + "**\n" : "N/A**\n");
         addressInfo.append("Organization: **").append(organization != null ? organization + "**\n" : "N/A**\n");
 

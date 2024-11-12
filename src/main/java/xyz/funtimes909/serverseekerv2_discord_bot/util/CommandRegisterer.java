@@ -29,6 +29,7 @@ public class CommandRegisterer {
         searchOptions.add(new OptionData(OptionType.BOOLEAN, "icon", "Search for servers that have an icon"));
         searchOptions.add(new OptionData(OptionType.STRING, "mods", "Search for forge servers running a specific ModID"));
         searchOptions.add(new OptionData(OptionType.BOOLEAN, "full", "Search for servers with a full player count"));
+        searchOptions.add(new OptionData(OptionType.BOOLEAN, "empty", "Search for servers that have no players online"));
         searchOptions.add(new OptionData(OptionType.INTEGER, "protocol", "Search for servers using a specific protocol"));
         searchOptions.add(new OptionData(OptionType.BOOLEAN, "forge", "Search for servers running Forge"));
         searchOptions.add(new OptionData(OptionType.INTEGER, "forgeversion", "Search for servers running a specific FML Network version"));

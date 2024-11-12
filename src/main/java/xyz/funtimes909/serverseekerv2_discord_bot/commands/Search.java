@@ -106,6 +106,9 @@ public class Search {
                 case "full":
                     query.append(option.getAsBoolean() ? "onlinePlayers >= maxPlayers AND " : "onlinePlayers < maxPlayers AND ");
                     break;
+                case "empty":
+                    query.append(option.getAsBoolean() ? "onlinePlayers = 0 AND " : "onlinePlayers != 0 AND ");
+                    break;
                 case "forge":
                     query.append(option.getAsBoolean() ? "fmlnetworkversion IS NOT NULL AND " : "fmlnetworkversion IS NULL AND ");
                     break;
@@ -176,7 +179,7 @@ public class Search {
 
             ResultSet resultSet = statement.executeQuery();
             ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(resultSet);
-            MessageEmbed embed = embedBuilder.build();
+            MessageEmbed embed = embedBuilder.build(false);
 
             if (embed == null) {
                 event.getHook().sendMessage("Something went wrong executing that command!").queue();

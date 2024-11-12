@@ -30,7 +30,7 @@ public class Ping {
         }
 
         ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server);
-        MessageEmbed embed = embedBuilder.build();
+        MessageEmbed embed = embedBuilder.build(true);
 
         if (embed == null) {
             event.getHook().sendMessage("Something went wrong running this command!").queue();
