@@ -31,6 +31,7 @@ public class ServerEmbedBuilder {
     private static Boolean enforceSecure;
     private static Boolean cracked;
     private static Boolean preventsReports;
+    private static int maxPlayers;
     private static int fmlNetworkVersion;
     private static List<Player> players = new ArrayList<>();
 
@@ -54,6 +55,7 @@ public class ServerEmbedBuilder {
             enforceSecure = results.getBoolean("enforceSecure");
             cracked = results.getBoolean("cracked");
             preventsReports = results.getBoolean("preventsReports");
+            maxPlayers = results.getInt("maxPlayers");
             fmlNetworkVersion = results.getInt("fmlNetworkVersion");
             if (results.getString("playername") != null && results.getString("playeruuid") != null) {
                 players.add(new Player(results.getString("playername"), results.getString("playeruuid"), results.getLong("lastseen")));
@@ -80,6 +82,7 @@ public class ServerEmbedBuilder {
         enforceSecure = server.getEnforceSecure();
         cracked = server.getCracked();
         preventsReports = server.getPreventsReports();
+        maxPlayers = server.getMaxPlayers();
         players = server.getPlayers();
 
         if (server.getFmlNetworkVersion() == null) fmlNetworkVersion = 0;
@@ -123,12 +126,15 @@ public class ServerEmbedBuilder {
 
         if (firstseen == 0) firstseen = System.currentTimeMillis() / 1000;
 
+        playerInfo.append("Players: **").append(players.size()).append("/").append(maxPlayers).append("**\n");
         if (players.isEmpty()) {
-            playerInfo.append("No players found!");
+            playerInfo.append("```No players found!```");
         } else {
+            playerInfo.append("```\n");
             for (Player player : players) {
                 playerInfo.append("\n").append(player.name()).append("\n").append(player.uuid()).append("\n");
             }
+            playerInfo.append("```");
         }
 
         // Build server information embed
@@ -143,7 +149,7 @@ public class ServerEmbedBuilder {
                 .addField("** -- __First Seen__ -- **", "<t:" + firstseen + ":R>", false)
                 .addField("** -- __Last Seen__ -- **", "<t:" + lastseen + ":R>", false)
                 .addField("** -- __Miscellaneous__ -- **", miscInfo.toString(), false)
-                .addField("** -- __Players__ -- **",  "```\n" + playerInfo + "```", false)
+                .addField("** -- __Players__ -- **",  playerInfo.toString(), false)
                 .addField("** -- __Address Information__ -- **", addressInfo.toString(), false)
                 .build();
     }
