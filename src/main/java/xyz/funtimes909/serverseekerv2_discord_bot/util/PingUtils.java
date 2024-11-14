@@ -111,7 +111,7 @@ public class PingUtils {
             return new Server.Builder()
                     .setAddress(address)
                     .setPort(port)
-                    .setTimestamp(System.currentTimeMillis() / 1000)
+                    .setLastSeen(System.currentTimeMillis() / 1000)
                     .setVersion(version)
                     .setProtocol(protocol)
                     .setFmlNetworkVersion(fmlNetworkVersion)

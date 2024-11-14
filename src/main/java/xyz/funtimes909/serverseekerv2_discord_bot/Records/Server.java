@@ -4,6 +4,7 @@ import java.util.List;
 
 public class Server {
     private final List<Player> players;
+    private final List<Mod> mods;
     private final String version;
     private final String motd;
     private final String icon;
@@ -18,7 +19,8 @@ public class Server {
     private final Integer protocol;
     private final Integer fmlNetworkVersion;
     private final int timesSeen;
-    private final long timestamp;
+    private final long firstseen;
+    private final long lastseen;
     private final Boolean whitelist;
     private final Boolean cracked;
     private final Boolean preventsReports;
@@ -26,6 +28,10 @@ public class Server {
 
     public List<Player> getPlayers() {
         return players;
+    }
+
+    public List<Mod> getMods() {
+        return mods;
     }
 
     public String getVersion() {
@@ -84,8 +90,12 @@ public class Server {
         return timesSeen;
     }
 
-    public long getTimestamp() {
-        return timestamp;
+    public long getFirstseen() {
+        return firstseen;
+    }
+
+    public long getLastseen() {
+        return firstseen;
     }
 
     public Boolean getWhitelist() {
@@ -106,6 +116,7 @@ public class Server {
 
     private Server(Builder builder) {
         this.players = builder.players;
+        this.mods = builder.mods;
         this.version = builder.version;
         this.motd = builder.motd;
         this.icon = builder.icon;
@@ -120,7 +131,8 @@ public class Server {
         this.protocol = builder.protocol;
         this.fmlNetworkVersion = builder.fmlNetworkVersion;
         this.timesSeen = builder.timesSeen;
-        this.timestamp = builder.timestamp;
+        this.firstseen = builder.firstseen;
+        this.lastseen = builder.lastseen;
         this.whitelist = builder.whitelist;
         this.cracked = builder.cracked;
         this.preventsReports = builder.preventsReports;
@@ -129,6 +141,7 @@ public class Server {
 
     public static class Builder {
         private List<Player> players;
+        private List<Mod> mods;
         private String version;
         private String motd;
         private String icon;
@@ -143,7 +156,8 @@ public class Server {
         private Integer protocol;
         private Integer fmlNetworkVersion;
         private int timesSeen;
-        private long timestamp;
+        private long firstseen;
+        private long lastseen;
         private Boolean whitelist;
         private Boolean cracked;
         private Boolean preventsReports;
@@ -152,6 +166,21 @@ public class Server {
         // Setters
         public Builder setPlayers(List<Player> players) {
             this.players = players;
+            return this;
+        }
+
+        public Builder setMods(List<Mod> mods) {
+            this.mods = mods;
+            return this;
+        }
+
+        public Builder addPlayer(Player player) {
+            players.add(player);
+            return this;
+        }
+
+        public Builder addMod(Mod mod) {
+            mods.add(mod);
             return this;
         }
 
@@ -225,8 +254,13 @@ public class Server {
             return this;
         }
 
-        public Builder setTimestamp(long timestamp) {
-            this.timestamp = timestamp;
+        public Builder setFirstSeen(long firstseen) {
+            this.firstseen = firstseen;
+            return this;
+        }
+
+        public Builder setLastSeen(long lastseen) {
+            this.lastseen = lastseen;
             return this;
         }
 

@@ -7,6 +7,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
+import xyz.funtimes909.serverseekerv2_discord_bot.Records.Mod;
+import xyz.funtimes909.serverseekerv2_discord_bot.Records.Player;
+import xyz.funtimes909.serverseekerv2_discord_bot.Records.Server;
 import xyz.funtimes909.serverseekerv2_discord_bot.Records.ServerEmbed;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.DatabaseConnectionPool;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PermissionsCheck;
@@ -173,12 +176,38 @@ public class Search {
 
     public static void serverSelectedButtonEvent(String address, short port) {
         try (Connection conn = DatabaseConnectionPool.getConnection()) {
-            PreparedStatement statement = conn.prepareStatement("SELECT * FROM servers LEFT JOIN playerhistory ON servers.address = playerhistory.address AND servers.port = playerhistory.port WHERE servers.address = ? AND servers.port = ?");
+            PreparedStatement statement = conn.prepareStatement("SELECT * FROM servers LEFT JOIN playerhistory ON servers.address = playerhistory.address AND servers.port = playerhistory.port LEFT JOIN mods ON servers.address = mods.address AND servers.port = mods.port WHERE servers.address = ? AND servers.port = ?");
             statement.setString(1, address);
             statement.setShort(2, port);
 
-            ResultSet resultSet = statement.executeQuery();
-            ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(resultSet);
+            ResultSet results = statement.executeQuery();
+            Server.Builder server = new Server.Builder();
+
+            while (results.next()) {
+                server.setAddress(results.getString("address"));
+                System.out.println(results.getString("address"));
+                server.setPort(results.getShort("port"));
+                server.setMotd(results.getString("motd"));
+                server.setVersion(results.getString("version"));
+                server.setFirstSeen(results.getLong("firstseen"));
+                server.setLastSeen(results.getLong("lastseen"));
+                server.setProtocol(results.getInt("protocol"));
+                server.setCountry(results.getString("country"));
+                server.setAsn(results.getString("asn"));
+                server.setReverseDns(results.getString("reversedns"));
+                server.setOrganization(results.getString("organization"));
+                server.setWhitelist(results.getBoolean("whitelist"));
+                server.setEnforceSecure(results.getBoolean("enforceSecure"));
+                server.setCracked(results.getBoolean("cracked"));
+                server.setPreventsReports(results.getBoolean("preventsReports"));
+                server.setMaxPlayers(results.getInt("maxPlayers"));
+                server.setFmlNetworkVersion(results.getInt("fmlnetworkversion"));
+
+//                server.addPlayer(new Player(results.getString("playername"), results.getString("playeruuid"), results.getLong("lastseen")));
+//                server.addMod(new Mod(results.getString("modid"), results.getString("modmarker")));
+            }
+
+            ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server.build());
             MessageEmbed embed = embedBuilder.build(false);
 
             if (embed == null) {

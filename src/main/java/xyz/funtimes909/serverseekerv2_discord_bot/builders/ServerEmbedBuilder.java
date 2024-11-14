@@ -15,28 +15,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ServerEmbedBuilder {
-    private static String address;
-    private static short port;
-    private static String description;
-    private static String version;
-    private static int protocol;
-    private static String country;
-    private static String asn;
-    private static String hostname;
-    private static String organization;
-    private static long firstseen;
-    private static long lastseen;
-    private static int timesSeen;
-    private static Boolean whitelist;
-    private static Boolean enforceSecure;
-    private static Boolean cracked;
-    private static Boolean preventsReports;
-    private static int maxPlayers;
-    private static int fmlNetworkVersion;
-    private static List<Player> players = new ArrayList<>();
+    private String address;
+    private short port;
+    private String description;
+    private String version;
+    private Integer protocol;
+    private String country;
+    private String asn;
+    private String hostname;
+    private String organization;
+    private long firstseen;
+    private long lastseen;
+    private int timesSeen;
+    private Boolean whitelist;
+    private Boolean enforceSecure;
+    private Boolean cracked;
+    private Boolean preventsReports;
+    private Integer maxPlayers;
+    private Integer fmlNetworkVersion;
+    private List<Player> players = new ArrayList<>();
 
     public ServerEmbedBuilder(ResultSet results) {
-        players.clear();
         try (results) {
             results.next();
             address = results.getString("address");
@@ -66,7 +65,6 @@ public class ServerEmbedBuilder {
     }
 
     public ServerEmbedBuilder(Server server) {
-        players.clear();
         address = server.getAddress();
         port = server.getPort();
         description = server.getMotd();
@@ -76,7 +74,8 @@ public class ServerEmbedBuilder {
         asn = server.getAsn();
         hostname = server.getReverseDns();
         organization = server.getOrganization();
-        lastseen = server.getTimestamp();
+        firstseen = server.getFirstseen();
+        lastseen = server.getLastseen();
         timesSeen = server.getTimesSeen();
         whitelist = server.getWhitelist();
         enforceSecure = server.getEnforceSecure();
@@ -84,9 +83,6 @@ public class ServerEmbedBuilder {
         preventsReports = server.getPreventsReports();
         maxPlayers = server.getMaxPlayers();
         players = server.getPlayers();
-
-        if (server.getFmlNetworkVersion() == null) fmlNetworkVersion = 0;
-        else fmlNetworkVersion = server.getFmlNetworkVersion();
     }
 
     public MessageEmbed build(boolean ping) {
@@ -100,7 +96,7 @@ public class ServerEmbedBuilder {
         miscInfo.append("Cracked: **").append(cracked != null ? cracked + "**\n" : "N/A**\n");
         miscInfo.append("Prevents Chat Reports: **").append(preventsReports != null ? preventsReports + "**\n" : "N/A**\n");
         miscInfo.append("Enforces Secure Chat: **").append(enforceSecure != null ? enforceSecure + "**\n" : "N/A**\n");
-        miscInfo.append("Forge: **").append(fmlNetworkVersion != 0 ? "true**\n" : "false**\n");
+        miscInfo.append("Forge: **").append(fmlNetworkVersion != null ? "true**\n" : "false**\n");
 
         // Address information
 
@@ -126,8 +122,8 @@ public class ServerEmbedBuilder {
 
         if (firstseen == 0) firstseen = System.currentTimeMillis() / 1000;
 
-        playerInfo.append("Players: **").append(players.size()).append("/").append(maxPlayers).append("**\n");
-        if (players.isEmpty()) {
+        playerInfo.append("Players: **").append(players != null ? players.size() : 0).append("/").append(maxPlayers).append("**\n");
+        if (players == null || players.isEmpty()) {
             playerInfo.append("```No players found!```");
         } else {
             playerInfo.append("```\n");
@@ -141,11 +137,11 @@ public class ServerEmbedBuilder {
         return new EmbedBuilder()
                 .setColor(new Color(0, 255, 0))
                 .setAuthor("ServerSeekerV2", "https://funtimes909.xyz/assets/images/serverseekerv2-icon-cropped.png")
-                .setTitle(address + ":" + port)
                 .setThumbnail("https://funtimes909.xyz/avatar-gif")
+                .setTitle(address + ":" + port)
                 .addField("** -- __Version__ -- **", version + " (" + protocol + ")", false)
                 .addField("** -- __Description__ -- **", description != null ? "```" + description + "```" : "```No description found!```", false)
-                .addField("** -- __Country__ -- **", country != null ? ":flag_" + country.toLowerCase() + ":" + country : ":x: No country information available", false)
+                .addField("** -- __Country__ -- **", country != null ? ":flag_" + country.toLowerCase() + ":" + country : ":x: No Country Information", false)
                 .addField("** -- __First Seen__ -- **", "<t:" + firstseen + ":R>", false)
                 .addField("** -- __Last Seen__ -- **", "<t:" + lastseen + ":R>", false)
                 .addField("** -- __Miscellaneous__ -- **", miscInfo.toString(), false)
