@@ -182,10 +182,11 @@ public class Search {
 
             ResultSet results = statement.executeQuery();
             Server.Builder server = new Server.Builder();
+            List<Player> players = new ArrayList<>();
+            List<Mod> mods = new ArrayList<>();
 
             while (results.next()) {
                 server.setAddress(results.getString("address"));
-                System.out.println(results.getString("address"));
                 server.setPort(results.getShort("port"));
                 server.setMotd(results.getString("motd"));
                 server.setVersion(results.getString("version"));
@@ -203,9 +204,12 @@ public class Search {
                 server.setMaxPlayers(results.getInt("maxPlayers"));
                 server.setFmlNetworkVersion(results.getInt("fmlnetworkversion"));
 
-//                server.addPlayer(new Player(results.getString("playername"), results.getString("playeruuid"), results.getLong("lastseen")));
-//                server.addMod(new Mod(results.getString("modid"), results.getString("modmarker")));
+                if (results.getString("playername") != null) players.add(new Player(results.getString("playername"), results.getString("playeruuid"), results.getLong("lastseen")));
+                if (results.getString("modid") != null) mods.add(new Mod(results.getString("modid"), results.getString("modmarker")));
             }
+
+            server.setPlayers(players);
+            server.setMods(mods);
 
             ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server.build());
             MessageEmbed embed = embedBuilder.build(false);

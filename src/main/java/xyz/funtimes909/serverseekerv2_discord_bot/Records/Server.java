@@ -174,16 +174,6 @@ public class Server {
             return this;
         }
 
-        public Builder addPlayer(Player player) {
-            players.add(player);
-            return this;
-        }
-
-        public Builder addMod(Mod mod) {
-            mods.add(mod);
-            return this;
-        }
-
         public Builder setVersion(String version) {
             this.version = version;
             return this;

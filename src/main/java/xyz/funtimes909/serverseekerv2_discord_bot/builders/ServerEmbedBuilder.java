@@ -33,36 +33,7 @@ public class ServerEmbedBuilder {
     private Boolean preventsReports;
     private Integer maxPlayers;
     private Integer fmlNetworkVersion;
-    private List<Player> players = new ArrayList<>();
-
-    public ServerEmbedBuilder(ResultSet results) {
-        try (results) {
-            results.next();
-            address = results.getString("address");
-            port = results.getShort("port");
-            description = results.getString("motd");
-            version = results.getString("version");
-            protocol = results.getInt("protocol");
-            country = results.getString("country");
-            asn = results.getString("asn");
-            hostname = results.getString("reversedns");
-            organization = results.getString("organization");
-            firstseen = results.getLong("firstseen");
-            lastseen = results.getLong("lastseen");
-            timesSeen = results.getInt("timesSeen");
-            whitelist = results.getBoolean("whitelist");
-            enforceSecure = results.getBoolean("enforceSecure");
-            cracked = results.getBoolean("cracked");
-            preventsReports = results.getBoolean("preventsReports");
-            maxPlayers = results.getInt("maxPlayers");
-            fmlNetworkVersion = results.getInt("fmlNetworkVersion");
-            if (results.getString("playername") != null && results.getString("playeruuid") != null) {
-                players.add(new Player(results.getString("playername"), results.getString("playeruuid"), results.getLong("lastseen")));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+    private List<Player> players;
 
     public ServerEmbedBuilder(Server server) {
         address = server.getAddress();
