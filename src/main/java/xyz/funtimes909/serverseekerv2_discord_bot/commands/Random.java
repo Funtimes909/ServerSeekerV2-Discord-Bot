@@ -6,9 +6,9 @@ import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 import xyz.funtimes909.serverseekerv2_discord_bot.Records.Mod;
 import xyz.funtimes909.serverseekerv2_discord_bot.Records.Player;
 import xyz.funtimes909.serverseekerv2_discord_bot.Records.Server;
+import xyz.funtimes909.serverseekerv2_discord_bot.builders.ServerEmbedBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.DatabaseConnectionPool;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PermissionsCheck;
-import xyz.funtimes909.serverseekerv2_discord_bot.builders.ServerEmbedBuilder;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

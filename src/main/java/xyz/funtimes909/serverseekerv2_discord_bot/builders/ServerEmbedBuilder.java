@@ -9,9 +9,6 @@ import xyz.funtimes909.serverseekerv2_discord_bot.Records.Server;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.IpLookup;
 
 import java.awt.*;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ServerEmbedBuilder {
