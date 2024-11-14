@@ -3,6 +3,7 @@ package xyz.funtimes909.serverseekerv2_discord_bot.util;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import xyz.funtimes909.serverseekerv2_discord_bot.Records.Mod;
 import xyz.funtimes909.serverseekerv2_discord_bot.Records.Player;
 import xyz.funtimes909.serverseekerv2_discord_bot.Records.Server;
 
@@ -52,6 +53,7 @@ public class PingUtils {
             Integer maxPlayers = null;
             Integer onlinePlayers = null;
             List<Player> playerList = new ArrayList<>();
+            List<Mod> modsList  = new ArrayList<>();
 
             // Minecraft server information
             if (parsedJson.has("version")) {
@@ -86,6 +88,15 @@ public class PingUtils {
             // Forge servers send back information about mods
             if (parsedJson.has("forgeData")) {
                 fmlNetworkVersion = parsedJson.get("forgeData").getAsJsonObject().get("fmlNetworkVersion").getAsInt();
+                if (parsedJson.get("forgeData").getAsJsonObject().has("mods")) {
+                    for (JsonElement modJson : parsedJson.get("forgeData").getAsJsonObject().get("mods").getAsJsonArray().asList()) {
+                        String modId = modJson.getAsJsonObject().get("modId").getAsString();
+                        String modmarker = modJson.getAsJsonObject().get("modmarker").getAsString();
+
+                        Mod mod = new Mod(modId, modmarker);
+                        modsList.add(mod);
+                    }
+                }
             }
 
             // Check for players
@@ -123,6 +134,7 @@ public class PingUtils {
                     .setMaxPlayers(maxPlayers)
                     .setOnlinePlayers(onlinePlayers)
                     .setPlayers(playerList)
+                    .setMods(modsList)
                     .build();
         } catch (IOException ignored) {}
         return null;

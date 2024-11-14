@@ -4,33 +4,36 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import xyz.funtimes909.serverseekerv2_discord_bot.Records.Mod;
 import xyz.funtimes909.serverseekerv2_discord_bot.Records.Player;
 import xyz.funtimes909.serverseekerv2_discord_bot.Records.Server;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.IpLookup;
 
 import java.awt.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ServerEmbedBuilder {
-    private String address;
-    private short port;
-    private String description;
-    private String version;
-    private Integer protocol;
+    private final String address;
+    private final short port;
+    private final String description;
+    private final String version;
+    private final Integer protocol;
     private String country;
     private String asn;
     private String hostname;
     private String organization;
     private long firstseen;
-    private long lastseen;
-    private int timesSeen;
-    private Boolean whitelist;
-    private Boolean enforceSecure;
-    private Boolean cracked;
-    private Boolean preventsReports;
-    private Integer maxPlayers;
-    private Integer fmlNetworkVersion;
-    private List<Player> players;
+    private final long lastseen;
+    private final int timesSeen;
+    private final Boolean whitelist;
+    private final Boolean enforceSecure;
+    private final Boolean cracked;
+    private final Boolean preventsReports;
+    private final Integer maxPlayers;
+    private final Integer fmlNetworkVersion;
+    private final List<Player> players;
+    private final List<Mod> mods;
 
     public ServerEmbedBuilder(Server server) {
         address = server.getAddress();
@@ -50,13 +53,16 @@ public class ServerEmbedBuilder {
         cracked = server.getCracked();
         preventsReports = server.getPreventsReports();
         maxPlayers = server.getMaxPlayers();
+        fmlNetworkVersion = server.getFmlNetworkVersion();
         players = server.getPlayers();
+        mods = server.getMods();
     }
 
     public MessageEmbed build(boolean ping) {
         StringBuilder miscInfo = new StringBuilder();
         StringBuilder addressInfo = new StringBuilder();
         StringBuilder playerInfo = new StringBuilder();
+        StringBuilder modInfo = new StringBuilder();
 
         // Miscellaneous info
         if (!ping) miscInfo.append("Times Seen: **").append(timesSeen).append("**\n");
@@ -94,6 +100,7 @@ public class ServerEmbedBuilder {
 
         if (firstseen == 0) firstseen = System.currentTimeMillis() / 1000;
 
+        // Create field for players
         playerInfo.append("Players: **").append(players != null ? players.size() : 0).append("/").append(maxPlayers).append("**\n");
         if (players == null || players.isEmpty()) {
             playerInfo.append("```No players found!```");
@@ -103,6 +110,24 @@ public class ServerEmbedBuilder {
                 playerInfo.append("\n").append(player.name()).append("\n").append(player.uuid()).append("\n");
             }
             playerInfo.append("```");
+        }
+
+        // Create field for mods
+        modInfo.append("Mods: **").append(mods != null ? mods.size() : 0).append("**\n");
+        if (mods == null || mods.isEmpty()) {
+            modInfo.append("```No mods found!```");
+        } else {
+            modInfo.append("```\n");
+            int count = 0;
+            for (Mod mod : mods) {
+                if (mod.modmarker().startsWith("OHNOES")) continue;
+                modInfo.append("\n").append(mod.modid()).append("\n").append(mod.modmarker()).append("\n");
+                count++;
+                if (count == 5) break;
+            }
+
+            if (mods.size() > 5) modInfo.append("\n").append(mods.size() - 5).append(" Mods not shown...\n");
+            modInfo.append("```");
         }
 
         // Build server information embed
@@ -118,6 +143,7 @@ public class ServerEmbedBuilder {
                 .addField("** -- __Last Seen__ -- **", "<t:" + lastseen + ":R>", false)
                 .addField("** -- __Miscellaneous__ -- **", miscInfo.toString(), false)
                 .addField("** -- __Players__ -- **",  playerInfo.toString(), false)
+                .addField("** -- __Mods__ -- **",  modInfo.toString(), false)
                 .addField("** -- __Address Information__ -- **", addressInfo.toString(), false)
                 .build();
     }
