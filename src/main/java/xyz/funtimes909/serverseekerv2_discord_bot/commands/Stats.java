@@ -16,9 +16,9 @@ public class Stats {
     public static void stats(SlashCommandInteractionEvent event) {
         try (Connection connection = DatabaseConnectionPool.getConnection()) {
             Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) FROM servers");
-            resultSet.next();
-            int serverCount = resultSet.getInt("count");
+            ResultSet results = statement.executeQuery("SELECT COUNT(*) FROM servers");
+            results.next();
+            int serverCount = results.getInt("count");
 
             MessageEmbed embed = new EmbedBuilder()
                     .setTitle("Stats")
@@ -29,6 +29,8 @@ public class Stats {
                     .build();
 
             event.replyEmbeds(embed).queue();
+            results.close();
+            statement.close();
         } catch (SQLException e) {
             Main.logger.error("Error running the stats command!", e);
         }

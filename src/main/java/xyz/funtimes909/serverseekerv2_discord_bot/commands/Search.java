@@ -89,7 +89,7 @@ public class Search {
 
         // Player and ModId searching
         if (event.getOption("player") != null) query.append(" JOIN playerhistory ON servers.address = playerhistory.address AND servers.port = playerhistory.port");
-        if (event.getOption("mods") != null) query.append(" JOIN mods ON servers.address = mods.address and servers.port = mods.port");
+        if (event.getOption("mods") != null) query.append(" JOIN mods ON servers.address = mods.address AND servers.port = mods.port");
         query.append(" WHERE ");
 
         for (OptionMapping option : options) {
@@ -210,6 +210,8 @@ public class Search {
 
             server.setPlayers(players);
             server.setMods(mods);
+            statement.close();
+            results.close();
 
             ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server.build());
             MessageEmbed embed = embedBuilder.build(false);

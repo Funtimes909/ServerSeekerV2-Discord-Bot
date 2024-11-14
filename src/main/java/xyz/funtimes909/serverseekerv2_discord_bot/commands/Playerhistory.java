@@ -34,6 +34,8 @@ public class Playerhistory {
             results.beforeFirst();
             MessageEmbed embed = PlayerhistoryEmbedBuilder.build(results);
             if (embed != null) event.getHook().sendMessageEmbeds(embed).queue();
+            statement.close();
+            results.close();
         } catch (SQLException e) {
             event.getHook().sendMessage("Something went wrong executing this command!").queue();
             Main.logger.warn("Exception when running the playerhistory command!", e);

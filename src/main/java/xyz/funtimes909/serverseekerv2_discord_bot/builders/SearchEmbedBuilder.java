@@ -24,7 +24,7 @@ public class SearchEmbedBuilder {
             if (server.country() != null) {
                 address.insert(0, ":flag_" + server.country().toLowerCase() + ": **:** ");
             } else {
-                address.insert(0, ":x:**:** ");
+                address.insert(0, ":x: **:** ");
             }
 
             // Make everything the same length
@@ -38,11 +38,11 @@ public class SearchEmbedBuilder {
             }
 
             if (server.country() != null) {
-                while (address.length() < 34) {
+                while (address.length() < 36) {
                     address.insert(address.length() - 2, " ");
                 }
             } else {
-                while (address.length() < 27) {
+                while (address.length() < 30) {
                     address.insert(address.length() - 2, " ");
                 }
             }

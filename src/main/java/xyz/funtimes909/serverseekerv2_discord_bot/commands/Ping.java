@@ -13,13 +13,9 @@ public class Ping {
             event.getHook().sendMessage("Sorry! You're not authorized to use this command!").queue();
             return;
         }
-
-        short port = 25565;
         event.deferReply().queue();
-
-        if (event.getOption("port") != null) {
-            port = (short) event.getOption("port").getAsInt();
-        }
+        short port = 25565;
+        if (event.getOption("port") != null) port = (short) event.getOption("port").getAsInt();
 
         PingUtils ping = new PingUtils(event.getOption("address").getAsString(), port);
         Server server = ping.parse();

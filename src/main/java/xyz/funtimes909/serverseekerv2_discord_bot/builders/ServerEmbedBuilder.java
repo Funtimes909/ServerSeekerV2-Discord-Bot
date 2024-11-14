@@ -70,7 +70,6 @@ public class ServerEmbedBuilder {
         miscInfo.append("Forge: **").append(fmlNetworkVersion != null ? "true**\n" : "false**\n");
 
         // Address information
-
         if (ping) {
             String primaryResponse = IpLookup.run(address);
             if (primaryResponse != null) {
@@ -83,12 +82,17 @@ public class ServerEmbedBuilder {
         }
 
         addressInfo.append("ASN: **").append(asn != null ? asn + "**\n" : "N/A**\n");
-        addressInfo.append("Organization: **").append(organization != null ? organization + "**\n" : "N/A**\n");
 
         if (hostname == null || hostname.isBlank()) {
             addressInfo.append("Hostname: **").append("N/A**\n");
         } else {
-            addressInfo.append("Hostname: **").append(hostname + "**\n");
+            addressInfo.append("Hostname: **").append(hostname).append("**\n");
+        }
+
+        if (organization == null || organization.isBlank()) {
+            addressInfo.append("Organization: **").append("N/A**\n");
+        } else {
+            addressInfo.append("Organization: **").append(organization).append("**\n");
         }
 
         if (firstseen == 0) firstseen = System.currentTimeMillis() / 1000;

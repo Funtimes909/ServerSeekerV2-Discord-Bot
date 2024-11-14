@@ -25,9 +25,7 @@ public class Random {
         }
         event.deferReply().queue();
 
-        try {
-            // Create statement
-            Connection conn = DatabaseConnectionPool.getConnection();
+        try (Connection conn = DatabaseConnectionPool.getConnection()) {
             Statement statement = conn.createStatement();
             long startTime = System.currentTimeMillis() / 1000;
             String query = "SELECT * FROM servers LEFT JOIN playerhistory ON servers.address = playerhistory.address AND servers.port = playerhistory.port LEFT JOIN mods ON servers.address = mods.address AND servers.port = mods.port ORDER BY RANDOM() LIMIT 1";
@@ -71,7 +69,7 @@ public class Random {
 
             if (embed != null) event.getHook().sendMessageEmbeds(embed).queue();
         } catch (SQLException e) {
-            Main.logger.warn("SQL Exception", e);
+            Main.logger.warn("SQL Exception while running the random command!", e);
         }
     }
 }
