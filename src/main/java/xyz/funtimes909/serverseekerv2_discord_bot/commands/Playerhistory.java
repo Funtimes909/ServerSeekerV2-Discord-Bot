@@ -18,13 +18,27 @@ public class Playerhistory {
             event.reply("Sorry! You're not authorized to use this command!").queue();
             return;
         }
+
+        if (event.getOption("player") != null && event.getOption("address") != null) {
+            event.reply("Please select only one option!").queue();
+            return;
+        }
         event.deferReply().queue();
 
         try (Connection conn = DatabaseConnectionPool.getConnection()) {
-            PreparedStatement statement = conn.prepareStatement("SELECT address, playername, playeruuid, lastseen FROM playerhistory WHERE playername = ?", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            statement.setString(1, event.getOption("player").getAsString());
-            ResultSet results = statement.executeQuery();
+            PreparedStatement statement = null;
 
+            if (event.getOption("player") != null) {
+                statement = conn.prepareStatement("SELECT address, playername, playeruuid, lastseen FROM playerhistory WHERE playername = ?", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                statement.setString(1, event.getOption("player").getAsString());
+            }
+
+            if (event.getOption("address") != null) {
+                statement = conn.prepareStatement("SELECT address, playername, playeruuid, lastseen FROM playerhistory WHERE playerhistory.address = ?", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                statement.setString(1, event.getOption("address").getAsString());
+            }
+
+            ResultSet results = statement.executeQuery();
             results.last();
             if (results.getRow() == 0) {
                 event.getHook().sendMessage("No playerhistory found!").queue();
@@ -32,7 +46,7 @@ public class Playerhistory {
             }
 
             results.beforeFirst();
-            MessageEmbed embed = PlayerhistoryEmbedBuilder.build(results);
+            MessageEmbed embed = PlayerhistoryEmbedBuilder.build(results, event.getOption("player") != null ? event.getOption("player").getAsString() : event.getOption("address").getAsString());
             if (embed != null) event.getHook().sendMessageEmbeds(embed).queue();
             statement.close();
             results.close();

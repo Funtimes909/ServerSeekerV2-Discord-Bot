@@ -12,21 +12,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlayerhistoryEmbedBuilder {
-    public static MessageEmbed build(ResultSet results) {
+    public static MessageEmbed build(ResultSet results, String title) {
         List<PlayerEmbed> players = new ArrayList<>();
-        try (results) {
-            while (results.next()) players.add(new PlayerEmbed(results.getString("address"), results.getString("playername"), results.getString("playeruuid"), results.getLong("lastseen")));
-            StringBuilder playersInfo = new StringBuilder();
 
-            players.forEach(player -> {
-                playersInfo.append("**``").append(player.address()).append("``** **``").append(player.playername()).append("``** ").append("<t:").append(player.lastseen()).append(":R> \n");
-            });
+        try (results) {
+            while (results.next()) {
+                players.add(new PlayerEmbed(results.getString("address"), results.getString("playername"), results.getString("playeruuid"), results.getLong("lastseen")));
+            }
 
             EmbedBuilder embed = new EmbedBuilder()
                     .setAuthor("ServerSeekerV2", "https://discord.gg/WEErxAP8kz", "https://funtimes909.xyz/assets/images/serverseekerv2-icon-cropped.png")
-                    .addField("Players", playersInfo.toString(), false)
+                    .setTitle("Showing player history for: " + title)
                     .setFooter("Funtimes909", "https://funtimes909.xyz/avatar-gif")
-                    .setColor(new Color(248, 127, 5));
+                    .setColor(new Color(255, 115, 0));
+
+            for (PlayerEmbed player : players) {
+                StringBuilder address = new StringBuilder(player.address());
+                while (address.length() < 15) {
+                    address.insert(address.length(), " ");
+                }
+
+                embed.addField("**``" + address + "``** **``" + player.playername() + "``** <t:" + player.lastseen() + ":R>", "_ _ ", false);
+            }
 
             return embed.build();
         } catch (SQLException e) {

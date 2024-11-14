@@ -43,7 +43,7 @@ public class CommandRegisterer {
 
         client.updateCommands().addCommands(
                 Commands.slash("search", "Searches for servers with advanced filters")
-                                .addOptions(searchOptions),
+                                    .addOptions(searchOptions),
 
                 Commands.slash("random", "Finds a random server"),
                 Commands.slash("blacklist", "Blacklist a user from using the bot")
@@ -54,7 +54,8 @@ public class CommandRegisterer {
                         .addOption(OptionType.STRING, "url", "Webhook URL you want notifications sent to", true),
 
                 Commands.slash("playerhistory", "Search for playerhistory of a specific player")
-                                .addOption(OptionType.STRING, "player", "The player you want to search for", true),
+                        .addOption(OptionType.STRING, "player", "The player you want to search for", false)
+                        .addOption(OptionType.STRING, "address", "The server you want to search history for", false),
 
                 Commands.slash("takedown", "Request for your server to be excluded from all future scans")
                         .addOption(OptionType.STRING, "address", "IP address of the server you want to takedown", true)
