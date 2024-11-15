@@ -30,8 +30,7 @@ public class Random {
             long startTime = System.currentTimeMillis() / 1000;
             String query = "SELECT * FROM servers LEFT JOIN playerhistory ON servers.address = playerhistory.address AND servers.port = playerhistory.port LEFT JOIN mods ON servers.address = mods.address AND servers.port = mods.port ORDER BY RANDOM() LIMIT 1";
             long endTime = System.currentTimeMillis() / 1000;
-            long duration = endTime - startTime;
-            Main.logger.debug("Query took {}ms", duration);
+            Main.logger.debug("Query took {}ms", endTime - startTime);
 
             ResultSet results = statement.executeQuery(query);
             Server.Builder server = new Server.Builder();

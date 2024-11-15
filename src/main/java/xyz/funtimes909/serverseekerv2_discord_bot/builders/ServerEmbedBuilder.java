@@ -3,6 +3,7 @@ package xyz.funtimes909.serverseekerv2_discord_bot.builders;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import xyz.funtimes909.serverseekerv2_discord_bot.Records.Mod;
 import xyz.funtimes909.serverseekerv2_discord_bot.Records.Player;
@@ -131,21 +132,25 @@ public class ServerEmbedBuilder {
         }
 
         // Build server information embed
-        return new EmbedBuilder()
+        EmbedBuilder embed = new EmbedBuilder()
                 .setColor(new Color(0, 255, 0))
                 .setAuthor("ServerSeekerV2", "https://funtimes909.xyz/assets/images/serverseekerv2-icon-cropped.png")
                 .setThumbnail("https://funtimes909.xyz/avatar-gif")
                 .setTitle(address + ":" + port)
                 .addField("** -- __Version__ -- **", version + " (" + protocol + ")", false)
-                .addField("** -- __Description__ -- **", description != null ? "```" + description + "```" : "```No description found!```", false)
-                .addField("** -- __Country__ -- **", country != null ? ":flag_" + country.toLowerCase() + ":" + country : ":x: No Country Information", false)
-                .addField("** -- __First Seen__ -- **", "<t:" + firstseen + ":R>", false)
-                .addField("** -- __Last Seen__ -- **", "<t:" + lastseen + ":R>", false)
-                .addField("** -- __Miscellaneous__ -- **", miscInfo.toString(), false)
-                .addField("** -- __Players__ -- **",  playerInfo.toString(), false)
-                .addField("** -- __Mods__ -- **",  modInfo.toString(), false)
-                .addField("** -- __Address Information__ -- **", addressInfo.toString(), false)
-                .build();
+                .addField("** -- __Description__ -- **", description != null ? "```" + description + "```" : "```No description found!```", false);
+
+        if (!ping) {
+            embed.addField("** -- __First Seen__ -- **", "<t:" + firstseen + ":R>", false);
+            embed.addField("** -- __Last Seen__ -- **", "<t:" + lastseen + ":R>", false);
+        }
+
+        embed.addField("** -- __Country__ -- **", country != null ? ":flag_" + country.toLowerCase() + ":" + country : ":x: No Country Information", false);
+        embed.addField("** -- __Miscellaneous__ -- **", miscInfo.toString(), false);
+        embed.addField("** -- __Players__ -- **",  playerInfo.toString(), false);
+        embed.addField("** -- __Mods__ -- **",  modInfo.toString(), false);
+        embed.addField("** -- __Address Information__ -- **", addressInfo.toString(), false);
+        return embed.build();
     }
 }
 
