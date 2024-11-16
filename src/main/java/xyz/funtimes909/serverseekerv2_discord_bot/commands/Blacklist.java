@@ -9,16 +9,20 @@ import java.io.IOException;
 
 public class Blacklist {
     public static void blacklist(SlashCommandInteractionEvent event) {
-        if (!PermissionsCheck.trustedUsersCheck(event.getUser().getId())) {
-            event.reply("Sorry! You're not authorized to use this command!").queue();
+        String id = event.getUser().getId();
+        String user = event.getOption("user").getAsString();
+
+        if (!PermissionsCheck.ownerCheck(id) && !PermissionsCheck.trustedUsersCheck(id) || PermissionsCheck.blacklistCheck(id)) {
+            event.reply("Sorry! You are not authorized to run this command!").setEphemeral(true).queue();
             return;
         }
 
         if (event.getOption("blacklist").getAsString().equalsIgnoreCase("add")) {
             try (FileWriter file = new FileWriter("blacklist.txt")) {
-                file.write(event.getOption("user").getAsString() + "\n");
-                Main.logger.info("Adding {} to the blacklist", event.getOption("user").getAsString());
-                event.reply("Added " + event.getOption("user").getAsString() + " to the blacklist!").setEphemeral(true).queue();
+                file.write(user + "\n");
+
+                Main.logger.info("Adding {} to the blacklist", user);
+                event.reply("Added <@" + user + "> to the blacklist!").setEphemeral(true).queue();
             } catch (IOException e) {
                 Main.logger.error("blacklist.txt malformed or not found!", e);
             }

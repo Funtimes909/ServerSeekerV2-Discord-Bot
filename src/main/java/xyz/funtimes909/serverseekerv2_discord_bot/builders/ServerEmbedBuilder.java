@@ -3,7 +3,6 @@ package xyz.funtimes909.serverseekerv2_discord_bot.builders;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import xyz.funtimes909.serverseekerv2_discord_bot.Records.Mod;
 import xyz.funtimes909.serverseekerv2_discord_bot.Records.Player;
@@ -12,7 +11,6 @@ import xyz.funtimes909.serverseekerv2_discord_bot.util.IpLookup;
 
 import java.awt.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ServerEmbedBuilder {
     private final String address;

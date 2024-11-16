@@ -18,8 +18,10 @@ import java.util.List;
 
 public class Playerhistory {
     public static void playerhistory(SlashCommandInteractionEvent event) {
-        if (PermissionsCheck.blacklistCheck(event.getUser().getId())) {
-            event.reply("Sorry! You're not authorized to use this command!").queue();
+        String id = event.getInteraction().getUser().getId();
+
+        if (!PermissionsCheck.ownerCheck(id) && !PermissionsCheck.trustedUsersCheck(id) || PermissionsCheck.blacklistCheck(id)) {
+            event.reply("Sorry! You are not authorized to run this command!").setEphemeral(true).queue();
             return;
         }
 

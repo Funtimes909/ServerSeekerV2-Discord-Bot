@@ -35,9 +35,11 @@ public class Search {
     private static ResultSet resultSet;
 
     public static void search(SlashCommandInteractionEvent interactionEvent) {
+        String id = event.getUser().getId();
         event = interactionEvent;
-        if (PermissionsCheck.blacklistCheck(event.getUser().getId())) {
-            event.reply("Sorry! You're not authorized to use this command!").queue();
+
+        if (!PermissionsCheck.ownerCheck(id) && !PermissionsCheck.trustedUsersCheck(id) || PermissionsCheck.blacklistCheck(id)) {
+            event.reply("Sorry! You are not authorized to run this command!").setEphemeral(true).queue();
             return;
         }
 

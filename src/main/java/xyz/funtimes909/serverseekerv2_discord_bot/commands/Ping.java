@@ -9,8 +9,10 @@ import xyz.funtimes909.serverseekerv2_discord_bot.util.PingUtils;
 
 public class Ping {
     public static void ping(SlashCommandInteractionEvent event) {
-        if (PermissionsCheck.blacklistCheck(event.getUser().getId())) {
-            event.getHook().sendMessage("Sorry! You're not authorized to use this command!").queue();
+        String id = event.getUser().getId();
+
+        if (!PermissionsCheck.ownerCheck(id) && !PermissionsCheck.trustedUsersCheck(id) || PermissionsCheck.blacklistCheck(id)) {
+            event.reply("Sorry! You are not authorized to run this command!").setEphemeral(true).queue();
             return;
         }
         event.deferReply().queue();

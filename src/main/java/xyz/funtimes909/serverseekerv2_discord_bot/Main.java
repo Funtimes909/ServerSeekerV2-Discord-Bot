@@ -23,7 +23,7 @@ public class Main {
     public static String password;
     public static String url;
     public static String ownerId;
-     public static final Logger logger = LoggerFactory.getLogger("ServerSeekerV2");
+    public static final Logger logger = LoggerFactory.getLogger("ServerSeekerV2");
 
     public static void main(String[] args) {
         String configFile;
@@ -57,7 +57,6 @@ public class Main {
                     .addEventListeners(new ButtonInteractionEventListener())
                     .build();
 
-            // CommandRegisterer commands
             CommandRegisterer.registerCommands(client);
         } catch (IOException e) {
             System.out.println("Failed to read config file: " + e.getMessage());

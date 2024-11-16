@@ -8,22 +8,20 @@ import java.io.IOException;
 
 public class PermissionsCheck {
     public static boolean blacklistCheck(String userId) {
-        try {
+        try (BufferedReader blacklist = new BufferedReader(new FileReader("blacklist.txt"))) {
             String line;
-            BufferedReader blacklist = new BufferedReader(new FileReader("blacklist.txt"));
             while ((line = blacklist.readLine()) != null) {
                 if (userId.equals(line)) return true;
             }
         } catch (IOException e) {
             Main.logger.error("Failed to read blacklist.txt");
         }
-            return false;
+        return false;
     }
 
     public static boolean trustedUsersCheck(String userId) {
-        try {
+        try (BufferedReader trustedUsers = new BufferedReader(new FileReader("trusted_users.txt"))) {
             String line;
-            BufferedReader trustedUsers = new BufferedReader(new FileReader("trusted_users.txt"));
             while ((line = trustedUsers.readLine()) != null) {
                 if (userId.equals(line)) return true;
             }
@@ -31,5 +29,9 @@ public class PermissionsCheck {
             Main.logger.error("Failed to read trusted_users.txt");
         }
         return false;
+    }
+
+    public static boolean ownerCheck(String userId) {
+        return Main.ownerId.equals(userId);
     }
 }
