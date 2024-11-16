@@ -7,33 +7,21 @@ import xyz.funtimes909.serverseekerv2_discord_bot.commands.Search;
 public class ButtonInteractionEventListener extends ListenerAdapter {
     @Override
     public void onButtonInteraction(ButtonInteractionEvent event) {
-        String name;
-        String address;
         switch (event.getComponentId()) {
             case "SearchButton1":
-                name = event.getMessage().getEmbeds().getFirst().getFields().stream().filter((index) -> index.getName().startsWith("1")).findFirst().get().getName();
-                address = name.substring(name.indexOf("`") + 2).replaceAll("``", "").split(" ")[0];
-                Search.serverSelectedButtonEvent(address, (short) 25565);
+                Search.serverSelectedButtonEvent(findField(event, 1), (short) 25565);
                 break;
             case "SearchButton2":
-                name = event.getMessage().getEmbeds().getFirst().getFields().stream().filter((index) -> index.getName().startsWith("2")).findFirst().get().getName();
-                address = name.substring(name.indexOf("`") + 2).replaceAll("``", "").split(" ")[0];
-                Search.serverSelectedButtonEvent(address, (short) 25565);
+                Search.serverSelectedButtonEvent(findField(event, 2), (short) 25565);
                 break;
             case "SearchButton3":
-                name = event.getMessage().getEmbeds().getFirst().getFields().stream().filter((index) -> index.getName().startsWith("3")).findFirst().get().getName();
-                address = name.substring(name.indexOf("`") + 2).replaceAll("``", "").split(" ")[0];
-                Search.serverSelectedButtonEvent(address, (short) 25565);
+                Search.serverSelectedButtonEvent(findField(event, 3), (short) 25565);
                 break;
             case "SearchButton4":
-                name = event.getMessage().getEmbeds().getFirst().getFields().stream().filter((index) -> index.getName().startsWith("4")).findFirst().get().getName();
-                address = name.substring(name.indexOf("`") + 2).replaceAll("``", "").split(" ")[0];
-                Search.serverSelectedButtonEvent(address, (short) 25565);
+                Search.serverSelectedButtonEvent(findField(event, 4), (short) 25565);
                 break;
             case "SearchButton5":
-                name = event.getMessage().getEmbeds().getFirst().getFields().stream().filter((index) -> index.getName().startsWith("5")).findFirst().get().getName();
-                address = name.substring(name.indexOf("`") + 2).replaceAll("``", "").split(" ")[0];
-                Search.serverSelectedButtonEvent(address, (short) 25565);
+                Search.serverSelectedButtonEvent(findField(event, 5), (short) 25565);
                 break;
             case "PagePrevious":
                 if (Search.page != 1) Search.page -= 1;
@@ -45,5 +33,11 @@ public class ButtonInteractionEventListener extends ListenerAdapter {
                 break;
         }
         event.deferEdit().complete();
+    }
+
+    private static String findField(ButtonInteractionEvent event, int fieldNumber) {
+        String fieldName;
+        fieldName = event.getMessage().getEmbeds().getFirst().getFields().stream().filter((index) -> index.getName().startsWith(String.valueOf(fieldNumber))).findFirst().get().getName();
+        return fieldName.substring(fieldName.indexOf("`") + 2).replaceAll("``", "").split(" ")[0];
     }
 }

@@ -17,7 +17,7 @@ public class DatabaseConnectionPool {
 
     public static Connection getConnection() {
         try {
-            return dataSource.getConnection();
+            return dataSource. getConnection();
         } catch (SQLException e) {
             throw new RuntimeException("Couldn't connect to database!", e);
         }
