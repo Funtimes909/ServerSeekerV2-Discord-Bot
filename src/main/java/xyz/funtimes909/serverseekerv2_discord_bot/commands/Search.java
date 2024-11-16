@@ -3,6 +3,7 @@ package xyz.funtimes909.serverseekerv2_discord_bot.commands;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -174,7 +175,7 @@ public class Search {
         }
     }
 
-    public static void serverSelectedButtonEvent(String address, short port) {
+    public static void serverSelectedButtonEvent(String address, short port, ButtonInteractionEvent event) {
         try (Connection conn = DatabaseConnectionPool.getConnection()) {
             PreparedStatement statement = conn.prepareStatement("SELECT * FROM servers LEFT JOIN playerhistory ON servers.address = playerhistory.address AND servers.port = playerhistory.port LEFT JOIN mods ON servers.address = mods.address AND servers.port = mods.port WHERE servers.address = ? AND servers.port = ?");
             statement.setString(1, address);
@@ -217,11 +218,11 @@ public class Search {
             MessageEmbed embed = embedBuilder.build(false);
 
             if (embed == null) {
-                event.getHook().sendMessage("Something went wrong executing that command!").queue();
+                event.getInteraction().reply("Something went wrong executing that command!").queue();
                 return;
             }
 
-            event.getHook().sendMessageEmbeds(embed).queue();
+            event.getInteraction().replyEmbeds(embed).queue();
         } catch (SQLException e) {
             Main.logger.error("Error while executing query!", e);
         }

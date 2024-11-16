@@ -9,19 +9,19 @@ public class ButtonInteractionEventListener extends ListenerAdapter {
     public void onButtonInteraction(ButtonInteractionEvent event) {
         switch (event.getComponentId()) {
             case "SearchButton1":
-                Search.serverSelectedButtonEvent(findField(event, 1), (short) 25565);
+                Search.serverSelectedButtonEvent(findField(event, 1), (short) 25565, event);
                 break;
             case "SearchButton2":
-                Search.serverSelectedButtonEvent(findField(event, 2), (short) 25565);
+                Search.serverSelectedButtonEvent(findField(event, 2), (short) 25565, event);
                 break;
             case "SearchButton3":
-                Search.serverSelectedButtonEvent(findField(event, 3), (short) 25565);
+                Search.serverSelectedButtonEvent(findField(event, 3), (short) 25565, event);
                 break;
             case "SearchButton4":
-                Search.serverSelectedButtonEvent(findField(event, 4), (short) 25565);
+                Search.serverSelectedButtonEvent(findField(event, 4), (short) 25565, event);
                 break;
             case "SearchButton5":
-                Search.serverSelectedButtonEvent(findField(event, 5), (short) 25565);
+                Search.serverSelectedButtonEvent(findField(event, 5), (short) 25565, event);
                 break;
             case "PagePrevious":
                 if (Search.page != 1) Search.page -= 1;
@@ -32,7 +32,6 @@ public class ButtonInteractionEventListener extends ListenerAdapter {
                 Search.scrollResults(0, false);
                 break;
         }
-        event.deferEdit().complete();
     }
 
     private static String findField(ButtonInteractionEvent event, int fieldNumber) {
