@@ -35,7 +35,7 @@ public class Search {
     private static ResultSet resultSet;
 
     public static void search(SlashCommandInteractionEvent interactionEvent) {
-        String id = event.getUser().getId();
+        String id = interactionEvent.getUser().getId();
         event = interactionEvent;
 
         if (!PermissionsCheck.ownerCheck(id) && !PermissionsCheck.trustedUsersCheck(id) || PermissionsCheck.blacklistCheck(id)) {
