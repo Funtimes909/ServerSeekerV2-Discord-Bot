@@ -39,6 +39,9 @@ public class SlashCommandListener extends ListenerAdapter {
                 case "playerhistory":
                     executor.submit(() -> Playerhistory.playerhistory(event));
                     break;
+                case "track":
+                    executor.submit(() -> Track.track(event));
+                    break;
             }
         }
     }
