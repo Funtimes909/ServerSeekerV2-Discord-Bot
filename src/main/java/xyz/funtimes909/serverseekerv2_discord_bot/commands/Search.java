@@ -38,7 +38,7 @@ public class Search {
         String id = interactionEvent.getUser().getId();
         event = interactionEvent;
 
-        if (!PermissionsCheck.ownerCheck(id) && !PermissionsCheck.trustedUsersCheck(id) || PermissionsCheck.blacklistCheck(id)) {
+        if (PermissionsCheck.blacklistCheck(id)) {
             event.reply("Sorry! You are not authorized to run this command!").setEphemeral(true).queue();
             return;
         }

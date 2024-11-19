@@ -20,7 +20,7 @@ public class Playerhistory {
     public static void playerhistory(SlashCommandInteractionEvent event) {
         String id = event.getInteraction().getUser().getId();
 
-        if (!PermissionsCheck.ownerCheck(id) && !PermissionsCheck.trustedUsersCheck(id) || PermissionsCheck.blacklistCheck(id)) {
+        if (PermissionsCheck.blacklistCheck(id)) {
             event.reply("Sorry! You are not authorized to run this command!").setEphemeral(true).queue();
             return;
         }

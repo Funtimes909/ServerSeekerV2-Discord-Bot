@@ -21,7 +21,7 @@ public class Random {
     public static void random(SlashCommandInteractionEvent event) {
         String id = event.getUser().getId();
 
-        if (!PermissionsCheck.ownerCheck(id) && !PermissionsCheck.trustedUsersCheck(id) || PermissionsCheck.blacklistCheck(id)) {
+        if (PermissionsCheck.blacklistCheck(id)) {
             event.reply("Sorry! You are not authorized to run this command!").setEphemeral(true).queue();
             return;
         }
