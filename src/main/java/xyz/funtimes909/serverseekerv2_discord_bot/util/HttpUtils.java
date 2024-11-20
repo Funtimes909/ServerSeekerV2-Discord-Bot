@@ -6,7 +6,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-public class IpLookup {
+public class HttpUtils {
     public static String run(String ip) {
         try (HttpClient client = HttpClient.newHttpClient()) {
 

@@ -1,4 +1,4 @@
-package xyz.funtimes909.serverseekerv2_discord_bot.Records;
+package xyz.funtimes909.serverseekerv2_discord_bot.records;
 
 import java.util.List;
 

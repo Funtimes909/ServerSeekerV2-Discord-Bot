@@ -2,7 +2,7 @@ package xyz.funtimes909.serverseekerv2_discord_bot.commands;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.DatabaseConnectionPool;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.Database;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PermissionsCheck;
 
 import java.io.BufferedWriter;
@@ -32,7 +32,7 @@ public class Takedown {
         event.deferReply().queue();
 
         if (event.getOption("remove-entries") != null && event.getOption("remove-entries").getAsBoolean()) {
-            try (Connection conn = DatabaseConnectionPool.getConnection()) {
+            try (Connection conn = Database.getConnection()) {
                 PreparedStatement playerhistory = conn.prepareStatement("DELETE FROM playerhistory WHERE address = ?");
                 playerhistory.setString(1, address);
 

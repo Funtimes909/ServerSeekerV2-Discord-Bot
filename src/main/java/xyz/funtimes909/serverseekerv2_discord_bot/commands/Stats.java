@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.DatabaseConnectionPool;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.Database;
 
 import java.awt.*;
 import java.sql.Connection;
@@ -14,7 +14,7 @@ import java.sql.Statement;
 
 public class Stats {
     public static void stats(SlashCommandInteractionEvent event) {
-        try (Connection connection = DatabaseConnectionPool.getConnection()) {
+        try (Connection connection = Database.getConnection()) {
             Statement statement = connection.createStatement();
             ResultSet results = statement.executeQuery("SELECT COUNT(*) FROM servers");
             results.next();

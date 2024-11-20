@@ -9,9 +9,10 @@ import org.slf4j.LoggerFactory;
 import xyz.funtimes909.serverseekerv2_discord_bot.events.ButtonInteractionEventListener;
 import xyz.funtimes909.serverseekerv2_discord_bot.events.SlashCommandListener;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.CommandRegisterer;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.DatabaseConnectionPool;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.Database;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PermissionsCheck;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -50,8 +51,15 @@ public class Main {
             exclude = config.get("masscan_exclude_file").getAsString();
             ownerId = config.get("owner_id").getAsString();
 
-            DatabaseConnectionPool.initPool();
+            Database.initPool();
             PermissionsCheck.initPermissions();
+
+            File blacklist = new File("blacklist.txt");
+            File trusted = new File("trusted_users.txt");
+            File tracks = new File("tracks.json");
+            blacklist.createNewFile();
+            trusted.createNewFile();
+            tracks.createNewFile();
 
             // Create bot instance
             JDA client = JDABuilder.createDefault(token)
@@ -61,7 +69,7 @@ public class Main {
 
             CommandRegisterer.registerCommands(client);
         } catch (IOException e) {
-            System.out.println("Failed to read config file: " + e.getMessage());
+            throw new RuntimeException("Failed to read config file: ");
         }
     }
 }

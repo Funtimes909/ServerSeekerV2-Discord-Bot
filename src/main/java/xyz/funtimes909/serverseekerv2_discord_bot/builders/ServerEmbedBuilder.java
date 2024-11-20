@@ -4,10 +4,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import xyz.funtimes909.serverseekerv2_discord_bot.Records.Mod;
-import xyz.funtimes909.serverseekerv2_discord_bot.Records.Player;
-import xyz.funtimes909.serverseekerv2_discord_bot.Records.Server;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.IpLookup;
+import xyz.funtimes909.serverseekerv2_discord_bot.records.Mod;
+import xyz.funtimes909.serverseekerv2_discord_bot.records.Player;
+import xyz.funtimes909.serverseekerv2_discord_bot.records.Server;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.HttpUtils;
 
 import java.awt.*;
 import java.util.List;
@@ -73,7 +73,7 @@ public class ServerEmbedBuilder {
 
         // Address information
         if (ping) {
-            String primaryResponse = IpLookup.run(address);
+            String primaryResponse = HttpUtils.run(address);
             if (primaryResponse != null) {
                 JsonObject parsedPrimaryResponse = JsonParser.parseString(primaryResponse).getAsJsonObject();
                 if (parsedPrimaryResponse.has("reverse")) hostname = parsedPrimaryResponse.get("reverse").getAsString();
@@ -100,14 +100,19 @@ public class ServerEmbedBuilder {
         if (firstseen == 0) firstseen = System.currentTimeMillis() / 1000;
 
         // Create field for players
-        playerInfo.append("Players: **").append(players != null ? players.size() : 0).append("/").append(maxPlayers).append("**\n");
+        modInfo.append("Players: **").append(players != null ? players.size() : 0).append("**\n");
         if (players == null || players.isEmpty()) {
             playerInfo.append("```No players found!```");
         } else {
             playerInfo.append("```\n");
+            int count = 0;
             for (Player player : players) {
                 playerInfo.append("\n").append(player.name()).append("\n").append(player.uuid()).append("\n");
+                count++;
+                if (count == 5) break;
             }
+
+            if (players.size() > 5) playerInfo.append("\n").append(players.size() - 5).append(" Players not shown...\n");
             playerInfo.append("```");
         }
 

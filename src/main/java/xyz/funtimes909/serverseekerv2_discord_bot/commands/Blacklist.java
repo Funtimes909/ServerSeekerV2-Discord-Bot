@@ -4,13 +4,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PermissionsCheck;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Blacklist {
@@ -26,6 +23,11 @@ public class Blacklist {
 
         if (user.equals(Main.ownerId)) {
             event.reply("So you think you're smart huh?").queue();
+            return;
+        }
+
+        if (PermissionsCheck.trustedUsers.contains(user)) {
+            event.reply("You can't blacklist a trusted user!").setEphemeral(true).queue();
             return;
         }
 
@@ -57,11 +59,9 @@ public class Blacklist {
             try {
                 List<String> lines = Files.readAllLines(Paths.get("blacklist.txt"));
                 for (String line : lines) {
-                    System.out.println(line);
                     if (line.equals(user)) {
                         lines.remove(user);
                     }
-                        System.out.println(line);
                 }
 
                 Files.write(Paths.get("blacklist.txt"), lines);

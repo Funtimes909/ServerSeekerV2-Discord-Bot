@@ -3,7 +3,7 @@ package xyz.funtimes909.serverseekerv2_discord_bot.builders;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
-import xyz.funtimes909.serverseekerv2_discord_bot.Records.PlayerEmbed;
+import xyz.funtimes909.serverseekerv2_discord_bot.records.PlayerEmbed;
 
 import java.awt.*;
 import java.sql.ResultSet;

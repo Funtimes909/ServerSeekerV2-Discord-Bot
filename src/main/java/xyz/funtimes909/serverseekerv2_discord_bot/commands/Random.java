@@ -3,11 +3,11 @@ package xyz.funtimes909.serverseekerv2_discord_bot.commands;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
-import xyz.funtimes909.serverseekerv2_discord_bot.Records.Mod;
-import xyz.funtimes909.serverseekerv2_discord_bot.Records.Player;
-import xyz.funtimes909.serverseekerv2_discord_bot.Records.Server;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.ServerEmbedBuilder;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.DatabaseConnectionPool;
+import xyz.funtimes909.serverseekerv2_discord_bot.records.Mod;
+import xyz.funtimes909.serverseekerv2_discord_bot.records.Player;
+import xyz.funtimes909.serverseekerv2_discord_bot.records.Server;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.Database;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PermissionsCheck;
 
 import java.sql.Connection;
@@ -27,7 +27,7 @@ public class Random {
         }
         event.deferReply().queue();
 
-        try (Connection conn = DatabaseConnectionPool.getConnection()) {
+        try (Connection conn = Database.getConnection()) {
             Statement statement = conn.createStatement();
             long startTime = System.currentTimeMillis() / 1000;
             String query = "SELECT * FROM servers LEFT JOIN playerhistory ON servers.address = playerhistory.address AND servers.port = playerhistory.port LEFT JOIN mods ON servers.address = mods.address AND servers.port = mods.port ORDER BY RANDOM() LIMIT 1";

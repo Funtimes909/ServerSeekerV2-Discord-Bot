@@ -3,9 +3,9 @@ package xyz.funtimes909.serverseekerv2_discord_bot.util;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import xyz.funtimes909.serverseekerv2_discord_bot.Records.Mod;
-import xyz.funtimes909.serverseekerv2_discord_bot.Records.Player;
-import xyz.funtimes909.serverseekerv2_discord_bot.Records.Server;
+import xyz.funtimes909.serverseekerv2_discord_bot.records.Mod;
+import xyz.funtimes909.serverseekerv2_discord_bot.records.Player;
+import xyz.funtimes909.serverseekerv2_discord_bot.records.Server;
 
 import java.io.IOException;
 import java.io.InputStream;

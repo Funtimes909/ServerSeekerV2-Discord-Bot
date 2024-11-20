@@ -6,7 +6,7 @@ import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class DatabaseConnectionPool {
+public class Database {
     private static final BasicDataSource dataSource = new BasicDataSource();
 
     public static void initPool() {

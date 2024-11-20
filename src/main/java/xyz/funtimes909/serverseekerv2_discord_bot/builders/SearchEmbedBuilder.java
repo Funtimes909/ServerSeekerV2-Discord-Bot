@@ -2,8 +2,8 @@ package xyz.funtimes909.serverseekerv2_discord_bot.builders;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import xyz.funtimes909.serverseekerv2_discord_bot.Records.ServerEmbed;
 import xyz.funtimes909.serverseekerv2_discord_bot.commands.Search;
+import xyz.funtimes909.serverseekerv2_discord_bot.records.ServerEmbed;
 
 import java.awt.*;
 import java.util.ArrayList;

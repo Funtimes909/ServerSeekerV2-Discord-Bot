@@ -8,13 +8,13 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
-import xyz.funtimes909.serverseekerv2_discord_bot.Records.Mod;
-import xyz.funtimes909.serverseekerv2_discord_bot.Records.Player;
-import xyz.funtimes909.serverseekerv2_discord_bot.Records.Server;
-import xyz.funtimes909.serverseekerv2_discord_bot.Records.ServerEmbed;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.SearchEmbedBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.ServerEmbedBuilder;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.DatabaseConnectionPool;
+import xyz.funtimes909.serverseekerv2_discord_bot.records.Mod;
+import xyz.funtimes909.serverseekerv2_discord_bot.records.Player;
+import xyz.funtimes909.serverseekerv2_discord_bot.records.Server;
+import xyz.funtimes909.serverseekerv2_discord_bot.records.ServerEmbed;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.Database;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PermissionsCheck;
 
 import java.sql.Connection;
@@ -27,7 +27,7 @@ public class Search {
     public static HashMap<Integer, ServerEmbed> searchResults = new HashMap<>();
     public static int rowCount;
     public static int page = 1;
-    private static final Connection conn = DatabaseConnectionPool.getConnection();
+    private static final Connection conn = Database.getConnection();
     private static SlashCommandInteractionEvent event;
     private static ResultSet resultSet;
 
@@ -130,7 +130,7 @@ public class Search {
             query.replace(query.length() - 4, query.length(), "");
             query.append(" ORDER BY lastseen DESC");
             if (event.getOption("limit") != null) query.append(" LIMIT ?");
-            Connection conn = DatabaseConnectionPool.getConnection();
+            Connection conn = Database.getConnection();
             PreparedStatement statement = conn.prepareStatement(query.toString(), ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 
             int index = 1;
@@ -169,7 +169,7 @@ public class Search {
     }
 
     public static void serverSelectedButtonEvent(String address, short port, ButtonInteractionEvent event) {
-        try (Connection conn = DatabaseConnectionPool.getConnection()) {
+        try (Connection conn = Database.getConnection()) {
             PreparedStatement statement = conn.prepareStatement("SELECT * FROM servers LEFT JOIN playerhistory ON servers.address = playerhistory.address AND servers.port = playerhistory.port LEFT JOIN mods ON servers.address = mods.address AND servers.port = mods.port WHERE servers.address = ? AND servers.port = ?");
             statement.setString(1, address);
             statement.setShort(2, port);
