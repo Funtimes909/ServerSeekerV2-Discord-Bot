@@ -1,9 +1,12 @@
 package xyz.funtimes909.serverseekerv2_discord_bot.builders;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import xyz.funtimes909.serverseekerv2_discord_bot.commands.Search;
 import xyz.funtimes909.serverseekerv2_discord_bot.records.ServerEmbed;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.HttpUtils;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -11,8 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 
 public class SearchEmbedBuilder {
-    public static boolean compact = true;
-
     public static MessageEmbed parse(HashMap<Integer, ServerEmbed> servers) {
         List<MessageEmbed.Field> fields = new ArrayList<>();
 
@@ -24,7 +25,11 @@ public class SearchEmbedBuilder {
             if (server.country() != null) {
                 address.insert(0, ":flag_" + server.country().toLowerCase() + ": **:** ");
             } else {
-                address.insert(0, ":x: **:** ");
+                String primaryResponse = HttpUtils.run(server.address());
+                if (primaryResponse != null) {
+                    JsonObject parsedPrimaryResponse = JsonParser.parseString(primaryResponse).getAsJsonObject();
+                    if (parsedPrimaryResponse.has("countryCode")) address.insert(0, ":flag_" + parsedPrimaryResponse.get("countryCode").getAsString().toLowerCase() + ": **:** ");
+                }
             }
 
             // Make everything the same length
@@ -37,14 +42,8 @@ public class SearchEmbedBuilder {
                 version.insert(version.length() - 2, " ");
             }
 
-            if (server.country() != null) {
-                while (address.length() < 36) {
-                    address.insert(address.length() - 2, " ");
-                }
-            } else {
-                while (address.length() < 30) {
-                    address.insert(address.length() - 2, " ");
-                }
+            while (address.length() < 36) {
+                address.insert(address.length() - 2, " ");
             }
 
             MessageEmbed.Field addressField = new MessageEmbed.Field(index + ". " + address + " **-** ", "_ _", true);

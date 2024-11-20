@@ -19,17 +19,4 @@ public class HttpUtils {
             return response.body();
         }
     }
-
-    public static String ipinfo(String ip) {
-        try (HttpClient client = HttpClient.newHttpClient()) {
-
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://ipinfo.io/" + ip + "/json"))
-                    .build();
-
-            HttpResponse<String> response = client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).join();
-            if (response.statusCode() == 429) return null;
-            return response.body();
-        }
-    }
 }
