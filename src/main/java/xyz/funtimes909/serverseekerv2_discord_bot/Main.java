@@ -10,6 +10,7 @@ import xyz.funtimes909.serverseekerv2_discord_bot.events.ButtonInteractionEventL
 import xyz.funtimes909.serverseekerv2_discord_bot.events.SlashCommandListener;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.CommandRegisterer;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.DatabaseConnectionPool;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.PermissionsCheck;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -50,6 +51,7 @@ public class Main {
             ownerId = config.get("owner_id").getAsString();
 
             DatabaseConnectionPool.initPool();
+            PermissionsCheck.initBlacklist();
 
             // Create bot instance
             JDA client = JDABuilder.createDefault(token)

@@ -23,6 +23,8 @@ public class Blacklist {
         }
 
         if (event.getOption("blacklist").getAsString().equalsIgnoreCase("add")) {
+            PermissionsCheck.blacklist.add(id);
+
             try (FileWriter file = new FileWriter("blacklist.txt")) {
                 file.write(user + "\n");
 

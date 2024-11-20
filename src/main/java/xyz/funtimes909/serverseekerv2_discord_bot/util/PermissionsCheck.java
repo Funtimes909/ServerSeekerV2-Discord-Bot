@@ -5,19 +5,25 @@ import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PermissionsCheck {
-    public static boolean blacklistCheck(String userId) {
-        try (BufferedReader blacklist = new BufferedReader(new FileReader("blacklist.txt"))) {
+    public static List<String> blacklist = new ArrayList<>();
+
+    public static void initBlacklist() {
+        try (BufferedReader blacklistReader = new BufferedReader(new FileReader("blacklist.txt"))) {
             String line;
-            while ((line = blacklist.readLine()) != null) {
-                if (userId.equals(Main.ownerId)) return false;
-                if (userId.equals(line)) return true;
+            while ((line = blacklistReader.readLine()) != null) {
+                blacklist.add(line);
             }
         } catch (IOException e) {
             Main.logger.error("Failed to read blacklist.txt");
         }
-        return false;
+    }
+
+    public static boolean blacklistCheck(String userId) {
+        return blacklist.contains(userId);
     }
 
     public static boolean trustedUsersCheck(String userId) {

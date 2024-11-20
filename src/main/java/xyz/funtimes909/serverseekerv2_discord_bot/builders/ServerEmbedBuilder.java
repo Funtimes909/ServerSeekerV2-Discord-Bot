@@ -143,7 +143,7 @@ public class ServerEmbedBuilder {
             embed.addField("** -- __Last Seen__ -- **", "<t:" + lastseen + ":R>", false);
         }
 
-        embed.addField("** -- __Country__ -- **", country != null ? ":flag_" + country.toLowerCase() + ":" + country : ":x: No Country Information", false);
+        embed.addField("** -- __Country__ -- **", country != null ? ":flag_" + country.toLowerCase() + ": " + country : ":x: No Country Information", false);
         embed.addField("** -- __Miscellaneous__ -- **", miscInfo.toString(), false);
         embed.addField("** -- __Players__ -- **",  playerInfo.toString(), false);
         embed.addField("** -- __Mods__ -- **",  modInfo.toString(), false);
