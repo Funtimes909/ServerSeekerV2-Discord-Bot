@@ -32,6 +32,7 @@ public class ButtonInteractionEventListener extends ListenerAdapter {
                 Search.scrollResults(0, false);
                 break;
         }
+        event.deferEdit().complete();
     }
 
     private static String findField(ButtonInteractionEvent event, int fieldNumber) {

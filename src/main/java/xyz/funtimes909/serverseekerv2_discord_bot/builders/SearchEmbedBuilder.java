@@ -16,16 +16,28 @@ import java.util.List;
 public class SearchEmbedBuilder {
     public static MessageEmbed parse(HashMap<Integer, ServerEmbed> servers) {
         List<MessageEmbed.Field> fields = new ArrayList<>();
+        int longestAddress = 0;
+        int longestVersion = 0;
 
-        servers.forEach((index, server) -> {
-            StringBuilder address = new StringBuilder("``").append(server.address()).append("``");
-            StringBuilder version = new StringBuilder("``").append(server.version()).append("``");
-            String timestamp = "<t:" + server.timestamp() + ":R>";
+        for (HashMap.Entry<Integer, ServerEmbed> entry : servers.entrySet()) {
+            if (entry.getValue().address().length() > longestAddress) {
+                longestAddress = entry.getValue().address().length();
+            }
 
-            if (server.country() != null) {
-                address.insert(0, ":flag_" + server.country().toLowerCase() + ": **:** ");
+            if (entry.getValue().version().length() > longestVersion) {
+                longestVersion = entry.getValue().version().length();
+            }
+        }
+
+        for (HashMap.Entry<Integer, ServerEmbed> entry : servers.entrySet()) {
+            StringBuilder address = new StringBuilder("``").append(entry.getValue().address()).append("``");
+            StringBuilder version = new StringBuilder("``").append(entry.getValue().version()).append("``");
+            String timestamp = "<t:" + entry.getValue().timestamp() + ":R>";
+
+            if (entry.getValue().country() != null) {
+                address.insert(0, ":flag_" + entry.getValue().country().toLowerCase() + ": **:** ");
             } else {
-                String primaryResponse = HttpUtils.run(server.address());
+                String primaryResponse = HttpUtils.run(entry.getValue().address());
                 if (primaryResponse != null) {
                     JsonObject parsedPrimaryResponse = JsonParser.parseString(primaryResponse).getAsJsonObject();
                     if (parsedPrimaryResponse.has("countryCode")) address.insert(0, ":flag_" + parsedPrimaryResponse.get("countryCode").getAsString().toLowerCase() + ": **:** ");
@@ -33,34 +45,21 @@ public class SearchEmbedBuilder {
             }
 
             // Make everything the same length
-            if (version.length() > 17) {
-                version.setLength(17);
-                version.replace(version.length() - 5, version.length(), "...``");
-            }
-
-            while (version.length() < 17) {
+            while (version.length() < longestVersion + 4) {
                 version.insert(version.length() - 2, " ");
             }
 
-            while (address.length() < 36) {
+            while (address.length() < longestAddress + 20) {
                 address.insert(address.length() - 2, " ");
             }
 
-            MessageEmbed.Field addressField = new MessageEmbed.Field(index + ". " + address + " **-** ", "_ _", true);
-            MessageEmbed.Field versionField = new MessageEmbed.Field(version + " **-** ", "_ _", true);
-            MessageEmbed.Field timestampField = new MessageEmbed.Field(timestamp, "_ _", true);
-
+            MessageEmbed.Field addressField = new MessageEmbed.Field(entry.getKey() + ". " + address + " **-** " + version + " **-** " + timestamp, "_ _", false);
             fields.add(addressField);
-            fields.add(versionField);
-            fields.add(timestampField);
-        });
+        };
 
         EmbedBuilder embed = new EmbedBuilder()
                 .setTitle("Pages: (" + Search.page + "/" + Search.rowCount / 5 + ")")
                 .setAuthor("ServerSeekerV2", "https://discord.gg/WEErxAP8kz", "https://funtimes909.xyz/assets/images/serverseekerv2-icon-cropped.png")
-                .addField("**Address**", "_ _", true)
-                .addField("**Version**", "_ _", true)
-                .addField("**Last Seen**", "_ _", true)
                 .setFooter("Funtimes909", "https://funtimes909.xyz/avatar-gif")
                 .setColor(new Color(8, 25, 238));
 
