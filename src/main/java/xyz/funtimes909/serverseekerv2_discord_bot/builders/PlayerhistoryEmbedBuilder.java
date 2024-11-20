@@ -25,7 +25,7 @@ public class PlayerhistoryEmbedBuilder {
                     .setAuthor("ServerSeekerV2", "https://discord.gg/WEErxAP8kz", "https://funtimes909.xyz/assets/images/serverseekerv2-icon-cropped.png")
                     .setTitle("Showing player history for: " + title)
                     .setFooter("Funtimes909", "https://funtimes909.xyz/avatar-gif")
-                    .setColor(new Color(255, 115, 0));
+                    .setColor(new Color(0, 255, 0));
 
             players.forEach((K, V) -> {
                 StringBuilder address = new StringBuilder(V.address());

@@ -58,10 +58,10 @@ public class SearchEmbedBuilder {
         };
 
         EmbedBuilder embed = new EmbedBuilder()
+                .setColor(new Color(0, 255, 0))
                 .setTitle("Pages: (" + Search.page + "/" + Search.rowCount / 5 + ")")
                 .setAuthor("ServerSeekerV2", "https://discord.gg/WEErxAP8kz", "https://funtimes909.xyz/assets/images/serverseekerv2-icon-cropped.png")
-                .setFooter("Funtimes909", "https://funtimes909.xyz/avatar-gif")
-                .setColor(new Color(8, 25, 238));
+                .setFooter("Funtimes909", "https://funtimes909.xyz/avatar-gif");
 
         for (MessageEmbed.Field field : fields) {
             embed.addField(field);
