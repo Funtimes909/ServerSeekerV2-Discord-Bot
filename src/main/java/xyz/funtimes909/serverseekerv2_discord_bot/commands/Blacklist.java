@@ -19,6 +19,7 @@ public class Blacklist {
 
         if (user.equals(Main.ownerId)) {
             event.reply("So you think you're smart huh?").queue();
+            return;
         }
 
         if (event.getOption("blacklist").getAsString().equalsIgnoreCase("add")) {
