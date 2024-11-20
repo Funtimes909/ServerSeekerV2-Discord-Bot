@@ -51,6 +51,11 @@ public class Main {
             exclude = config.get("masscan_exclude_file").getAsString();
             ownerId = config.get("owner_id").getAsString();
 
+            // Warn user about configs should some of them not exist
+            if (username.isBlank()) logger.warn("Warning! No postgres username specified. Attempting to use default username \"postgres\"");
+            if (password.isBlank()) logger.warn("Warning! No postgres password specified. You should setup a password for your database");
+            if (url.isBlank()) throw new RuntimeException("Error! No postgres URL specified!");
+
             Database.initPool();
             PermissionsCheck.initPermissions();
 
