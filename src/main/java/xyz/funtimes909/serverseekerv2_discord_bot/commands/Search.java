@@ -21,10 +21,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Search {
     public static HashMap<Integer, ServerEmbed> searchResults = new HashMap<>();
@@ -66,9 +63,9 @@ public class Search {
             List<ItemComponent> buttons = new ArrayList<>();
 
             // Add buttons for each returned server
-            searchResults.forEach((key, value) -> {
-                buttons.add(Button.success("SearchButton" + key, String.valueOf(key)));
-            });
+            for (Map.Entry<Integer, ServerEmbed> entry : searchResults.entrySet()) {
+                buttons.add(Button.success("SearchButton" + entry.getKey(), String.valueOf(entry.getKey())));
+            }
 
             // Send a new message if it's the first interaction, edit the original if it's a new search page
             if (firstRun) {
@@ -89,6 +86,7 @@ public class Search {
     private static void buildQuery(List<OptionMapping> options) {
         Map<String, OptionMapping> parameters = new HashMap<>();
         StringBuilder query = new StringBuilder("SELECT servers.address, servers.country, servers.version, servers.lastseen, servers.port FROM servers");
+        Set<String> mods = new HashSet<>();
 
         // Player and ModId searching
         if (event.getOption("player") != null) query.append(" JOIN playerhistory ON servers.address = playerhistory.address AND servers.port = playerhistory.port");
@@ -97,53 +95,38 @@ public class Search {
 
         for (OptionMapping option : options) {
             switch (option.getName()) {
-                case "description":
-                    parameters.put("motd", option);
-                    break;
-                case "playercount":
-                    parameters.put("onlineplayers", option);
-                    break;
-                case "hostname":
-                    parameters.put("reversedns", option);
-                    break;
-                case "seenbefore", "seenafter":
-                    parameters.put("lastseen", option);
-                    break;
-                case "full":
-                    query.append(option.getAsBoolean() ? "onlinePlayers >= maxPlayers AND " : "onlinePlayers < maxPlayers AND ");
-                    break;
-                case "empty":
-                    query.append(option.getAsBoolean() ? "onlinePlayers = 0 AND " : "onlinePlayers != 0 AND ");
-                    break;
-                case "forge":
-                    query.append(option.getAsBoolean() ? "fmlnetworkversion IS NOT NULL AND " : "fmlnetworkversion IS NULL AND ");
-                    break;
-                case "icon":
-                    query.append(option.getAsBoolean() ? "icon IS NOT NULL AND " : "icon IS NULL AND ");
-                    break;
-                case "limit":
-                    break;
-                default:
-                    parameters.put(option.getName(), option);
-                    break;
+                case "description" -> parameters.put("motd", option);
+                case "playercount" -> parameters.put("onlineplayers", option);
+                case "hostname" -> parameters.put("reversedns", option);
+                case "seenbefore", "seenafter" -> parameters.put("lastseen", option);
+                case "full" -> query.append(option.getAsBoolean() ? "onlinePlayers >= maxPlayers AND " : "onlinePlayers < maxPlayers AND ");
+                case "empty" -> query.append(option.getAsBoolean() ? "onlinePlayers = 0 AND " : "onlinePlayers != 0 AND ");
+                case "forge" -> query.append(option.getAsBoolean() ? "fmlnetworkversion IS NOT NULL AND " : "fmlnetworkversion IS NULL AND ");
+                case "icon" -> query.append(option.getAsBoolean() ? "icon IS NOT NULL AND " : "icon IS NULL AND ");
+                case "mods" -> {
+                    if (option.getAsString().contains(",")) { mods.addAll(Arrays.asList(option.getAsString().split(", "))); }
+                }
+                case "limit" -> {}
+                default -> parameters.put(option.getName(), option);
             }
         }
 
-        parameters.forEach((key, value) -> {
-            switch (value.getName()) {
+        for (Map.Entry<String, OptionMapping> entry : parameters.entrySet()) {
+            switch (entry.getValue().getName()) {
                 case "seenbefore" -> query.append("lastseen <= ? AND ");
                 case "seenafter" -> query.append("lastseen >= ? AND ");
                 case "reversedns" -> query.append("hostname = ? AND ");
                 case "forgeversion" -> query.append("fmlnetworkversion = ? AND ");
                 case "description" -> query.append("motd ILIKE '%' || ? || '%' AND ");
                 case "player" -> query.append("playername ILIKE '%' || ? || '%' AND ");
-                case "mods" -> query.append("modid = ? AND ");
-                default -> query.append(key).append(" = ? AND ");
+                default -> query.append(entry.getKey()).append(" = ? AND ");
             }
-        });
+        }
 
         try {
-            // Create statement and assign values
+            // Add modids to the end of the query
+            if (!mods.isEmpty()) mods.forEach((mod) -> query.append("modid = ? OR "));
+
             query.replace(query.length() - 4, query.length(), "");
             query.append(" ORDER BY lastseen DESC");
             if (event.getOption("limit") != null) query.append(" LIMIT ?");
@@ -159,6 +142,14 @@ public class Search {
                 }
                 index++;
             }
+
+            if (!mods.isEmpty()) {
+                for (String mod : mods) {
+                    statement.setString(index, mod);
+                    index++;
+                }
+            }
+
             if (event.getOption("limit") != null) statement.setInt(index, event.getOption("limit").getAsInt());
 
             // Time query duration
