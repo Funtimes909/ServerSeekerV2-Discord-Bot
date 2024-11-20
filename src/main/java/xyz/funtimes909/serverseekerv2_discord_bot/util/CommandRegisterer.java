@@ -37,17 +37,16 @@ public class CommandRegisterer {
         searchOptions.add(new OptionData(OptionType.INTEGER, "limit", "Limit how many results are returned"));
         searchOptions.add(new OptionData(OptionType.BOOLEAN, "compact", "Show results in a compact or bold style (default: compact)"));
 
-        List<OptionData> blacklistOptions = new ArrayList<>();
-        blacklistOptions.add(new OptionData(OptionType.STRING, "blacklist", "Blacklist a user").addChoice("add", "Add").addChoice("remove", "Remove"));
-        blacklistOptions.add(new OptionData(OptionType.USER, "user", "Which user add/remove from the blacklist"));
-
         client.updateCommands().addCommands(
                 Commands.slash("search", "Searches for servers with advanced filters")
                                     .addOptions(searchOptions),
 
                 Commands.slash("random", "Finds a random server"),
                 Commands.slash("blacklist", "Blacklist a user from using the bot")
-                        .addOptions(blacklistOptions),
+                        .addOptions(new OptionData(OptionType.STRING, "operation", "Whether to add or remove a user from the blacklist")
+                                .addChoice("add", "Add")
+                                .addChoice("remove", "Remove"))
+                        .addOption(OptionType.USER, "user", "Which user add/remove from the blacklist"),
 
                 Commands.slash("playerinfo", "Shows information about a player")
                                 .addOption(OptionType.STRING, "player", "The player to show", true),

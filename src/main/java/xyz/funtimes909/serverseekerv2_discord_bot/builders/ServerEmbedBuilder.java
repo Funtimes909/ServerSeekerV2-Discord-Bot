@@ -44,8 +44,8 @@ public class ServerEmbedBuilder {
         asn = server.getAsn();
         hostname = server.getReverseDns();
         organization = server.getOrganization();
-        firstseen = server.getFirstseen();
-        lastseen = server.getLastseen();
+        firstseen = server.getFirstSeen();
+        lastseen = server.getLastSeen();
         timesSeen = server.getTimesSeen();
         whitelist = server.getWhitelist();
         enforceSecure = server.getEnforceSecure();

@@ -90,11 +90,11 @@ public class Server {
         return timesSeen;
     }
 
-    public long getFirstseen() {
+    public long getFirstSeen() {
         return firstseen;
     }
 
-    public long getLastseen() {
+    public long getLastSeen() {
         return firstseen;
     }
 

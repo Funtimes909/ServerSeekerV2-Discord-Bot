@@ -5,7 +5,9 @@ import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.DatabaseConnectionPool;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PermissionsCheck;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.Inet4Address;
 import java.sql.Connection;
 import java.sql.PreparedStatement;

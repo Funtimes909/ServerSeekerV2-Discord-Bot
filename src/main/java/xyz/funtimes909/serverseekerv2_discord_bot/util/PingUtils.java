@@ -136,6 +136,7 @@ public class PingUtils {
                     .setPlayers(playerList)
                     .setMods(modsList)
                     .build();
+
         } catch (IOException ignored) {}
         return null;
     }

@@ -12,7 +12,7 @@ public class SlashCommandListener extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
-            Main.logger.info("Command: {} run by {} [{}]", event.getName(), event.getUser().getName(), event.getUser().getId());
+            Main.logger.info("Command: {} run by {} [{}] ({} options)", event.getName(), event.getUser().getName(), event.getUser().getId(), event.getOptions().size());
 
             switch (event.getName()) {
                 case "search":
