@@ -10,15 +10,23 @@ import java.util.List;
 
 public class PermissionsCheck {
     public static List<String> blacklist = new ArrayList<>();
+    public static List<String> trustedUsers = new ArrayList<>();
 
-    public static void initBlacklist() {
-        try (BufferedReader blacklistReader = new BufferedReader(new FileReader("blacklist.txt"))) {
-            String line;
-            while ((line = blacklistReader.readLine()) != null) {
-                blacklist.add(line);
-            }
+    public static void initPermissions() {
+        try (
+                BufferedReader blacklistReader = new BufferedReader(new FileReader("blacklist.txt"));
+                BufferedReader trustedUsersReader = new BufferedReader(new FileReader("trusted_users.txt"));
+        )   {
+                String line;
+                while ((line = blacklistReader.readLine()) != null) {
+                    blacklist.add(line);
+                }
+
+                while ((line = trustedUsersReader.readLine()) != null) {
+                    trustedUsers.add(line);
+                }
         } catch (IOException e) {
-            Main.logger.error("Failed to read blacklist.txt");
+            Main.logger.error("Failed to read blacklist or trusted users file!");
         }
     }
 
@@ -27,15 +35,7 @@ public class PermissionsCheck {
     }
 
     public static boolean trustedUsersCheck(String userId) {
-        try (BufferedReader trustedUsers = new BufferedReader(new FileReader("trusted_users.txt"))) {
-            String line;
-            while ((line = trustedUsers.readLine()) != null) {
-                if (userId.equals(line)) return true;
-            }
-        } catch (IOException e) {
-            Main.logger.error("Failed to read trusted_users.txt");
-        }
-        return false;
+        return trustedUsers.contains(userId);
     }
 
     public static boolean ownerCheck(String userId) {

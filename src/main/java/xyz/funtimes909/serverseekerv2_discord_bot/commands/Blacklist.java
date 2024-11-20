@@ -28,7 +28,7 @@ public class Blacklist {
             try (FileWriter file = new FileWriter("blacklist.txt")) {
                 file.write(user + "\n");
 
-                Main.logger.info("Adding {} to the blacklist", user);
+                Main.logger.info("Adding {} to the blacklist (Requested by trusted user {})", user, event.getUser().getName());
                 event.reply("Added <@" + user + "> to the blacklist!").setEphemeral(true).queue();
             } catch (IOException e) {
                 Main.logger.error("blacklist.txt malformed or not found!", e);

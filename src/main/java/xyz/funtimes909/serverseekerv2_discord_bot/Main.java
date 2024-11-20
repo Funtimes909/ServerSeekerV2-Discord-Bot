@@ -51,7 +51,7 @@ public class Main {
             ownerId = config.get("owner_id").getAsString();
 
             DatabaseConnectionPool.initPool();
-            PermissionsCheck.initBlacklist();
+            PermissionsCheck.initPermissions();
 
             // Create bot instance
             JDA client = JDABuilder.createDefault(token)
