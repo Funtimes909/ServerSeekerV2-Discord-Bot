@@ -95,7 +95,7 @@ public class Server {
     }
 
     public long getLastSeen() {
-        return firstseen;
+        return lastseen;
     }
 
     public Boolean getWhitelist() {
