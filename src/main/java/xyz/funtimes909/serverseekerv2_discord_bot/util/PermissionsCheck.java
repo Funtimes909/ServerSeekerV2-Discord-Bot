@@ -11,6 +11,7 @@ public class PermissionsCheck {
         try (BufferedReader blacklist = new BufferedReader(new FileReader("blacklist.txt"))) {
             String line;
             while ((line = blacklist.readLine()) != null) {
+                if (userId.equals(Main.ownerId)) return false;
                 if (userId.equals(line)) return true;
             }
         } catch (IOException e) {

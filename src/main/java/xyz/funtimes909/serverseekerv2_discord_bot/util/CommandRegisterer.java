@@ -49,6 +49,9 @@ public class CommandRegisterer {
                 Commands.slash("blacklist", "Blacklist a user from using the bot")
                         .addOptions(blacklistOptions),
 
+                Commands.slash("playerinfo", "Shows information about a player")
+                                .addOption(OptionType.STRING, "player", "The player to show", true),
+
                 Commands.slash("track", "Get notified through a webhook of player activity")
                         .addOption(OptionType.STRING, "player", "The player you want to receive activity notifications for", true)
                         .addOption(OptionType.STRING, "webhook", "Webhook URL you want notifications sent to", true),

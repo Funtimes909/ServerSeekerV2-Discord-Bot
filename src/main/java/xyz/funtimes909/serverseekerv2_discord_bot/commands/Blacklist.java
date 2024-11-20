@@ -12,9 +12,13 @@ public class Blacklist {
         String id = event.getUser().getId();
         String user = event.getOption("user").getAsString();
 
-        if (!PermissionsCheck.ownerCheck(id) && !PermissionsCheck.trustedUsersCheck(id) || PermissionsCheck.blacklistCheck(id)) {
+        if (!PermissionsCheck.ownerCheck(id) && !PermissionsCheck.trustedUsersCheck(id)) {
             event.reply("Sorry! You are not authorized to run this command!").setEphemeral(true).queue();
             return;
+        }
+
+        if (user.equals(Main.ownerId)) {
+            event.reply("So you think you're smart huh?").queue();
         }
 
         if (event.getOption("blacklist").getAsString().equalsIgnoreCase("add")) {
