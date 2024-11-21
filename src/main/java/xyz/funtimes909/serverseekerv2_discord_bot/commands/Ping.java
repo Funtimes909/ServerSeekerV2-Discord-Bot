@@ -15,7 +15,14 @@ public class Ping {
             event.reply("Sorry! You are not authorized to run this command!").setEphemeral(true).queue();
             return;
         }
+
+        if (event.getOption("address").getAsString().equals("localhost") || event.getOption("address").getAsString().equals("0.0.0.0") || event.getOption("address").getAsString().startsWith("127")) {
+            event.reply("You can't ping this address!").queue();
+            return;
+        }
+
         event.deferReply().queue();
+
         short port = 25565;
         if (event.getOption("port") != null) port = (short) event.getOption("port").getAsInt();
 
