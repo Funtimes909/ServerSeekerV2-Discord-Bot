@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -193,6 +192,7 @@ public class Search {
                 server.setCracked(results.getBoolean("cracked"));
                 server.setPreventsReports(results.getBoolean("preventsReports"));
                 server.setMaxPlayers(results.getInt("maxPlayers"));
+                server.setTimesSeen(results.getInt("timesSeen"));
                 server.setFmlNetworkVersion(results.getInt("fmlnetworkversion"));
 
                 if (results.getString("playername") != null) players.add(new Player(results.getString("playername"), results.getString("playeruuid"), results.getLong("lastseen")));

@@ -101,7 +101,7 @@ public class ServerEmbedBuilder {
         if (firstseen == 0) firstseen = System.currentTimeMillis() / 1000;
 
         // Create field for players
-        playerInfo.append("Players: **").append(players != null ? players.size() : 0).append("**\n");
+        playerInfo.append("Players: **").append(players != null ? players.size() + "/" + maxPlayers : 0).append("**\n");
         if (players == null || players.isEmpty()) {
             playerInfo.append("```No players found!```");
         } else {

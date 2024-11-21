@@ -52,6 +52,7 @@ public class Random {
                 server.setCracked(results.getBoolean("cracked"));
                 server.setPreventsReports(results.getBoolean("preventsReports"));
                 server.setMaxPlayers(results.getInt("maxPlayers"));
+                server.setTimesSeen(results.getInt("timesSeen"));
                 server.setFmlNetworkVersion(results.getInt("fmlnetworkversion"));
 
                 if (results.getString("playername") != null) players.add(new Player(results.getString("playername"), results.getString("playeruuid"), results.getLong("lastseen")));
