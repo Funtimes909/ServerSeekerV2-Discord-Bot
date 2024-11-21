@@ -159,8 +159,8 @@ public class Search {
             }
         }
 
-        for (Map.Entry<Integer, ServerEmbed> entry : results.entrySet()) {
-            buttons.add(Button.success("SearchButton" + entry.getKey(), String.valueOf(entry.getKey())));
+        for (Integer entry : results.keySet()) {
+            buttons.add(Button.success("SearchButton" + entry, String.valueOf(entry)));
         }
 
         MessageEmbed embed = SearchEmbedBuilder.parse(results);
