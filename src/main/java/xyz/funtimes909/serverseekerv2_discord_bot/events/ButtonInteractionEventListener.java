@@ -24,12 +24,10 @@ public class ButtonInteractionEventListener extends ListenerAdapter {
                 Search.serverSelectedButtonEvent(findField(event, 5), (short) 25565, event);
                 break;
             case "PagePrevious":
-                if (Search.page != 1) Search.page -= 1;
-                Search.scrollResults(-10, false);
+                Search.scrollResults(false, false, 5);
                 break;
             case "PageNext":
-                if (Search.page != Search.rowCount / 5) Search.page += 1;
-                Search.scrollResults(0, false);
+                Search.scrollResults(false, true, 5);
                 break;
         }
         event.deferEdit().queue();

@@ -24,11 +24,13 @@ import java.sql.SQLException;
 import java.util.*;
 
 public class Search {
-    public static HashMap<Integer, ServerEmbed> searchResults = new HashMap<>();
-    public static int rowCount;
-    public static int page = 1;
+    private static Map<String, OptionMapping> parameters = new HashMap<>();
+    private static Set<String> mods = new HashSet<>();
+    private static HashMap<Integer, ServerEmbed> pages = new HashMap<>();
+    private static String query;
     private static SlashCommandInteractionEvent event;
-    private static ResultSet resultSet;
+    public static int pointer = 1;
+    public static int rowCount;
 
     public static void search(SlashCommandInteractionEvent interactionEvent) {
         event = interactionEvent;
@@ -43,13 +45,12 @@ public class Search {
             return;
         }
 
-        buildQuery(event.getOptions());
+        query = buildQuery(event.getOptions());
+        runQuery();
     }
 
-    private static void buildQuery(List<OptionMapping> options) {
-        Map<String, OptionMapping> parameters = new HashMap<>();
+    private static String buildQuery(List<OptionMapping> options) {
         StringBuilder query = new StringBuilder("SELECT servers.address, servers.country, servers.version, servers.lastseen, servers.port FROM servers");
-        Set<String> mods = new HashSet<>();
 
         // Player and ModId searching
         if (event.getOption("player") != null) query.append(" JOIN playerhistory ON servers.address = playerhistory.address AND servers.port = playerhistory.port");
@@ -85,14 +86,15 @@ public class Search {
                 default -> query.append(entry.getKey()).append(" = ? AND ");
             }
         }
+        // Add modids to the end of the query
+        if (!mods.isEmpty()) mods.forEach((mod) -> query.append("modid = ? OR "));
+        query.replace(query.length() - 4, query.length(), "");
+        query.append(" ORDER BY lastseen DESC LIMIT 100");
+        return query.toString();
+    }
 
+    private static void runQuery() {
         try {
-            // Add modids to the end of the query
-            if (!mods.isEmpty()) mods.forEach((mod) -> query.append("modid = ? OR "));
-
-            query.replace(query.length() - 4, query.length(), "");
-            query.append(" ORDER BY lastseen DESC");
-            if (event.getOption("limit") != null) query.append(" LIMIT ?");
             Connection conn = Database.getConnection();
             PreparedStatement statement = conn.prepareStatement(query.toString(), ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 
@@ -113,53 +115,63 @@ public class Search {
                 }
             }
 
-            if (event.getOption("limit") != null) statement.setInt(index, event.getOption("limit").getAsInt());
-
-            // Time query duration
             long startTime = System.currentTimeMillis() / 1000L;
-            resultSet = statement.executeQuery();
+            ResultSet results = statement.executeQuery();
             Main.logger.debug("Search command took {}ms to execute!", (System.currentTimeMillis() / 1000L - startTime));
 
-            resultSet.last();
-            rowCount = resultSet.getRow();
-            if (rowCount == 0) event.getHook().sendMessage("No results!").queue();
-            resultSet.beforeFirst();
-            scrollResults(0, true);
+            results.last();
+            rowCount = results.getRow();
+            if (rowCount == 0) {
+                event.getHook().sendMessage("No results!").queue();
+                return;
+            }
+            results.beforeFirst();
+
+            pages.clear();
+            int count = 1;
+            while (results.next()) {
+                pages.put(count, new ServerEmbed(results.getString("address"), results.getString("country"), results.getString("version"), results.getLong("lastseen"), results.getShort("port")));
+                count++;
+            }
+
+            conn.close();
+            scrollResults(true, true, 0);
         } catch (SQLException e) {
             Main.logger.error("Error while forming search query!", e);
         }
     }
 
-    public static void scrollResults(int direction, boolean firstRun) {
-        try {
-            int rowCount = 0;
-            searchResults.clear();
-            resultSet.relative(direction);
-            while (rowCount < 5 && resultSet.next()) {
-                searchResults.put(rowCount + 1, new ServerEmbed(resultSet.getString("address"), resultSet.getString("country"), resultSet.getString("version"), resultSet.getLong("lastseen"), resultSet.getShort("port")));
-                rowCount++;
+    public static void scrollResults(boolean firstRun, boolean forward, int amount) {
+        HashMap<Integer, ServerEmbed> results = new HashMap<>();
+        List<ItemComponent> buttons = new ArrayList<>();
+
+        if (forward) {
+            int index = 1;
+            for (int i = pointer; 6 > i; i++) {
+                results.put(index, pages.get(i));
+                index++;
             }
-
-            MessageEmbed embed = SearchEmbedBuilder.parse(searchResults);
-            List<ItemComponent> buttons = new ArrayList<>();
-
-            // Add buttons for each returned server
-            for (Map.Entry<Integer, ServerEmbed> entry : searchResults.entrySet()) {
-                buttons.add(Button.success("SearchButton" + entry.getKey(), String.valueOf(entry.getKey())));
+        } else {
+            int index = 1;
+            for (int i = pointer; 6 > i; i--) {
+                results.put(index, pages.get(i));
+                index++;
             }
+        }
 
-            // Send a new message if it's the first interaction, edit the original if it's a new search page
-            if (firstRun) {
-                if (searchResults.keySet().size() < 5) {
-                    event.getHook().sendMessageEmbeds(embed).addActionRow(buttons).queue();
-                } else {
-                    event.getHook().sendMessageEmbeds(embed).addActionRow(buttons).addActionRow(Button.primary("PagePrevious", Emoji.fromFormatted("U+2B05")), Button.primary("PageNext", Emoji.fromFormatted("U+27A1"))).queue();
-                }
+        for (Map.Entry<Integer, ServerEmbed> entry : results.entrySet()) {
+            buttons.add(Button.success("SearchButton" + entry.getKey(), String.valueOf(entry.getKey())));
+        }
+
+        MessageEmbed embed = SearchEmbedBuilder.parse(results);
+        if (firstRun) {
+            if (results.size() < 5) {
+                event.getHook().sendMessageEmbeds(embed).addActionRow(buttons).queue();
             } else {
-                event.getHook().editOriginalEmbeds(embed).queue();
+                event.getHook().sendMessageEmbeds(embed).addActionRow(buttons).addActionRow(Button.primary("PagePrevious", Emoji.fromFormatted("U+2B05")), Button.primary("PageNext", Emoji.fromFormatted("U+27A1"))).queue();
             }
-        } catch (SQLException e) {
-            Main.logger.error("Error while scrolling results!", e);
+        } else {
+            event.getHook().editOriginalEmbeds(embed).queue();
         }
     }
 
