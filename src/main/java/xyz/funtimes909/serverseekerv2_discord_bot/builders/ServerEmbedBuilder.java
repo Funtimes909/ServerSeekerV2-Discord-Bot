@@ -69,7 +69,8 @@ public class ServerEmbedBuilder {
         miscInfo.append("Cracked: **").append(cracked != null ? cracked + "**\n" : "N/A**\n");
         miscInfo.append("Prevents Chat Reports: **").append(preventsReports != null ? preventsReports + "**\n" : "N/A**\n");
         miscInfo.append("Enforces Secure Chat: **").append(enforceSecure != null ? enforceSecure + "**\n" : "N/A**\n");
-        miscInfo.append("Forge: **").append(fmlNetworkVersion != null ? "true**\n" : "false**\n");
+        if (fmlNetworkVersion != null) miscInfo.append("Forge: **").append("true**\n");
+        if (fmlNetworkVersion != null && fmlNetworkVersion != 0) miscInfo.append("Forge Version: **").append(fmlNetworkVersion).append("**\n");
 
         // Address information
         if (ping) {
@@ -100,11 +101,12 @@ public class ServerEmbedBuilder {
         if (firstseen == 0) firstseen = System.currentTimeMillis() / 1000;
 
         // Create field for players
-        modInfo.append("Players: **").append(players != null ? players.size() : 0).append("**\n");
+        playerInfo.append("Players: **").append(players != null ? players.size() : 0).append("**\n");
         if (players == null || players.isEmpty()) {
             playerInfo.append("```No players found!```");
         } else {
             playerInfo.append("```\n");
+
             int count = 0;
             for (Player player : players) {
                 playerInfo.append("\n").append(player.name()).append("\n").append(player.uuid()).append("\n");
@@ -123,6 +125,7 @@ public class ServerEmbedBuilder {
         } else {
             modInfo.append("```\n");
             int count = 0;
+
             for (Mod mod : mods) {
                 if (mod.modmarker().startsWith("OHNOES")) continue;
                 modInfo.append("\n").append(mod.modid()).append("\n").append(mod.modmarker()).append("\n");
