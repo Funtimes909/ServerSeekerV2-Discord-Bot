@@ -187,10 +187,10 @@ public class Search {
                 server.setAsn(results.getString("asn"));
                 server.setReverseDns(results.getString("reversedns"));
                 server.setOrganization(results.getString("organization"));
-                server.setWhitelist(results.getBoolean("whitelist"));
-                server.setEnforceSecure(results.getBoolean("enforceSecure"));
-                server.setCracked(results.getBoolean("cracked"));
-                server.setPreventsReports(results.getBoolean("preventsReports"));
+                server.setWhitelist((Boolean) results.getObject("whitelist"));
+                server.setEnforceSecure((Boolean) results.getObject("enforceSecure"));
+                server.setCracked((Boolean) results.getObject("cracked"));
+                server.setPreventsReports((Boolean) results.getObject("preventsReports"));
                 server.setMaxPlayers(results.getInt("maxPlayers"));
                 server.setTimesSeen(results.getInt("timesSeen"));
                 server.setFmlNetworkVersion(results.getInt("fmlnetworkversion"));
