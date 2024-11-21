@@ -19,20 +19,16 @@ import java.util.List;
 
 public class Random {
     public static void random(SlashCommandInteractionEvent event) {
-        String id = event.getUser().getId();
-
-        if (PermissionsCheck.blacklistCheck(id)) {
-            event.reply("Sorry! You are not authorized to run this command!").setEphemeral(true).queue();
+        if (PermissionsCheck.blacklistCheck(event.getInteraction().getUser().getId())) {
+            event.getHook().sendMessage("Sorry! You are not authorized to run this command!").setEphemeral(true).queue();
             return;
         }
-        event.deferReply().queue();
 
         try (Connection conn = Database.getConnection()) {
             Statement statement = conn.createStatement();
             long startTime = System.currentTimeMillis() / 1000;
             String query = "SELECT * FROM servers LEFT JOIN playerhistory ON servers.address = playerhistory.address AND servers.port = playerhistory.port LEFT JOIN mods ON servers.address = mods.address AND servers.port = mods.port ORDER BY RANDOM() LIMIT 1";
-            long endTime = System.currentTimeMillis() / 1000;
-            Main.logger.debug("Query took {}ms", endTime - startTime);
+            Main.logger.debug("Query took {}ms", System.currentTimeMillis() / 1000L - startTime);
 
             ResultSet results = statement.executeQuery(query);
             Server.Builder server = new Server.Builder();

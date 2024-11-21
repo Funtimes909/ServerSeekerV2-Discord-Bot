@@ -22,13 +22,13 @@ public class Stats {
 
             MessageEmbed embed = new EmbedBuilder()
                     .setTitle("Stats")
+                    .setColor(new Color(0, 255, 0))
                     .setAuthor("ServerSeekerV2", "https://discord.gg/WEErxAP8kz", "https://funtimes909.xyz/assets/images/serverseekerv2-icon-cropped.png")
                     .setFooter("Funtimes909", "https://funtimes909.xyz/avatar-gif")
                     .addField("Unique Servers Found", "**" + serverCount + "**", false)
-                    .setColor(new Color(92, 0, 255))
                     .build();
 
-            event.replyEmbeds(embed).queue();
+            event.getHook().sendMessageEmbeds(embed).queue();
             results.close();
             statement.close();
         } catch (SQLException e) {

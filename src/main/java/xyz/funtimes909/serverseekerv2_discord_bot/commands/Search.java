@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -27,60 +28,23 @@ public class Search {
     public static HashMap<Integer, ServerEmbed> searchResults = new HashMap<>();
     public static int rowCount;
     public static int page = 1;
-    private static final Connection conn = Database.getConnection();
     private static SlashCommandInteractionEvent event;
     private static ResultSet resultSet;
 
     public static void search(SlashCommandInteractionEvent interactionEvent) {
-        String id = interactionEvent.getUser().getId();
         event = interactionEvent;
 
-        if (PermissionsCheck.blacklistCheck(id)) {
-            event.reply("Sorry! You are not authorized to run this command!").setEphemeral(true).queue();
+        if (PermissionsCheck.blacklistCheck(interactionEvent.getInteraction().getUser().getId())) {
+            interactionEvent.getHook().sendMessage("Sorry! You are not authorized to run this command!").setEphemeral(true).queue();
             return;
         }
 
         if (event.getOptions().isEmpty()) {
-            event.reply("You must provide some search queries!").queue();
+            interactionEvent.getHook().sendMessage("You must provide some search queries!").queue();
             return;
         }
 
-        event.deferReply().queue();
         buildQuery(event.getOptions());
-    }
-
-    public static void scrollResults(int direction, boolean firstRun) {
-        try {
-            int rowCount = 0;
-            searchResults.clear();
-            resultSet.relative(direction);
-            while (rowCount < 5 && resultSet.next()) {
-                searchResults.put(rowCount + 1, new ServerEmbed(resultSet.getString("address"), resultSet.getString("country"), resultSet.getString("version"), resultSet.getLong("lastseen"), resultSet.getShort("port")));
-                rowCount++;
-            }
-
-            MessageEmbed embed = SearchEmbedBuilder.parse(searchResults);
-            List<ItemComponent> buttons = new ArrayList<>();
-
-            // Add buttons for each returned server
-            for (Map.Entry<Integer, ServerEmbed> entry : searchResults.entrySet()) {
-                buttons.add(Button.success("SearchButton" + entry.getKey(), String.valueOf(entry.getKey())));
-            }
-
-            // Send a new message if it's the first interaction, edit the original if it's a new search page
-            if (firstRun) {
-                if (searchResults.keySet().size() < 5) {
-                    event.getHook().sendMessageEmbeds(embed).addActionRow(buttons).queue();
-                } else {
-                    event.getHook().sendMessageEmbeds(embed).addActionRow(buttons).addActionRow(Button.primary("PagePrevious", Emoji.fromFormatted("U+2B05")), Button.primary("PageNext", Emoji.fromFormatted("U+27A1"))).queue();
-                }
-            } else {
-                event.getHook().editOriginalEmbeds(embed).queue();
-            }
-
-        } catch (SQLException e) {
-            Main.logger.error("Error while scrolling results!", e);
-        }
     }
 
     private static void buildQuery(List<OptionMapping> options) {
@@ -155,8 +119,7 @@ public class Search {
             // Time query duration
             long startTime = System.currentTimeMillis() / 1000L;
             resultSet = statement.executeQuery();
-            long endTime = System.currentTimeMillis() / 1000L;
-            Main.logger.debug("Search command took {}ms to execute!", (endTime - startTime));
+            Main.logger.debug("Search command took {}ms to execute!", (System.currentTimeMillis() / 1000L - startTime));
 
             resultSet.last();
             rowCount = resultSet.getRow();
@@ -167,6 +130,40 @@ public class Search {
             Main.logger.error("Error while forming search query!", e);
         }
     }
+
+    public static void scrollResults(int direction, boolean firstRun) {
+        try {
+            int rowCount = 0;
+            searchResults.clear();
+            resultSet.relative(direction);
+            while (rowCount < 5 && resultSet.next()) {
+                searchResults.put(rowCount + 1, new ServerEmbed(resultSet.getString("address"), resultSet.getString("country"), resultSet.getString("version"), resultSet.getLong("lastseen"), resultSet.getShort("port")));
+                rowCount++;
+            }
+
+            MessageEmbed embed = SearchEmbedBuilder.parse(searchResults);
+            List<ItemComponent> buttons = new ArrayList<>();
+
+            // Add buttons for each returned server
+            for (Map.Entry<Integer, ServerEmbed> entry : searchResults.entrySet()) {
+                buttons.add(Button.success("SearchButton" + entry.getKey(), String.valueOf(entry.getKey())));
+            }
+
+            // Send a new message if it's the first interaction, edit the original if it's a new search page
+            if (firstRun) {
+                if (searchResults.keySet().size() < 5) {
+                    event.getHook().sendMessageEmbeds(embed).addActionRow(buttons).queue();
+                } else {
+                    event.getHook().sendMessageEmbeds(embed).addActionRow(buttons).addActionRow(Button.primary("PagePrevious", Emoji.fromFormatted("U+2B05")), Button.primary("PageNext", Emoji.fromFormatted("U+27A1"))).queue();
+                }
+            } else {
+                event.getHook().editOriginalEmbeds(embed).queue();
+            }
+        } catch (SQLException e) {
+            Main.logger.error("Error while scrolling results!", e);
+        }
+    }
+
 
     public static void serverSelectedButtonEvent(String address, short port, ButtonInteractionEvent event) {
         try (Connection conn = Database.getConnection()) {

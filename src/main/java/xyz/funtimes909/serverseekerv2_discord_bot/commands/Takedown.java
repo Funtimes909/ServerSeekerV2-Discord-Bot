@@ -19,17 +19,15 @@ public class Takedown {
         String id = event.getInteraction().getUser().getId();
         String address = event.getOption("address").getAsString();
 
-        if (!PermissionsCheck.ownerCheck(id) && !PermissionsCheck.trustedUsersCheck(id) || PermissionsCheck.blacklistCheck(id)) {
-            event.reply("Sorry! You are not authorized to run this command!").setEphemeral(true).queue();
+        if (!PermissionsCheck.ownerCheck(id) && !PermissionsCheck.trustedUsersCheck(id)) {
+            event.getHook().sendMessage("Sorry! You are not authorized to run this command!").setEphemeral(true).queue();
             return;
         }
 
         if (Pattern.compile("[A-Za-z]").matcher(address).find()) {
-            event.reply("Invalid address!").queue();
+            event.getHook().sendMessage("Invalid address!").queue();
             return;
         }
-
-        event.deferReply().queue();
 
         if (event.getOption("remove-entries") != null && event.getOption("remove-entries").getAsBoolean()) {
             try (Connection conn = Database.getConnection()) {
@@ -52,6 +50,7 @@ public class Takedown {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter("exclude.txt", true))) {
                 // Throw an unknown host exception if option isn't an address
                 Inet4Address.getByName(address);
+
                 writer.write(address + "\n");
                 event.getHook().sendMessage("Added " + address + " to the exclude file").queue();
             } catch (IOException e) {

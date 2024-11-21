@@ -23,11 +23,9 @@ public class Track {
         String webhook = event.getOption("webhook").getAsString();
 
         if (!PermissionsCheck.ownerCheck(id) && !PermissionsCheck.trustedUsersCheck(id)) {
-            event.reply("Sorry! You are not authorized to run this command!").setEphemeral(true).queue();
+            event.getHook().sendMessage("Sorry! You are not authorized to run this command!").setEphemeral(true).queue();
             return;
         }
-
-        event.deferReply().queue();
 
         try (BufferedReader reader = new BufferedReader(new FileReader("tracks.json"))) {
             Gson gson = new GsonBuilder()

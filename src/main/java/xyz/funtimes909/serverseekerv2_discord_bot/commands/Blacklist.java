@@ -17,24 +17,23 @@ public class Blacklist {
         String username = event.getOption("user").getAsUser().getName();
 
         if (!PermissionsCheck.ownerCheck(id) && !PermissionsCheck.trustedUsersCheck(id)) {
-            event.reply("Sorry! You are not authorized to run this command!").setEphemeral(true).queue();
+            event.getHook().sendMessage("Sorry! You are not authorized to run this command!").setEphemeral(true).queue();
             return;
         }
 
         if (user.equals(Main.ownerId)) {
-            event.reply("So you think you're smart huh?").queue();
+            event.getHook().sendMessage("So you think you're smart huh?").queue();
             return;
         }
 
         if (PermissionsCheck.trustedUsers.contains(user)) {
-            event.reply("You can't blacklist a trusted user!").setEphemeral(true).queue();
+            event.getHook().sendMessage("You can't blacklist a trusted user!").setEphemeral(true).queue();
             return;
         }
 
         if (event.getOption("operation").getAsString().equalsIgnoreCase("add")) {
-
             if (PermissionsCheck.blacklist.contains(user)) {
-                event.reply("<@" + user + "> is already blacklisted!").setEphemeral(true).queue();
+                event.getHook().sendMessage("<@" + user + "> is already blacklisted!").setEphemeral(true).queue();
                 return;
             }
             PermissionsCheck.blacklist.add(user);
@@ -42,16 +41,15 @@ public class Blacklist {
             try (FileWriter file = new FileWriter("blacklist.txt", true)) {
                 file.write(user + "\n");
                 Main.logger.info("Adding {} to the blacklist (Requested by trusted user {})", username, event.getUser().getName());
-                event.reply("Added <@" + user + "> to the blacklist!").setEphemeral(true).queue();
+                event.getHook().sendMessage("Added <@" + user + "> to the blacklist!").queue();
             } catch (IOException e) {
                 Main.logger.error("blacklist.txt malformed or not found!", e);
             }
         }
 
         if (event.getOption("operation").getAsString().equalsIgnoreCase("remove")) {
-
             if (!PermissionsCheck.blacklist.contains(user)) {
-                event.reply("<@" + user + "> is not blacklisted!").setEphemeral(true).queue();
+                event.getHook().sendMessage("<@" + user + "> is not blacklisted!").setEphemeral(true).queue();
                 return;
             }
             PermissionsCheck.blacklist.remove(id);
@@ -67,7 +65,7 @@ public class Blacklist {
                 Files.write(Paths.get("blacklist.txt"), lines);
 
                 Main.logger.info("Removing {} from the blacklist (Requested by trusted user {})", username, event.getUser().getName());
-                event.reply("Removed <@" + user + "> from the blacklist!").setEphemeral(true).queue();
+                event.getHook().sendMessage("Removed <@" + user + "> from the blacklist!").queue();
             } catch (IOException e) {
                 Main.logger.error("blacklist.txt malformed or not found!", e);
             }
