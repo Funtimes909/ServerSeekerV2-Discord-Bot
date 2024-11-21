@@ -32,12 +32,11 @@ public class ButtonInteractionEventListener extends ListenerAdapter {
                 Search.scrollResults(0, false);
                 break;
         }
-        event.deferEdit().complete();
+        event.deferEdit().queue();
     }
 
     private static String findField(ButtonInteractionEvent event, int fieldNumber) {
-        String fieldName;
-        fieldName = event.getMessage().getEmbeds().getFirst().getFields().stream().filter((index) -> index.getName().startsWith(String.valueOf(fieldNumber))).findFirst().get().getName();
+        String fieldName = event.getMessage().getEmbeds().getFirst().getFields().stream().filter((index) -> index.getName().startsWith(String.valueOf(fieldNumber))).findFirst().get().getName();
         return fieldName.substring(fieldName.indexOf("`") + 2).replaceAll("``", "").split(" ")[0];
     }
 }

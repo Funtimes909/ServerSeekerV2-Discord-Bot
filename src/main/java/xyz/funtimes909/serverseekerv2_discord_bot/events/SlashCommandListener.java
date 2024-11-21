@@ -16,31 +16,31 @@ public class SlashCommandListener extends ListenerAdapter {
 
             switch (event.getName()) {
                 case "search":
-                    executor.submit(() -> Search.search(event));
+                    Search.search(event);
                     break;
                 case "stats":
-                    executor.submit(() -> Stats.stats(event));
+                    Stats.stats(event);
                     break;
                 case "random":
-                    executor.submit(() -> Random.random(event));
+                    Random.random(event);
                     break;
                 case "ping":
-                    executor.submit(() -> Ping.ping(event));
+                    Ping.ping(event);
                     break;
                 case "info":
-                    executor.submit(() -> Info.info(event));
+                    Info.info(event);
                     break;
                 case "takedown":
-                    executor.submit(() -> Takedown.takedown(event));
+                    Takedown.takedown(event);
                     break;
                 case "blacklist":
-                    executor.submit(() -> Blacklist.blacklist(event));
+                    Blacklist.blacklist(event);
                     break;
                 case "playerhistory":
-                    executor.submit(() -> Playerhistory.playerhistory(event));
+                    Playerhistory.playerhistory(event);
                     break;
                 case "track":
-                    executor.submit(() -> Track.track(event));
+                    Track.track(event);
                     break;
             }
         }

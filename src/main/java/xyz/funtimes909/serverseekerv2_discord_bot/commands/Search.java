@@ -211,11 +211,11 @@ public class Search {
             MessageEmbed embed = embedBuilder.build(false);
 
             if (embed == null) {
-                event.getInteraction().reply("Something went wrong executing that command!").queue();
+                event.getInteraction().getHook().sendMessage("Something went wrong executing that command!").queue();
                 return;
             }
 
-            event.getInteraction().replyEmbeds(embed).queue();
+            event.getInteraction().getHook().sendMessageEmbeds(embed).queue();
         } catch (SQLException e) {
             Main.logger.error("Error while executing query!", e);
         }
