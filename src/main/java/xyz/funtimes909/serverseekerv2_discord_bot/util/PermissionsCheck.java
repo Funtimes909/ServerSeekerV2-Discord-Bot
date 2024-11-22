@@ -5,12 +5,12 @@ import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class PermissionsCheck {
-    public static List<String> blacklist = new ArrayList<>();
-    public static List<String> trustedUsers = new ArrayList<>();
+    public static Set<String> blacklist = new HashSet<>();
+    public static Set<String> trustedUsers = new HashSet<>();
 
     public static void initPermissions() {
         try (

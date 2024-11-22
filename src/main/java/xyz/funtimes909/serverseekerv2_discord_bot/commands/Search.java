@@ -24,9 +24,9 @@ import java.sql.SQLException;
 import java.util.*;
 
 public class Search {
-    private static Map<String, OptionMapping> parameters = new HashMap<>();
-    private static Set<String> mods = new HashSet<>();
-    private static HashMap<Integer, ServerEmbed> pages = new HashMap<>();
+    private static final Map<String, OptionMapping> parameters = new HashMap<>();
+    private static final Set<String> mods = new HashSet<>();
+    private static final HashMap<Integer, ServerEmbed> results = new HashMap<>();
     private static String query;
     private static SlashCommandInteractionEvent event;
     public static int pointer = 1;
@@ -53,7 +53,7 @@ public class Search {
         StringBuilder query = new StringBuilder("SELECT servers.address, servers.country, servers.version, servers.lastseen, servers.port FROM servers");
 
         // Player and ModId searching
-        if (event.getOption("player") != null) query.append(" JOIN playerhistory ON servers.address = playerhistory.address AND servers.port = playerhistory.port");
+        if (event.getOption("players") != null) query.append(" JOIN playerhistory ON servers.address = playerhistory.address AND servers.port = playerhistory.port");
         if (event.getOption("mods") != null) query.append(" JOIN mods ON servers.address = mods.address AND servers.port = mods.port");
         query.append(" WHERE ");
 
@@ -94,9 +94,8 @@ public class Search {
     }
 
     private static void runQuery() {
-        try {
-            Connection conn = Database.getConnection();
-            PreparedStatement statement = conn.prepareStatement(query.toString(), ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+        try (Connection conn = Database.getConnection()) {
+            PreparedStatement statement = conn.prepareStatement(query, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 
             int index = 1;
             for (OptionMapping option : parameters.values()) {
@@ -125,47 +124,62 @@ public class Search {
                 event.getHook().sendMessage("No results!").queue();
                 return;
             }
-            results.beforeFirst();
 
-            pages.clear();
-            int count = 1;
+            Search.results.clear();
+            int count = 0;
+            results.beforeFirst();
             while (results.next()) {
-                pages.put(count, new ServerEmbed(results.getString("address"), results.getString("country"), results.getString("version"), results.getLong("lastseen"), results.getShort("port")));
+                Search.results.put(count, new ServerEmbed(results.getString("address"), results.getString("country"), results.getString("version"), results.getLong("lastseen"), results.getShort("port")));
                 count++;
             }
 
-            conn.close();
-            scrollResults(true, true, 0);
+            scrollResults(true, true);
         } catch (SQLException e) {
             Main.logger.error("Error while forming search query!", e);
         }
     }
 
-    public static void scrollResults(boolean firstRun, boolean forward, int amount) {
-        HashMap<Integer, ServerEmbed> results = new HashMap<>();
+    public static void scrollResults(boolean firstRun, boolean forward) {
+        HashMap<Integer, ServerEmbed> page = new HashMap<>();
         List<ItemComponent> buttons = new ArrayList<>();
 
-        if (forward) {
+        if (forward && firstRun) {
             int index = 1;
-            for (int i = pointer; 6 > i; i++) {
-                results.put(index, pages.get(i));
+            for (int i = 1; 6 > i; i++) {
+                System.out.println("At index: " + i + " Pointer value: " + pointer);
+                page.put(index, results.get(i));
+                pointer++;
                 index++;
             }
         } else {
-            int index = 1;
-            for (int i = pointer; 6 > i; i--) {
-                results.put(index, pages.get(i));
-                index++;
+            if (forward) {
+                int index = 1;
+                int count = pointer;
+                for (int i = pointer; count + 5 > i; i++) {
+                    System.out.println("At index: " + i + " Pointer value: " + pointer);
+                    page.put(index, results.get(i));
+                    pointer++;
+                    index++;
+                }
+            } else {
+                int index = 1;
+                int count = pointer;
+                for (int i = pointer; count - 5 < i; i--) {
+                    System.out.println("At index: " + i + " Pointer value: " + pointer);
+                    page.put(index, results.get(i));
+                    pointer--;
+                    index++;
+                }
             }
         }
 
-        for (Integer entry : results.keySet()) {
+        for (int entry : page.keySet()) {
             buttons.add(Button.success("SearchButton" + entry, String.valueOf(entry)));
         }
 
-        MessageEmbed embed = SearchEmbedBuilder.parse(results);
+        MessageEmbed embed = SearchEmbedBuilder.parse(page);
         if (firstRun) {
-            if (results.size() < 5) {
+            if (page.size() < 5) {
                 event.getHook().sendMessageEmbeds(embed).addActionRow(buttons).queue();
             } else {
                 event.getHook().sendMessageEmbeds(embed).addActionRow(buttons).addActionRow(Button.primary("PagePrevious", Emoji.fromFormatted("U+2B05")), Button.primary("PageNext", Emoji.fromFormatted("U+27A1"))).queue();
@@ -173,6 +187,7 @@ public class Search {
         } else {
             event.getHook().editOriginalEmbeds(embed).queue();
         }
+        System.out.println(pointer);
     }
 
 
