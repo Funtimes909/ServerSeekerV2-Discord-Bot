@@ -15,7 +15,6 @@ import xyz.funtimes909.serverseekerv2_discord_bot.records.Player;
 import xyz.funtimes909.serverseekerv2_discord_bot.records.Server;
 import xyz.funtimes909.serverseekerv2_discord_bot.records.ServerEmbed;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.Database;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.PermissionsCheck;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

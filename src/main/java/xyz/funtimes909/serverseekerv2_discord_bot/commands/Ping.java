@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.ServerEmbedBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.records.Server;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.PermissionsCheck;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PingUtils;
 
 public class Ping {

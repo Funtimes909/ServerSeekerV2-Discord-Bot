@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.PlayerhistoryEmbedBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.Database;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.PermissionsCheck;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
