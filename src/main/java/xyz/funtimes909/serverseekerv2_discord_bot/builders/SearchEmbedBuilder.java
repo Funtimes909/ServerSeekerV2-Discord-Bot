@@ -20,13 +20,8 @@ public class SearchEmbedBuilder {
         int longestVersion = 0;
 
         for (HashMap.Entry<Integer, ServerEmbed> entry : servers.entrySet()) {
-            if (entry.getValue().address().length() > longestAddress) {
-                longestAddress = entry.getValue().address().length();
-            }
-
-            if (entry.getValue().version().length() > longestVersion) {
-                longestVersion = entry.getValue().version().length();
-            }
+            if (entry.getValue().address().length() > longestAddress) longestAddress = entry.getValue().address().length();
+            if (entry.getValue().version().length() > longestVersion) longestVersion = entry.getValue().version().length();
         }
 
         for (HashMap.Entry<Integer, ServerEmbed> entry : servers.entrySet()) {
@@ -55,7 +50,7 @@ public class SearchEmbedBuilder {
 
             MessageEmbed.Field addressField = new MessageEmbed.Field(entry.getKey() + ". " + address + " **-** " + version + " **-** " + timestamp, "_ _", false);
             fields.add(addressField);
-        };
+        }
 
         EmbedBuilder embed = new EmbedBuilder()
                 .setColor(new Color(0, 255, 0))

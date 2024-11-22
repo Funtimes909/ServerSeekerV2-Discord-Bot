@@ -9,12 +9,13 @@ import xyz.funtimes909.serverseekerv2_discord_bot.util.PermissionsCheck;
 public class SlashCommandListener extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-        Main.logger.info("Command: {} run by {} [{}] ({} options)", event.getName(), event.getUser().getName(), event.getUser().getId(), event.getOptions().size());
         if (PermissionsCheck.blacklistCheck(event.getUser().getId())) {
+            Main.logger.info("Blacklisted user attempted to run command! {} Ran {}", event.getUser().getName(), event.getName());
             event.reply("You are blacklisted!").setEphemeral(true).queue();
             return;
         }
 
+        Main.logger.info("Command: {} run by {} [{}] ({} options)", event.getName(), event.getUser().getName(), event.getUser().getId(), event.getOptions().size());
         event.deferReply().queue();
         switch (event.getName()) {
             case "search" -> Search.search(event);
