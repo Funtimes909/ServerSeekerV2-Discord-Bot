@@ -4,9 +4,13 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import xyz.funtimes909.serverseekerv2_discord_bot.commands.Search;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
 public class ButtonInteractionEventListener extends ListenerAdapter {
     @Override
     public void onButtonInteraction(ButtonInteractionEvent event) {
+        Executor executor = Executors.newVirtualThreadPerTaskExecutor();
         event.deferEdit().queue();
         switch (event.getComponentId()) {
             case "SearchButton1":
@@ -25,10 +29,11 @@ public class ButtonInteractionEventListener extends ListenerAdapter {
                 Search.serverSelectedButtonEvent(findField(event, 5), (short) 25565, event);
                 break;
             case "PagePrevious":
-                Search.scrollResults(false, false);
+                if (Search.pointer <= 6) return;
+                executor.execute(() -> Search.scrollResults(false, false));
                 break;
             case "PageNext":
-                Search.scrollResults(false, true);
+                executor.execute(() -> Search.scrollResults(false, true));
                 break;
         }
     }
