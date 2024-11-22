@@ -18,6 +18,7 @@ import xyz.funtimes909.serverseekerv2_discord_bot.util.Database;
 
 import java.sql.*;
 import java.util.*;
+import java.util.stream.IntStream;
 
 public class Search {
     private static final Map<String, OptionMapping> parameters = new HashMap<>();
@@ -38,17 +39,13 @@ public class Search {
             interactionEvent.getHook().sendMessage("You must provide some search queries!").queue();
         }
 
-        query = buildQuery(options, true);
-        runQuery(true);
-
+        // Return a chunk of 100 rows
         query = buildQuery(options, false);
-        runQuery(false);
-
+        runQuery();
     }
 
     private static StringBuilder buildQuery(List<OptionMapping> options, boolean countQuery) {
         StringBuilder query = new StringBuilder("SELECT servers.address, servers.country, servers.version, servers.lastseen, servers.port FROM servers");
-        if (countQuery) query.replace(7, 88, "COUNT(*)");
 
         // Player and ModId searching
         if (event.getOption("players") != null) query.append(" JOIN playerhistory ON servers.address = playerhistory.address AND servers.port = playerhistory.port");
@@ -65,10 +62,7 @@ public class Search {
                 case "empty" -> query.append(option.getAsBoolean() ? "onlinePlayers = 0 AND " : "onlinePlayers != 0 AND ");
                 case "forge" -> query.append(option.getAsBoolean() ? "fmlnetworkversion IS NOT NULL AND " : "fmlnetworkversion IS NULL AND ");
                 case "icon" -> query.append(option.getAsBoolean() ? "icon IS NOT NULL AND " : "icon IS NULL AND ");
-                case "mods" -> {
-                    if (option.getAsString().contains(",")) { mods.addAll(Arrays.asList(option.getAsString().split(", "))); }
-                }
-                case "limit" -> {}
+                case "mods" -> { if (option.getAsString().contains(",")) { mods.addAll(Arrays.asList(option.getAsString().split(", "))); } }
                 default -> parameters.put(option.getName(), option);
             }
         }
@@ -81,9 +75,7 @@ public class Search {
                 case "forgeversion" -> query.append("fmlnetworkversion = ? AND ");
                 case "description" -> query.append("motd ILIKE '%' || ? || '%' AND ");
                 case "player" -> query.append("playername ILIKE '%' || ? || '%' AND ");
-                case "port" -> {
-                    if (event.getOption("players") != null || event.getOption("mods") != null) { query.append("servers.port = ? AND "); }
-                }
+                case "port" -> { if (event.getOption("players") != null || event.getOption("mods") != null) { query.append("servers.port = ? AND "); } }
                 default -> query.append(entry.getKey()).append(" = ? AND ");
             }
         }
@@ -91,11 +83,11 @@ public class Search {
         // Add modids to the end of the query
         if (!mods.isEmpty()) mods.forEach((mod) -> query.append("modid = ? OR "));
         query.replace(query.length() - 4, query.length(), "");
-        if (!countQuery) query.append(" ORDER BY lastseen DESC OFFSET ").append(offset);
+        query.append(" ORDER BY lastseen DESC OFFSET ").append(offset);
         return query;
     }
 
-    private static void runQuery(boolean countQuery) {
+    private static void runQuery() {
         try (Connection conn = Database.getConnection()) {
             PreparedStatement statement = conn.prepareStatement(query.toString(), ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 
@@ -115,34 +107,29 @@ public class Search {
                     index++;
                 }
             }
-            System.out.println(statement);
 
             long startTime = System.currentTimeMillis() / 1000L;
             ResultSet results = statement.executeQuery();
             Main.logger.debug("Search command took {}ms to execute!", (System.currentTimeMillis() / 1000L - startTime));
 
-            if (!countQuery) {
-                results.last();
-                int rowCount = results.getRow();
-                if (rowCount == 0) {
-                    event.getHook().sendMessage("No results!").queue();
-                    return;
-                }
-
-                Search.results.clear();
-                int count = 1;
-                results.beforeFirst();
-                while (results.next()) {
-                    Search.results.put(count, new ServerEmbed(results.getString("address"), results.getString("country"), results.getString("version"), results.getLong("lastseen"), results.getShort("port")));
-                    count++;
-                }
-
-                scrollResults(true, true);
-            } else {
-                while (results.next()) {
-                    totalRows = results.getInt(1);
-                }
+            results.last();
+            totalRows = results.getRow();
+            if (totalRows == 0) {
+                event.getHook().sendMessage("No results!").queue();
+                return;
             }
+
+            Search.results.clear();
+            results.beforeFirst();
+
+            int count = 1;
+            while (results.next()) {
+                Search.results.put(count, new ServerEmbed(results.getString("address"), results.getString("country"), results.getString("version"), results.getLong("lastseen"), results.getShort("port")));
+                count++;
+                if (count == 100) break;
+            }
+
+            scrollResults(true, true);
         } catch (SQLException e) {
             Main.logger.error("Error while running search query!", e);
             event.getHook().sendMessage("Error while running search query!").queue();
