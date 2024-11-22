@@ -54,7 +54,7 @@ public class SearchEmbedBuilder {
 
         EmbedBuilder embed = new EmbedBuilder()
                 .setColor(new Color(0, 255, 0))
-                .setTitle("Results: (" + Search.totalRows + ")")
+                .setTitle("Results: " + Search.totalRows)
                 .setAuthor("ServerSeekerV2", "https://discord.gg/WEErxAP8kz", "https://funtimes909.xyz/assets/images/serverseekerv2-icon-cropped.png")
                 .setFooter("Funtimes909", "https://funtimes909.xyz/avatar-gif");
 

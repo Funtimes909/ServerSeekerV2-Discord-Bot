@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.collections4.MapIterator;
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.SearchEmbedBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.ServerEmbedBuilder;
@@ -18,33 +19,30 @@ import xyz.funtimes909.serverseekerv2_discord_bot.util.Database;
 
 import java.sql.*;
 import java.util.*;
-import java.util.stream.IntStream;
 
 public class Search {
-    private static final Map<String, OptionMapping> parameters = new HashMap<>();
-    private static List<OptionMapping> options = new ArrayList<>();
-    private static final Set<String> mods = new HashSet<>();
     private static final HashMap<Integer, ServerEmbed> results = new HashMap<>();
-    private static StringBuilder query;
+    private static final Map<String, OptionMapping> parameters = new HashMap<>();
+    private static final Set<String> mods = new HashSet<>();
     private static SlashCommandInteractionEvent event;
+    private static StringBuilder query;
     public static int pointer = 1;
-    public static int offset;
     public static int totalRows;
+    public static int offset;
 
     public static void search(SlashCommandInteractionEvent interactionEvent) {
         event = interactionEvent;
-        options = interactionEvent.getOptions();
 
         if (interactionEvent.getOptions().isEmpty()) {
             interactionEvent.getHook().sendMessage("You must provide some search queries!").queue();
         }
 
         // Return a chunk of 100 rows
-        query = buildQuery(options, false);
+        query = buildQuery(event.getOptions());
         runQuery();
     }
 
-    private static StringBuilder buildQuery(List<OptionMapping> options, boolean countQuery) {
+    private static StringBuilder buildQuery(List<OptionMapping> options) {
         StringBuilder query = new StringBuilder("SELECT servers.address, servers.country, servers.version, servers.lastseen, servers.port FROM servers");
 
         // Player and ModId searching
@@ -139,31 +137,26 @@ public class Search {
     public static void scrollResults(boolean firstRun, boolean forward) {
         HashMap<Integer, ServerEmbed> page = new HashMap<>();
         List<ItemComponent> buttons = new ArrayList<>();
+        int index = 1;
 
-        if (forward && firstRun) {
-            int index = 1;
-            for (int i = 0; 5 > i; i++) {
-                System.out.println("At index: " + (i + 1) + " Page value: " + results.get(i + 1));
-                page.put(index, results.get(i + 1));
+        if (firstRun) {
+            for (int i = 1; 6 > i; i++) {
+                page.put(index, results.get(i));
                 pointer++;
                 index++;
             }
         } else {
             if (forward) {
-                int index = 1;
                 int count = pointer;
-                for (int i = pointer; count + 5 > i; i++) {
-                    System.out.println("At index: " + i + " Page value: " + results.get(i));
+                for (int i = count; (count + 5) > i; i++) {
                     page.put(index, results.get(i));
                     pointer++;
                     index++;
                 }
             } else {
-                int index = 1;
                 int count = pointer;
-                for (int i = pointer; count - 5 < i; i--) {
-                    System.out.println("At index: " + i + " Page value: " + results.get(i));
-                    page.put(index, results.get(i));
+                for (int i = count; (count - 5) < i; i--) {
+                    page.put(index, results.get(i - 1));
                     pointer--;
                     index++;
                 }
@@ -179,7 +172,7 @@ public class Search {
             if (page.size() < 5) {
                 event.getHook().sendMessageEmbeds(embed).addActionRow(buttons).queue();
             } else {
-                event.getHook().sendMessageEmbeds(embed).addActionRow(buttons).addActionRow(Button.primary("PagePrevious", Emoji.fromFormatted("U+2B05")), Button.primary("PageNext", Emoji.fromFormatted("U+27A1"))).queue();
+                event.getHook().sendMessageEmbeds(embed).addActionRow(buttons).addActionRow(Button.primary("PagePrevious", Emoji.fromFormatted("U+2B05"))  , Button.primary("PageNext", Emoji.fromFormatted("U+27A1"))).queue();
             }
         } else {
             event.getHook().editOriginalEmbeds(embed).queue();

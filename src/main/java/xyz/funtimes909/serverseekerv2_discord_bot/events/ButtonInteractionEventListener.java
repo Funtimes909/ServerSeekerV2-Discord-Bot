@@ -14,22 +14,21 @@ public class ButtonInteractionEventListener extends ListenerAdapter {
         event.deferEdit().queue();
         switch (event.getComponentId()) {
             case "SearchButton1":
-                Search.serverSelectedButtonEvent(findField(event, 1), (short) 25565, event);
+                executor.execute(() -> Search.serverSelectedButtonEvent(findField(event, 1), (short) 25565, event));
                 break;
             case "SearchButton2":
-                Search.serverSelectedButtonEvent(findField(event, 2), (short) 25565, event);
+                executor.execute(() -> Search.serverSelectedButtonEvent(findField(event, 2), (short) 25565, event));
                 break;
             case "SearchButton3":
-                Search.serverSelectedButtonEvent(findField(event, 3), (short) 25565, event);
+                executor.execute(() -> Search.serverSelectedButtonEvent(findField(event, 3), (short) 25565, event));
                 break;
             case "SearchButton4":
-                Search.serverSelectedButtonEvent(findField(event, 4), (short) 25565, event);
+                executor.execute(() -> Search.serverSelectedButtonEvent(findField(event, 4), (short) 25565, event));
                 break;
             case "SearchButton5":
-                Search.serverSelectedButtonEvent(findField(event, 5), (short) 25565, event);
+                executor.execute(() -> Search.serverSelectedButtonEvent(findField(event, 5), (short) 25565, event));
                 break;
             case "PagePrevious":
-                if (Search.pointer <= 6) return;
                 executor.execute(() -> Search.scrollResults(false, false));
                 break;
             case "PageNext":
