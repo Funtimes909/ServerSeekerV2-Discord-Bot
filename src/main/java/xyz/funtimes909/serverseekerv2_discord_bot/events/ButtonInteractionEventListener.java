@@ -7,6 +7,7 @@ import xyz.funtimes909.serverseekerv2_discord_bot.commands.Search;
 public class ButtonInteractionEventListener extends ListenerAdapter {
     @Override
     public void onButtonInteraction(ButtonInteractionEvent event) {
+        event.deferEdit().queue();
         switch (event.getComponentId()) {
             case "SearchButton1":
                 Search.serverSelectedButtonEvent(findField(event, 1), (short) 25565, event);
@@ -30,7 +31,6 @@ public class ButtonInteractionEventListener extends ListenerAdapter {
                 Search.scrollResults(false, true);
                 break;
         }
-        event.deferEdit().queue();
     }
 
     private static String findField(ButtonInteractionEvent event, int fieldNumber) {
