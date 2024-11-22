@@ -18,11 +18,6 @@ import java.util.List;
 
 public class Playerhistory {
     public static void playerhistory(SlashCommandInteractionEvent event) {
-        if (PermissionsCheck.blacklistCheck(event.getInteraction().getUser().getId())) {
-            event.getHook().sendMessage("Sorry! You are not authorized to run this command!").setEphemeral(true).queue();
-            return;
-        }
-
         if (event.getOption("player") != null && event.getOption("address") != null) {
             event.getHook().sendMessage("Please select only one option!").queue();
             return;

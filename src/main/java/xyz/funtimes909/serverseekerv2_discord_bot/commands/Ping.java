@@ -9,11 +9,6 @@ import xyz.funtimes909.serverseekerv2_discord_bot.util.PingUtils;
 
 public class Ping {
     public static void ping(SlashCommandInteractionEvent event) {
-        if (PermissionsCheck.blacklistCheck(event.getHook().getInteraction().getUser().getId())) {
-            event.getHook().sendMessage("Sorry! You are not authorized to run this command!").setEphemeral(true).queue();
-            return;
-        }
-
         if (event.getOption("address").getAsString().equals("localhost") || event.getOption("address").getAsString().equals("0.0.0.0") || event.getOption("address").getAsString().startsWith("127")) {
             event.getHook().sendMessage("You can't ping this address!").queue();
             return;

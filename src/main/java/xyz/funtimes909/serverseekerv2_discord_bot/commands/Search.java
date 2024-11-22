@@ -35,11 +35,6 @@ public class Search {
     public static void search(SlashCommandInteractionEvent interactionEvent) {
         event = interactionEvent;
 
-        if (PermissionsCheck.blacklistCheck(interactionEvent.getInteraction().getUser().getId())) {
-            interactionEvent.getHook().sendMessage("Sorry! You are not authorized to run this command!").setEphemeral(true).queue();
-            return;
-        }
-
         if (event.getOptions().isEmpty()) {
             interactionEvent.getHook().sendMessage("You must provide some search queries!").queue();
             return;

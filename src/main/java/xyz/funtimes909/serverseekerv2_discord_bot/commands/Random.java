@@ -19,11 +19,6 @@ import java.util.List;
 
 public class Random {
     public static void random(SlashCommandInteractionEvent event) {
-        if (PermissionsCheck.blacklistCheck(event.getInteraction().getUser().getId())) {
-            event.getHook().sendMessage("Sorry! You are not authorized to run this command!").setEphemeral(true).queue();
-            return;
-        }
-
         try (Connection conn = Database.getConnection()) {
             Statement statement = conn.createStatement();
             long startTime = System.currentTimeMillis() / 1000;
