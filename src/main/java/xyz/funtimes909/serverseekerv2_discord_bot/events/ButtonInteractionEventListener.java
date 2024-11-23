@@ -32,6 +32,11 @@ public class ButtonInteractionEventListener extends ListenerAdapter {
                 executor.execute(() -> Search.scrollResults(false, false));
                 break;
             case "PageNext":
+                if (Search.pointer >= Search.totalRows - 6) {
+                    Search.results.clear();
+                    Search.offset += 25;
+                    Search.runQuery();
+                }
                 executor.execute(() -> Search.scrollResults(false, true));
                 break;
         }

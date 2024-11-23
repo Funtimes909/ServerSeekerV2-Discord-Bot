@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.collections4.MapIterator;
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.SearchEmbedBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.ServerEmbedBuilder;
@@ -21,34 +20,35 @@ import java.sql.*;
 import java.util.*;
 
 public class Search {
-    private static final HashMap<Integer, ServerEmbed> results = new HashMap<>();
     private static final Map<String, OptionMapping> parameters = new HashMap<>();
     private static final Set<String> mods = new HashSet<>();
     private static SlashCommandInteractionEvent event;
     private static StringBuilder query;
+    public static HashMap<Integer, ServerEmbed> results = new HashMap<>();
     public static int pointer = 1;
+    public static int offset = 0;
     public static int totalRows;
-    public static int offset;
 
     public static void search(SlashCommandInteractionEvent interactionEvent) {
         event = interactionEvent;
 
         if (interactionEvent.getOptions().isEmpty()) {
             interactionEvent.getHook().sendMessage("You must provide some search queries!").queue();
+            return;
         }
 
         // Return a chunk of 100 rows
         query = buildQuery(event.getOptions());
         runQuery();
+        scrollResults(true, true);
     }
 
     private static StringBuilder buildQuery(List<OptionMapping> options) {
-        StringBuilder query = new StringBuilder("SELECT servers.address, servers.country, servers.version, servers.lastseen, servers.port FROM servers");
+        StringBuilder query = new StringBuilder("SELECT servers.address, servers.port, servers.country, servers.version, servers.lastseen FROM servers ");
 
-        // Player and ModId searching
-        if (event.getOption("players") != null) query.append(" JOIN playerhistory ON servers.address = playerhistory.address AND servers.port = playerhistory.port");
-        if (event.getOption("mods") != null) query.append(" JOIN mods ON servers.address = mods.address AND servers.port = mods.port");
-        query.append(" WHERE ");
+        if (event.getOption("player") != null) query.append("JOIN playerhistory ON servers.address = playerhistory.address AND servers.port = playerhistory.port ");
+        if (event.getOption("mods") != null) query.append("JOIN mods ON servers.address = mods.address AND servers.port = mods.port ");
+        query.append("WHERE ");
 
         for (OptionMapping option : options) {
             switch (option.getName()) {
@@ -67,13 +67,13 @@ public class Search {
 
         for (Map.Entry<String, OptionMapping> entry : parameters.entrySet()) {
             switch (entry.getValue().getName()) {
-                case "seenbefore" -> query.append("lastseen <= ? AND ");
-                case "seenafter" -> query.append("lastseen >= ? AND ");
+                case "seenbefore" -> query.append("lastseen < ? AND ");
+                case "seenafter" -> query.append("lastseen > ? AND ");
                 case "reversedns" -> query.append("hostname = ? AND ");
-                case "forgeversion" -> query.append("fmlnetworkversion = ? AND ");
+                case "forgeversion" -> query.append("FmlNetworkVersion = ? AND ");
                 case "description" -> query.append("motd ILIKE '%' || ? || '%' AND ");
                 case "player" -> query.append("playername ILIKE '%' || ? || '%' AND ");
-                case "port" -> { if (event.getOption("players") != null || event.getOption("mods") != null) { query.append("servers.port = ? AND "); } }
+                case "port" -> query.append("servers.port = ? AND ");
                 default -> query.append(entry.getKey()).append(" = ? AND ");
             }
         }
@@ -81,12 +81,15 @@ public class Search {
         // Add modids to the end of the query
         if (!mods.isEmpty()) mods.forEach((mod) -> query.append("modid = ? OR "));
         query.replace(query.length() - 4, query.length(), "");
-        query.append(" ORDER BY lastseen DESC OFFSET ").append(offset);
+        query.append(" ORDER BY lastseen DESC");
+
         return query;
     }
 
-    private static void runQuery() {
+    public static void runQuery() {
         try (Connection conn = Database.getConnection()) {
+            query.append(" OFFSET ").append(offset);
+            System.out.println(query);
             PreparedStatement statement = conn.prepareStatement(query.toString(), ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 
             int index = 1;
@@ -106,6 +109,8 @@ public class Search {
                 }
             }
 
+            Search.parameters.clear();
+            System.out.println(statement);
             long startTime = System.currentTimeMillis() / 1000L;
             ResultSet results = statement.executeQuery();
             Main.logger.debug("Search command took {}ms to execute!", (System.currentTimeMillis() / 1000L - startTime));
@@ -117,17 +122,14 @@ public class Search {
                 return;
             }
 
-            Search.results.clear();
-            results.beforeFirst();
-
             int count = 1;
+            results.beforeFirst();
             while (results.next()) {
                 Search.results.put(count, new ServerEmbed(results.getString("address"), results.getString("country"), results.getString("version"), results.getLong("lastseen"), results.getShort("port")));
+                System.out.println("Adding server to search results at index: " + count + " " + Search.results.get(count) + " " + results.getRow());
                 count++;
                 if (count == 100) break;
             }
-
-            scrollResults(true, true);
         } catch (SQLException e) {
             Main.logger.error("Error while running search query!", e);
             event.getHook().sendMessage("Error while running search query!").queue();
@@ -137,30 +139,12 @@ public class Search {
     public static void scrollResults(boolean firstRun, boolean forward) {
         HashMap<Integer, ServerEmbed> page = new HashMap<>();
         List<ItemComponent> buttons = new ArrayList<>();
-        int index = 1;
 
-        if (firstRun) {
-            for (int i = 1; 6 > i; i++) {
-                page.put(index, results.get(i));
-                pointer++;
-                index++;
-            }
-        } else {
-            if (forward) {
-                int count = pointer;
-                for (int i = count; (count + 5) > i; i++) {
-                    page.put(index, results.get(i));
-                    pointer++;
-                    index++;
-                }
-            } else {
-                int count = pointer;
-                for (int i = count; (count - 5) < i; i--) {
-                    page.put(index, results.get(i - 1));
-                    pointer--;
-                    index++;
-                }
-            }
+        if (!forward) pointer -= 10;
+        int count = pointer;
+        for (int i = count; (count + 5) > i; i++) {
+            page.put(pointer, results.get(i));
+            pointer++;
         }
 
         for (int entry : page.keySet()) {
@@ -175,7 +159,11 @@ public class Search {
                 event.getHook().sendMessageEmbeds(embed).addActionRow(buttons).addActionRow(Button.primary("PagePrevious", Emoji.fromFormatted("U+2B05"))  , Button.primary("PageNext", Emoji.fromFormatted("U+27A1"))).queue();
             }
         } else {
-            event.getHook().editOriginalEmbeds(embed).queue();
+            if (pointer <= 5) {
+                event.getHook().editOriginalEmbeds(embed).setActionRow(buttons).queue();
+            } else {
+                event.getHook().editOriginalEmbeds(embed).queue();
+            }
         }
     }
 
