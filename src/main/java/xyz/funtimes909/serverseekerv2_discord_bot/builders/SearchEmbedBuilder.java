@@ -23,15 +23,18 @@ public class SearchEmbedBuilder {
             if (entry.version().length() > longestVersion) longestVersion = entry.version().length();
         }
 
-        for (HashMap.Entry<Integer, ServerEmbed> entry : servers.entrySet()) {
-            StringBuilder address = new StringBuilder("``").append(entry.getValue().address()).append("``");
-            StringBuilder version = new StringBuilder("``").append(entry.getValue().version()).append("``");
-            String timestamp = "<t:" + entry.getValue().timestamp() + ":R>";
+        if (longestVersion > 24) longestVersion = 24;
 
-            if (entry.getValue().country() != null) {
-                address.insert(0, ":flag_" + entry.getValue().country().toLowerCase() + ": **:** ");
+        int index = 1;
+        for (ServerEmbed entry : servers.values()) {
+            StringBuilder address = new StringBuilder("``").append(entry.address()).append("``");
+            StringBuilder version = new StringBuilder("``").append(entry.version()).append("``");
+            String timestamp = "<t:" + entry.timestamp() + ":R>";
+
+            if (entry.country() != null) {
+                address.insert(0, ":flag_" + entry.country().toLowerCase() + ": **:** ");
             } else {
-                String primaryResponse = HttpUtils.run(entry.getValue().address());
+                String primaryResponse = HttpUtils.run(entry.address());
                 if (primaryResponse != null) {
                     JsonObject parsedPrimaryResponse = JsonParser.parseString(primaryResponse).getAsJsonObject();
                     if (parsedPrimaryResponse.has("countryCode")) address.insert(0, ":flag_" + parsedPrimaryResponse.get("countryCode").getAsString().toLowerCase() + ": **:** ");
@@ -39,7 +42,11 @@ public class SearchEmbedBuilder {
             }
 
             // Make everything the same length
-            while (version.length() < longestVersion + 4) {
+            if (longestVersion == 24 && version.length() >= longestVersion) {
+                version.replace(0, version.length(), version.substring(0, longestVersion) + "...``");
+            }
+
+            while (version.length() < longestVersion) {
                 version.insert(version.length() - 2, " ");
             }
 
@@ -47,8 +54,9 @@ public class SearchEmbedBuilder {
                 address.insert(address.length() - 2, " ");
             }
 
-            MessageEmbed.Field addressField = new MessageEmbed.Field(entry.getKey() + ". " + address + " **-** " + version + " **-** " + timestamp, "_ _", false);
+            MessageEmbed.Field addressField = new MessageEmbed.Field(index + ". " + address + " - " + version + " - " + timestamp, "_ _", false);
             fields.add(addressField);
+            index++;
         }
 
         EmbedBuilder embed = new EmbedBuilder()
