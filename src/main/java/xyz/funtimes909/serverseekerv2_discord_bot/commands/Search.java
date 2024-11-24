@@ -5,8 +5,10 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.components.ItemComponent;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.SearchEmbedBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.ServerEmbedBuilder;
@@ -136,34 +138,40 @@ public class Search {
 
     public void scrollResults(boolean firstRun, boolean forward) {
         HashMap<Integer, ServerEmbed> page = new HashMap<>();
-        List<ItemComponent> buttons = new ArrayList<>();
+        List<Button> buttons = new ArrayList<>();
+        List<LayoutComponent> pageButtons = new ArrayList<>();
 
-        int index = 1;
+        System.out.println("Pointer at start: " + pointer);
         if (!forward) pointer -= 10;
+        int index = 1;
         int count = pointer;
         for (int i = count; (count + 5) > i; i++) {
             page.put(index, results.get(i));
             pointer++;
             index++;
         }
+        System.out.println("Pointer at end: " + pointer);
 
         for (int entry : page.keySet()) {
-            buttons.add(Button.success("SearchButton" + entry, String.valueOf(entry)));
+            buttons.add(Button.of(ButtonStyle.SUCCESS, String.valueOf(entry), String.valueOf(entry)));
+        }
+
+        if (pointer <= 5) {
+            pageButtons.add(ActionRow.of(buttons));
+            pageButtons.add(ActionRow.of(Button.primary("PagePrevious", Emoji.fromFormatted("U+2B05")).asDisabled(), Button.primary("PageNext", Emoji.fromFormatted("U+27A1"))));
+        } else if (pointer >= (totalRows - 6)) {
+            pageButtons.add(ActionRow.of(buttons));
+            pageButtons.add(ActionRow.of(Button.primary("PagePrevious", Emoji.fromFormatted("U+2B05")), Button.primary("PageNext", Emoji.fromFormatted("U+27A1")).asDisabled()));
+        } else {
+            pageButtons.add(ActionRow.of(buttons));
+            pageButtons.add(ActionRow.of(Button.primary("PagePrevious", Emoji.fromFormatted("U+2B05")), Button.primary("PageNext", Emoji.fromFormatted("U+27A1"))));
         }
 
         MessageEmbed embed = SearchEmbedBuilder.parse(page, totalRows);
         if (firstRun) {
-            if (page.size() < 5) {
-                interaction.getHook().sendMessageEmbeds(embed).addActionRow(buttons).queue();
-            } else {
-                interaction.getHook().sendMessageEmbeds(embed).addActionRow(buttons).addActionRow(Button.primary("PagePrevious", Emoji.fromFormatted("U+2B05"))  , Button.primary("PageNext", Emoji.fromFormatted("U+27A1"))).queue();
-            }
+            interaction.getHook().sendMessageEmbeds(embed).setComponents(pageButtons).queue();
         } else {
-            if (pointer <= 5) {
-                interaction.getHook().editOriginalEmbeds(embed).setActionRow(buttons).queue();
-            } else {
-                interaction.getHook().editOriginalEmbeds(embed).queue();
-            }
+            interaction.getHook().editOriginalEmbeds(embed).setComponents(pageButtons).queue();
         }
     }
 

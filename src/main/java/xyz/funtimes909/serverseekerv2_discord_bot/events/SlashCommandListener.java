@@ -24,9 +24,9 @@ public class SlashCommandListener extends ListenerAdapter {
         switch (event.getName()) {
             case "search" -> {
                 Search command = new Search(event);
-                searchCommands.put(event.getHook().getInteraction().getId(), command);
-                System.out.println(event.getHook().getInteraction().getId());
                 command.search();
+                searchCommands.put(event.getUser().getId(), command);
+                System.out.println(event.getUser().getId());
             }
             case "stats" -> Stats.stats(event);
             case "random" -> Random.random(event);

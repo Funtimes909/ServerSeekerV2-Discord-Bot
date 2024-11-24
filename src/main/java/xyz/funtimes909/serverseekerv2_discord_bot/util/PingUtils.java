@@ -20,11 +20,11 @@ public class PingUtils {
     private final String address;
     private final short port;
     private static final byte[] REQUEST = new byte[] {
-            6, // Size: Amount of proceeding bytes [varint]
+            8, // Size: Amount of proceeding bytes [varint]
             0, // ID: Has to be 0
             0, // Protocol Version: Can be anything as long as it's a valid varint
-            2, // Address: As it is indexed with a varint to state it's size, we can just skip sending anything by setting it's size to 0
-            0x3A, 0x33, // Port: Can be anything (Notchian servers don't use this)
+            2, 0x3A, 0x33, // Address: As it is indexed with a varint to state it's size, we can just skip sending anything by setting it's size to 0
+            0, 0, // Port: Can be anything (Notchian servers don't use this)
             1, // Next State: 1 for status, 2 for login. Therefore, has to be 1
             1, // Size
             0, // ID

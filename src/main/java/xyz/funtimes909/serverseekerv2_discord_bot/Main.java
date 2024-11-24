@@ -26,13 +26,14 @@ public class Main {
     public static String url;
     public static String ownerId;
     public static final Logger logger = LoggerFactory.getLogger("ServerSeekerV2");
+    public static JDA client;
 
     public static void main(String[] args) {
         String configFile;
 
         // Set config on launch
         if (args.length == 0) {
-            logger.error("Usage: java -jar serverseekerv2.jar --config <file>");
+            logger.error("Usage: java -jar serverseekerv2-discord-bot.jar --config <file>");
             return;
         } else {
             configFile = args[1];
@@ -67,7 +68,7 @@ public class Main {
             tracks.createNewFile();
 
             // Create bot instance
-            JDA client = JDABuilder.createDefault(token)
+            client = JDABuilder.createDefault(token)
                     .addEventListeners(new SlashCommandListener())
                     .addEventListeners(new ButtonInteractionEventListener())
                     .build();

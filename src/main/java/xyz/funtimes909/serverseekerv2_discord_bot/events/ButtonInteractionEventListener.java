@@ -10,7 +10,10 @@ import java.util.concurrent.Executors;
 public class ButtonInteractionEventListener extends ListenerAdapter {
     @Override
     public void onButtonInteraction(ButtonInteractionEvent event) {
-        Search command = SlashCommandListener.searchCommands.get(event.getMessage().getInteraction().getId());
+        SlashCommandListener.searchCommands.forEach((K, V) -> {
+            System.out.println(K + " " + V);
+        });
+        Search command = SlashCommandListener.searchCommands.get(event.getUser().getId());
 
         Executor executor = Executors.newVirtualThreadPerTaskExecutor();
         event.deferEdit().queue();

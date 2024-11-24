@@ -4,7 +4,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import xyz.funtimes909.serverseekerv2_discord_bot.commands.Search;
 import xyz.funtimes909.serverseekerv2_discord_bot.records.ServerEmbed;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.HttpUtils;
 
@@ -19,9 +18,9 @@ public class SearchEmbedBuilder {
         int longestAddress = 0;
         int longestVersion = 0;
 
-        for (HashMap.Entry<Integer, ServerEmbed> entry : servers.entrySet()) {
-            if (entry.getValue().address().length() > longestAddress) longestAddress = entry.getValue().address().length();
-            if (entry.getValue().version().length() > longestVersion) longestVersion = entry.getValue().version().length();
+        for (ServerEmbed entry : servers.values()) {
+            if (entry.address().length() > longestAddress) longestAddress = entry.address().length();
+            if (entry.version().length() > longestVersion) longestVersion = entry.version().length();
         }
 
         for (HashMap.Entry<Integer, ServerEmbed> entry : servers.entrySet()) {
