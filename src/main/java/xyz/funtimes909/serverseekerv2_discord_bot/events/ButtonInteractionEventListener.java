@@ -10,11 +10,7 @@ import java.util.concurrent.Executors;
 public class ButtonInteractionEventListener extends ListenerAdapter {
     @Override
     public void onButtonInteraction(ButtonInteractionEvent event) {
-        SlashCommandListener.searchCommands.forEach((K, V) -> {
-            System.out.println(K + " " + V);
-        });
         Search command = SlashCommandListener.searchCommands.get(event.getUser().getId());
-
         Executor executor = Executors.newVirtualThreadPerTaskExecutor();
         event.deferEdit().queue();
 
@@ -24,14 +20,16 @@ public class ButtonInteractionEventListener extends ListenerAdapter {
             case "SearchButton3" -> executor.execute(() -> command.serverSelectedButtonEvent(findField(event, 3), (short) 25565, event));
             case "SearchButton4" -> executor.execute(() -> command.serverSelectedButtonEvent(findField(event, 4), (short) 25565, event));
             case "SearchButton5" -> executor.execute(() -> command.serverSelectedButtonEvent(findField(event, 5), (short) 25565, event));
-            case "PagePrevious" -> {
-                if (command.pointer >= 95) {
-                    command.offset += 100;
-                    command.runQuery();
+            case "PagePrevious" -> executor.execute(() -> command.scrollResults(false, false));
+            case "PageNext" -> {
+                if (command.pointer >= 46) {
+                    command.offset += 50;
+                    command.pointer = 1;
+//                    command.query.replace(command.query.reverse().indexOf(" "), command.query.length(), String.valueOf(command.offset));
+                    command.runQuery(false);
                 }
-                executor.execute(() -> command.scrollResults(false, false));
+                executor.execute(() -> command.scrollResults(false, true));
             }
-            case "PageNext" -> executor.execute(() -> command.scrollResults(false, true));
         }
     }
 

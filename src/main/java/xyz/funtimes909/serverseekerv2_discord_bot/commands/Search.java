@@ -26,10 +26,10 @@ public class Search {
     private final HashMap<Integer, ServerEmbed> results = new HashMap<>();
     private final Set<String> mods = new HashSet<>();
     private final SlashCommandInteractionEvent interaction;
-    private StringBuilder query;
+    private int totalRows;
+    public StringBuilder query;
     public int pointer = 1;
     public int offset = 0;
-    private int totalRows;
 
     public Search(SlashCommandInteractionEvent event) {
         interaction = event;
@@ -43,12 +43,12 @@ public class Search {
 
         // Return a chunk of 100 rows
         query = buildQuery(interaction.getOptions());
-        runQuery();
+        runQuery(true);
         scrollResults(true, true);
     }
 
     private StringBuilder buildQuery(List<OptionMapping> options) {
-        StringBuilder query = new StringBuilder("SELECT servers.address, servers.port, servers.country, servers.version, servers.lastseen FROM servers ");
+        query = new StringBuilder("SELECT servers.address, servers.port, servers.country, servers.version, servers.lastseen FROM servers ");
 
         if (interaction.getOption("player") != null) query.append("JOIN playerhistory ON servers.address = playerhistory.address AND servers.port = playerhistory.port ");
         if (interaction.getOption("mods") != null) query.append("JOIN mods ON servers.address = mods.address AND servers.port = mods.port ");
@@ -90,9 +90,10 @@ public class Search {
         return query;
     }
 
-    public void runQuery() {
+    public void runQuery(boolean firstRun) {
         try (Connection conn = Database.getConnection()) {
-            query.append(" OFFSET ").append(offset);
+            if (firstRun) query.append(" OFFSET 0");
+            else query.replace(query.lastIndexOf(" OFFSET"), query.length(), " OFFSET " + offset);
             PreparedStatement statement = conn.prepareStatement(query.toString(), ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 
             int index = 1;
@@ -116,16 +117,19 @@ public class Search {
             ResultSet results = statement.executeQuery();
             Main.logger.debug("Search command took {}ms to execute!", (System.currentTimeMillis() / 1000L - startTime));
 
-            results.last();
-            totalRows = results.getRow();
-            if (totalRows == 0) {
-                interaction.getHook().sendMessage("No results!").queue();
-                return;
+            // Check the row count for the first run
+            if (firstRun) {
+                results.last();
+                totalRows = results.getRow();
+                if (totalRows == 0) {
+                    interaction.getHook().sendMessage("No results!").queue();
+                    return;
+                }
             }
 
             int count = 1;
             results.beforeFirst();
-            while (results.next() && count < 100) {
+            while (results.next() && count < 50) {
                 this.results.put(count, new ServerEmbed(results.getString("address"), results.getString("country"), results.getString("version"), results.getLong("lastseen"), results.getShort("port")));
                 count++;
             }
@@ -148,22 +152,18 @@ public class Search {
             pointer++;
             index++;
         }
-        System.out.println(pointer);
 
         for (int entry : page.keySet()) {
-            buttons.add(Button.of(ButtonStyle.SUCCESS, String.valueOf(entry), String.valueOf(entry)));
+            buttons.add(Button.of(ButtonStyle.SUCCESS, "SearchButton" + entry, String.valueOf(entry)));
         }
 
-        if (pointer <= 6 || firstRun) {
-            System.out.println("First page");
+        if (pointer <= 6) {
             pageButtons.add(ActionRow.of(buttons));
             pageButtons.add(ActionRow.of(Button.primary("PagePrevious", Emoji.fromFormatted("U+2B05")).asDisabled(), Button.primary("PageNext", Emoji.fromFormatted("U+27A1"))));
         } else if (pointer >= (totalRows - 6)) {
-            System.out.println("Last page");
             pageButtons.add(ActionRow.of(buttons));
             pageButtons.add(ActionRow.of(Button.primary("PagePrevious", Emoji.fromFormatted("U+2B05")), Button.primary("PageNext", Emoji.fromFormatted("U+27A1")).asDisabled()));
         } else {
-            System.out.println("Normal page");
             pageButtons.add(ActionRow.of(buttons));
             pageButtons.add(ActionRow.of(Button.primary("PagePrevious", Emoji.fromFormatted("U+2B05")), Button.primary("PageNext", Emoji.fromFormatted("U+27A1"))));
         }
@@ -177,6 +177,7 @@ public class Search {
     }
 
     public void serverSelectedButtonEvent(String address, short port, ButtonInteractionEvent event) {
+        System.out.println("lala!");
         try (Connection conn = Database.getConnection()) {
             PreparedStatement statement = conn.prepareStatement("SELECT * FROM servers LEFT JOIN playerhistory ON servers.address = playerhistory.address AND servers.port = playerhistory.port LEFT JOIN mods ON servers.address = mods.address AND servers.port = mods.port WHERE servers.address = ? AND servers.port = ?");
             statement.setString(1, address);
