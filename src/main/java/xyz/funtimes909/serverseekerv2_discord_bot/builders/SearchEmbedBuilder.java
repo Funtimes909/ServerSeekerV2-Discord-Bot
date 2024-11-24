@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class SearchEmbedBuilder {
-    public static MessageEmbed parse(HashMap<Integer, ServerEmbed> servers, int rowCount) {
+    public static MessageEmbed parse(HashMap<Integer, ServerEmbed> servers, int rowCount, int page) {
         List<MessageEmbed.Field> fields = new ArrayList<>();
         int longestAddress = 0;
         int longestVersion = 0;
@@ -53,7 +53,7 @@ public class SearchEmbedBuilder {
 
         EmbedBuilder embed = new EmbedBuilder()
                 .setColor(new Color(0, 255, 0))
-                .setTitle("Results: " + rowCount)
+                .setTitle("Page: " + page + " (Total Results: " + rowCount + ")")
                 .setAuthor("ServerSeekerV2", "https://discord.gg/WEErxAP8kz", "https://funtimes909.xyz/assets/images/serverseekerv2-icon-cropped.png")
                 .setFooter("Funtimes909", "https://funtimes909.xyz/avatar-gif");
 

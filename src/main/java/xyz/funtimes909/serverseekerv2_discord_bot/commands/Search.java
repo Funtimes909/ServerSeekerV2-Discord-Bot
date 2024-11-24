@@ -27,8 +27,8 @@ public class Search {
     private final Set<String> mods = new HashSet<>();
     private final SlashCommandInteractionEvent interaction;
     private StringBuilder query;
-    private int pointer = 1;
-    private int offset = 0;
+    public int pointer = 1;
+    public int offset = 0;
     private int totalRows;
 
     public Search(SlashCommandInteractionEvent event) {
@@ -125,10 +125,9 @@ public class Search {
 
             int count = 1;
             results.beforeFirst();
-            while (results.next()) {
+            while (results.next() && count < 100) {
                 this.results.put(count, new ServerEmbed(results.getString("address"), results.getString("country"), results.getString("version"), results.getLong("lastseen"), results.getShort("port")));
                 count++;
-                if (count == 100) break;
             }
         } catch (SQLException e) {
             Main.logger.error("Error while running search query!", e);
@@ -141,7 +140,6 @@ public class Search {
         List<Button> buttons = new ArrayList<>();
         List<LayoutComponent> pageButtons = new ArrayList<>();
 
-        System.out.println("Pointer at start: " + pointer);
         if (!forward) pointer -= 10;
         int index = 1;
         int count = pointer;
@@ -150,24 +148,27 @@ public class Search {
             pointer++;
             index++;
         }
-        System.out.println("Pointer at end: " + pointer);
+        System.out.println(pointer);
 
         for (int entry : page.keySet()) {
             buttons.add(Button.of(ButtonStyle.SUCCESS, String.valueOf(entry), String.valueOf(entry)));
         }
 
-        if (pointer <= 5) {
+        if (pointer <= 6 || firstRun) {
+            System.out.println("First page");
             pageButtons.add(ActionRow.of(buttons));
             pageButtons.add(ActionRow.of(Button.primary("PagePrevious", Emoji.fromFormatted("U+2B05")).asDisabled(), Button.primary("PageNext", Emoji.fromFormatted("U+27A1"))));
         } else if (pointer >= (totalRows - 6)) {
+            System.out.println("Last page");
             pageButtons.add(ActionRow.of(buttons));
             pageButtons.add(ActionRow.of(Button.primary("PagePrevious", Emoji.fromFormatted("U+2B05")), Button.primary("PageNext", Emoji.fromFormatted("U+27A1")).asDisabled()));
         } else {
+            System.out.println("Normal page");
             pageButtons.add(ActionRow.of(buttons));
             pageButtons.add(ActionRow.of(Button.primary("PagePrevious", Emoji.fromFormatted("U+2B05")), Button.primary("PageNext", Emoji.fromFormatted("U+27A1"))));
         }
 
-        MessageEmbed embed = SearchEmbedBuilder.parse(page, totalRows);
+        MessageEmbed embed = SearchEmbedBuilder.parse(page, totalRows, (pointer / 5));
         if (firstRun) {
             interaction.getHook().sendMessageEmbeds(embed).setComponents(pageButtons).queue();
         } else {
