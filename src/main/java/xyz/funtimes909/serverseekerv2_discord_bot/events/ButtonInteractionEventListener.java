@@ -10,35 +10,19 @@ import java.util.concurrent.Executors;
 public class ButtonInteractionEventListener extends ListenerAdapter {
     @Override
     public void onButtonInteraction(ButtonInteractionEvent event) {
+        Search command = SlashCommandListener.searchCommands.get(event.getMessage().getInteraction().getId());
+
         Executor executor = Executors.newVirtualThreadPerTaskExecutor();
         event.deferEdit().queue();
+
         switch (event.getComponentId()) {
-            case "SearchButton1":
-                executor.execute(() -> Search.serverSelectedButtonEvent(findField(event, 1), (short) 25565, event));
-                break;
-            case "SearchButton2":
-                executor.execute(() -> Search.serverSelectedButtonEvent(findField(event, 2), (short) 25565, event));
-                break;
-            case "SearchButton3":
-                executor.execute(() -> Search.serverSelectedButtonEvent(findField(event, 3), (short) 25565, event));
-                break;
-            case "SearchButton4":
-                executor.execute(() -> Search.serverSelectedButtonEvent(findField(event, 4), (short) 25565, event));
-                break;
-            case "SearchButton5":
-                executor.execute(() -> Search.serverSelectedButtonEvent(findField(event, 5), (short) 25565, event));
-                break;
-            case "PagePrevious":
-                executor.execute(() -> Search.scrollResults(false, false));
-                break;
-            case "PageNext":
-                if (Search.pointer >= Search.totalRows - 6) {
-                    Search.results.clear();
-                    Search.offset += 25;
-                    Search.runQuery();
-                }
-                executor.execute(() -> Search.scrollResults(false, true));
-                break;
+            case "SearchButton1" -> executor.execute(() -> command.serverSelectedButtonEvent(findField(event, 1), (short) 25565, event));
+            case "SearchButton2" -> executor.execute(() -> command.serverSelectedButtonEvent(findField(event, 2), (short) 25565, event));
+            case "SearchButton3" -> executor.execute(() -> command.serverSelectedButtonEvent(findField(event, 3), (short) 25565, event));
+            case "SearchButton4" -> executor.execute(() -> command.serverSelectedButtonEvent(findField(event, 4), (short) 25565, event));
+            case "SearchButton5" -> executor.execute(() -> command.serverSelectedButtonEvent(findField(event, 5), (short) 25565, event));
+            case "PagePrevious" -> executor.execute(() -> command.scrollResults(false, false));
+            case "PageNext" -> executor.execute(() -> command.scrollResults(false, true));
         }
     }
 

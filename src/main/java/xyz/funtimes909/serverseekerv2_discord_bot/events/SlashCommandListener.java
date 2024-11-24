@@ -6,7 +6,11 @@ import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 import xyz.funtimes909.serverseekerv2_discord_bot.commands.*;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PermissionsCheck;
 
+import java.util.HashMap;
+
 public class SlashCommandListener extends ListenerAdapter {
+    public static final HashMap<String, Search> searchCommands = new HashMap<>();
+
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         if (PermissionsCheck.blacklistCheck(event.getUser().getId())) {
@@ -18,7 +22,12 @@ public class SlashCommandListener extends ListenerAdapter {
         Main.logger.info("Command: {} run by {} [{}] ({} options)", event.getName(), event.getUser().getName(), event.getUser().getId(), event.getOptions().size());
         event.deferReply().queue();
         switch (event.getName()) {
-            case "search" -> Search.search(event);
+            case "search" -> {
+                Search command = new Search(event);
+                searchCommands.put(event.getHook().getInteraction().getId(), command);
+                System.out.println(event.getHook().getInteraction().getId());
+                command.search();
+            }
             case "stats" -> Stats.stats(event);
             case "random" -> Random.random(event);
             case "ping" -> Ping.ping(event);

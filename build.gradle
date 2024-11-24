@@ -35,6 +35,7 @@ application {
 }
 
 jar {
+    from "LICENSE.txt"
     manifest {
         attributes(
                 'Main-Class': 'xyz.funtimes909.serverseekerv2_discord_bot.Main'
