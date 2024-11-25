@@ -22,7 +22,7 @@ public class Blacklist {
         }
 
         if (user.equals(Main.ownerId)) {
-            event.getHook().sendMessage("So you think you're smart huh?").queue();
+            event.getHook().sendMessage("So you think you're smart huh?").setEphemeral(true).queue();
             return;
         }
 
@@ -53,22 +53,6 @@ public class Blacklist {
                 return;
             }
             PermissionsCheck.blacklist.remove(id);
-
-            try {
-                List<String> lines = Files.readAllLines(Paths.get("blacklist.txt"));
-                for (String line : lines) {
-                    if (line.equals(user)) {
-                        lines.remove(user);
-                    }
-                }
-
-                Files.write(Paths.get("blacklist.txt"), lines);
-
-                Main.logger.info("Removing {} from the blacklist (Requested by trusted user {})", username, event.getUser().getName());
-                event.getHook().sendMessage("Removed <@" + user + "> from the blacklist!").queue();
-            } catch (IOException e) {
-                Main.logger.error("blacklist.txt malformed or not found!", e);
-            }
         }
     }
 }
