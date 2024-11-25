@@ -13,13 +13,15 @@ public class Database {
         dataSource.setUrl("jdbc:postgresql://" + Main.url);
         dataSource.setPassword(Main.password);
         dataSource.setUsername(Main.username);
+        dataSource.setMinIdle(20);
     }
 
     public static Connection getConnection() {
         try {
-            return dataSource. getConnection();
+            return dataSource.getConnection();
         } catch (SQLException e) {
-            throw new RuntimeException("Couldn't connect to database!", e);
+            Main.logger.error("Couldn't get connection to the database!", e);
+            return null;
         }
     }
 }

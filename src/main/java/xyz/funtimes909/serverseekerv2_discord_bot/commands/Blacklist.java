@@ -6,9 +6,6 @@ import xyz.funtimes909.serverseekerv2_discord_bot.util.PermissionsCheck;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
 
 public class Blacklist {
     public static void blacklist(SlashCommandInteractionEvent event) {

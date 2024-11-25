@@ -18,7 +18,10 @@ import xyz.funtimes909.serverseekerv2_discord_bot.records.Server;
 import xyz.funtimes909.serverseekerv2_discord_bot.records.ServerEmbed;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.Database;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 
 public class Search {
@@ -27,7 +30,7 @@ public class Search {
     private final Set<String> mods = new HashSet<>();
     private final SlashCommandInteractionEvent interaction;
     private int totalRows;
-    public StringBuilder query;
+    private StringBuilder query;
     public int pointer = 1;
     public int offset = 0;
 
@@ -41,7 +44,7 @@ public class Search {
             return;
         }
 
-        // Return a chunk of 100 rows
+        // Return a chunk of 50 rows
         query = buildQuery(interaction.getOptions());
         runQuery(true);
         scrollResults(true, true);
@@ -50,10 +53,12 @@ public class Search {
     private StringBuilder buildQuery(List<OptionMapping> options) {
         query = new StringBuilder("SELECT servers.address, servers.port, servers.country, servers.version, servers.lastseen FROM servers ");
 
+        // If either player or mods are requested, join the tables
         if (interaction.getOption("player") != null) query.append("JOIN playerhistory ON servers.address = playerhistory.address AND servers.port = playerhistory.port ");
         if (interaction.getOption("mods") != null) query.append("JOIN mods ON servers.address = mods.address AND servers.port = mods.port ");
         query.append("WHERE ");
 
+        // For simple boolean queries, add them directly to the query, for everything else add it to the parameters Map
         for (OptionMapping option : options) {
             switch (option.getName()) {
                 case "description" -> parameters.put("motd", option);
@@ -69,6 +74,7 @@ public class Search {
             }
         }
 
+        // Append corresponding query parameter to end of query
         for (Map.Entry<String, OptionMapping> entry : parameters.entrySet()) {
             switch (entry.getValue().getName()) {
                 case "seenbefore" -> query.append("lastseen < ? AND ");
@@ -92,10 +98,14 @@ public class Search {
 
     public void runQuery(boolean firstRun) {
         try (Connection conn = Database.getConnection()) {
+            if (conn == null) return;
+
+            // Append offset
             if (firstRun) query.append(" OFFSET 0");
             else query.replace(query.lastIndexOf(" OFFSET"), query.length(), " OFFSET " + offset);
             PreparedStatement statement = conn.prepareStatement(query.toString(), ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 
+            // Add every query value based on its type to the statement
             int index = 1;
             for (OptionMapping option : parameters.values()) {
                 switch (option.getType()) {
@@ -106,6 +116,7 @@ public class Search {
                 index++;
             }
 
+            // Add modID's to the statement last as they will always be at the end
             if (!mods.isEmpty()) {
                 for (String mod : mods) {
                     statement.setString(index, mod);
@@ -127,6 +138,7 @@ public class Search {
                 }
             }
 
+            // Add the first 50 results to a Map, where the key is the results number between 1 - 50
             int count = 1;
             results.beforeFirst();
             while (results.next() && count < 50) {
@@ -144,10 +156,12 @@ public class Search {
         List<Button> buttons = new ArrayList<>();
         List<LayoutComponent> pageButtons = new ArrayList<>();
 
+        // Iterate through results by 5 and add them to the page results, set pointer back 10 results for scrolling backwards
         if (!forward) pointer -= 10;
         int index = 1;
         int count = pointer;
         for (int i = count; (count + 5) > i; i++) {
+            if (results.get(i) == null) continue;
             page.put(index, results.get(i));
             pointer++;
             index++;
@@ -157,28 +171,33 @@ public class Search {
             buttons.add(Button.of(ButtonStyle.SUCCESS, "SearchButton" + entry, String.valueOf(entry)));
         }
 
-        if (pointer <= 6) {
+        if (totalRows <= 5) {
+            // Less than 6 total results, only one page, don't scroll
             pageButtons.add(ActionRow.of(buttons));
-            pageButtons.add(ActionRow.of(Button.primary("PagePrevious", Emoji.fromFormatted("U+2B05")).asDisabled(), Button.primary("PageNext", Emoji.fromFormatted("U+27A1"))));
         } else if (pointer >= (totalRows - 6)) {
+            // Last page, don't let the user scroll forwards anymore
             pageButtons.add(ActionRow.of(buttons));
             pageButtons.add(ActionRow.of(Button.primary("PagePrevious", Emoji.fromFormatted("U+2B05")), Button.primary("PageNext", Emoji.fromFormatted("U+27A1")).asDisabled()));
+        } else if (pointer <= 6) {
+            // First page, don't let the user scroll back
+            pageButtons.add(ActionRow.of(buttons));
+            pageButtons.add(ActionRow.of(Button.primary("PagePrevious", Emoji.fromFormatted("U+2B05")).asDisabled(), Button.primary("PageNext", Emoji.fromFormatted("U+27A1"))));
         } else {
+            // Normal page, let the user scroll both directions
             pageButtons.add(ActionRow.of(buttons));
             pageButtons.add(ActionRow.of(Button.primary("PagePrevious", Emoji.fromFormatted("U+2B05")), Button.primary("PageNext", Emoji.fromFormatted("U+27A1"))));
         }
 
-        MessageEmbed embed = SearchEmbedBuilder.parse(page, totalRows, (pointer / 5));
-        if (firstRun) {
-            interaction.getHook().sendMessageEmbeds(embed).setComponents(pageButtons).queue();
-        } else {
-            interaction.getHook().editOriginalEmbeds(embed).setComponents(pageButtons).queue();
-        }
+        // Show accurate page count if pointer is over 5, otherwise display only one page
+        MessageEmbed embed = SearchEmbedBuilder.parse(page, totalRows, totalRows <= 5 ? 1 : (pointer / 5));
+        if (firstRun) interaction.getHook().sendMessageEmbeds(embed).setComponents(pageButtons).queue();
+        else interaction.getHook().editOriginalEmbeds(embed).setComponents(pageButtons).queue();
     }
 
     public void serverSelectedButtonEvent(String address, short port, ButtonInteractionEvent event) {
-        System.out.println("lala!");
         try (Connection conn = Database.getConnection()) {
+            if (conn == null) return;
+
             PreparedStatement statement = conn.prepareStatement("SELECT * FROM servers LEFT JOIN playerhistory ON servers.address = playerhistory.address AND servers.port = playerhistory.port LEFT JOIN mods ON servers.address = mods.address AND servers.port = mods.port WHERE servers.address = ? AND servers.port = ?");
             statement.setString(1, address);
             statement.setShort(2, port);

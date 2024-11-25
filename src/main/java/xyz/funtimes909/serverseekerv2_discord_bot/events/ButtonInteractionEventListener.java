@@ -25,7 +25,6 @@ public class ButtonInteractionEventListener extends ListenerAdapter {
                 if (command.pointer >= 46) {
                     command.offset += 50;
                     command.pointer = 1;
-//                    command.query.replace(command.query.reverse().indexOf(" "), command.query.length(), String.valueOf(command.offset));
                     command.runQuery(false);
                 }
                 executor.execute(() -> command.scrollResults(false, true));
