@@ -18,7 +18,7 @@ import java.util.List;
 
 public class Random {
     public static void random(SlashCommandInteractionEvent event) {
-        try (Connection conn = Database.getConnection()) {
+        try (Connection conn = Database.getConnection(event.getMessageChannel())) {
             Statement statement = conn.createStatement();
             long startTime = System.currentTimeMillis() / 1000;
             String query = "SELECT * FROM servers LEFT JOIN playerhistory ON servers.address = playerhistory.address AND servers.port = playerhistory.port LEFT JOIN mods ON servers.address = mods.address AND servers.port = mods.port ORDER BY RANDOM() LIMIT 1";

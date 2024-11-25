@@ -14,7 +14,7 @@ import java.sql.Statement;
 
 public class Stats {
     public static void stats(SlashCommandInteractionEvent event) {
-        try (Connection connection = Database.getConnection()) {
+        try (Connection connection = Database.getConnection(event.getMessageChannel())) {
             Statement statement = connection.createStatement();
             ResultSet results = statement.executeQuery("SELECT COUNT(*) FROM servers");
             results.next();

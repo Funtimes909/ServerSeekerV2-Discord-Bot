@@ -47,7 +47,7 @@ public class Ping {
     }
 
     private static void updateServer(Server server) {
-        try (Connection conn = Database.getConnection()) {
+        try (Connection conn = Database.getConnection(null)) {
             String address = server.getAddress();
             short port = server.getPort();
             long timestamp = server.getLastSeen();

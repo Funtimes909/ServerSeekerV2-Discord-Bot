@@ -97,7 +97,7 @@ public class Search {
     }
 
     public void runQuery(boolean firstRun) {
-        try (Connection conn = Database.getConnection()) {
+        try (Connection conn = Database.getConnection(interaction.getChannel())) {
             if (conn == null) return;
 
             // Append offset
@@ -195,7 +195,7 @@ public class Search {
     }
 
     public void serverSelectedButtonEvent(String address, short port, ButtonInteractionEvent event) {
-        try (Connection conn = Database.getConnection()) {
+        try (Connection conn = Database.getConnection(interaction.getChannel())) {
             if (conn == null) return;
 
             PreparedStatement statement = conn.prepareStatement("SELECT * FROM servers LEFT JOIN playerhistory ON servers.address = playerhistory.address AND servers.port = playerhistory.port LEFT JOIN mods ON servers.address = mods.address AND servers.port = mods.port WHERE servers.address = ? AND servers.port = ?");

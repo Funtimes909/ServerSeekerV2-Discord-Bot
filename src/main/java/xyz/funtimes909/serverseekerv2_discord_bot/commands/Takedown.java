@@ -30,7 +30,7 @@ public class Takedown {
         }
 
         if (event.getOption("remove-entries") != null && event.getOption("remove-entries").getAsBoolean()) {
-            try (Connection conn = Database.getConnection()) {
+            try (Connection conn = Database.getConnection(event.getMessageChannel())) {
                 PreparedStatement playerhistory = conn.prepareStatement("DELETE FROM playerhistory WHERE address = ?");
                 playerhistory.setString(1, address);
 

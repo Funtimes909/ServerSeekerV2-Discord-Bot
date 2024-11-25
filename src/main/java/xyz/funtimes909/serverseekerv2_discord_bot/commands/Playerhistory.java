@@ -22,7 +22,8 @@ public class Playerhistory {
             return;
         }
 
-        try (Connection conn = Database.getConnection()) {
+        try (Connection conn = Database.getConnection(event.getMessageChannel())) {
+            if (conn == null) return;
             PreparedStatement statement = null;
 
             if (event.getOption("player") != null) {
