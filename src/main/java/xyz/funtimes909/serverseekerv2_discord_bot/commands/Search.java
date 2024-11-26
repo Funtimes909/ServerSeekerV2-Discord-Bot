@@ -67,7 +67,7 @@ public class Search {
                 case "seenbefore", "seenafter" -> parameters.put("lastseen", option);
                 case "full" -> query.append(option.getAsBoolean() ? "onlinePlayers >= maxPlayers AND " : "onlinePlayers < maxPlayers AND ");
                 case "empty" -> query.append(option.getAsBoolean() ? "onlinePlayers = 0 AND " : "onlinePlayers != 0 AND ");
-                case "forge" -> query.append(option.getAsBoolean() ? "fmlnetworkversion IS NOT NULL AND " : "fmlnetworkversion IS NULL AND ");
+                case "forge" -> query.append(option.getAsBoolean() ? "fmlnetworkversion IS NOT NULL AND " : "fmlnetworkversion IS NULL OR fmlnetworkversion = 0 AND ");
                 case "icon" -> query.append(option.getAsBoolean() ? "icon IS NOT NULL AND " : "icon IS NULL AND ");
                 case "mods" -> { if (option.getAsString().contains(",")) { mods.addAll(Arrays.asList(option.getAsString().split(", "))); } }
                 default -> parameters.put(option.getName(), option);
@@ -91,7 +91,7 @@ public class Search {
         // Add modids to the end of the query
         if (!mods.isEmpty()) mods.forEach((mod) -> query.append("modid = ? OR "));
         query.replace(query.length() - 4, query.length(), "");
-        query.append(" ORDER BY lastseen DESC");
+        query.append("ORDER BY lastseen DESC");
 
         return query;
     }
@@ -104,6 +104,7 @@ public class Search {
             if (firstRun) query.append(" OFFSET 0");
             else query.replace(query.lastIndexOf(" OFFSET"), query.length(), " OFFSET " + offset);
             PreparedStatement statement = conn.prepareStatement(query.toString(), ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            System.out.println(statement);
 
             // Add every query value based on its type to the statement
             int index = 1;

@@ -69,8 +69,10 @@ public class ServerEmbedBuilder {
         miscInfo.append("Cracked: **").append(cracked != null ? cracked + "**\n" : "N/A**\n");
         miscInfo.append("Prevents Chat Reports: **").append(preventsReports != null ? preventsReports + "**\n" : "N/A**\n");
         miscInfo.append("Enforces Secure Chat: **").append(enforceSecure != null ? enforceSecure + "**\n" : "N/A**\n");
-        if (fmlNetworkVersion != null) miscInfo.append("Forge: **").append("true**\n");
-        if (fmlNetworkVersion != null && fmlNetworkVersion != 0) miscInfo.append("Forge Version: **").append(fmlNetworkVersion).append("**\n");
+        if (fmlNetworkVersion != null && fmlNetworkVersion != 0) {
+            miscInfo.append("Forge: **").append("true**\n");
+            miscInfo.append("Forge Version: **").append(fmlNetworkVersion).append("**\n");
+        }
 
         // Address information
         if (ping) {
