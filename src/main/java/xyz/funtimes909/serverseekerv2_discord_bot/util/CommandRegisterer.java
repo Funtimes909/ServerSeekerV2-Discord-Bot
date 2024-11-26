@@ -49,7 +49,7 @@ public class CommandRegisterer {
                         .addOption(OptionType.STRING, "player", "The player you want to search for", false)
                         .addOption(OptionType.STRING, "address", "The server you want to search history for", false),
 
-                Commands.slash("takedown", "Adds an ip address to the exclude for the next scan, optionally removes all entries of that address from the database")
+                Commands.slash("takedown", "Add an ip address to the exclude list, optionally remove it from the database")
                         .addOption(OptionType.STRING, "address", "IP address of the server you want to takedown", true)
                         .addOption(OptionType.BOOLEAN, "remove-entries", "Whether or not to delete existing entries of your server from the database"),
 

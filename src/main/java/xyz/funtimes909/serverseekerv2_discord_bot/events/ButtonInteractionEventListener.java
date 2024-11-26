@@ -20,7 +20,14 @@ public class ButtonInteractionEventListener extends ListenerAdapter {
             case "SearchButton3" -> executor.execute(() -> command.serverSelectedButtonEvent(findField(event, 3), (short) 25565, event));
             case "SearchButton4" -> executor.execute(() -> command.serverSelectedButtonEvent(findField(event, 4), (short) 25565, event));
             case "SearchButton5" -> executor.execute(() -> command.serverSelectedButtonEvent(findField(event, 5), (short) 25565, event));
-            case "PagePrevious" -> executor.execute(() -> command.scrollResults(false, false));
+            case "PagePrevious" -> {
+                if (command.pointer <= 6 && command.totalRows >= 6) {
+                    command.offset -= 100;
+                    command.pointer = 1;
+                    command.runQuery(false);
+                }
+                executor.execute(() -> command.scrollResults(false, false));
+            }
             case "PageNext" -> {
                 if (command.pointer >= 46) {
                     command.offset += 50;

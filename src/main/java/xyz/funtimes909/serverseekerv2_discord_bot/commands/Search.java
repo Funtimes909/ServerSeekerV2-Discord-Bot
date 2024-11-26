@@ -29,8 +29,8 @@ public class Search {
     private final HashMap<Integer, ServerEmbed> results = new HashMap<>();
     private final Set<String> mods = new HashSet<>();
     private final SlashCommandInteractionEvent interaction;
-    private int totalRows;
     private StringBuilder query;
+    public int totalRows;
     public int pointer = 1;
     public int offset = 0;
 
