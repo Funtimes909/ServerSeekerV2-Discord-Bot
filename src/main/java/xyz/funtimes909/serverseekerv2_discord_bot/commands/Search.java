@@ -44,13 +44,12 @@ public class Search {
             return;
         }
 
-        // Return a chunk of 50 rows
-        query = buildQuery(interaction.getOptions());
+        buildQuery(interaction.getOptions());
         runQuery(true);
         scrollResults(true, true);
     }
 
-    private StringBuilder buildQuery(List<OptionMapping> options) {
+    private void buildQuery(List<OptionMapping> options) {
         query = new StringBuilder("SELECT servers.address, servers.port, servers.country, servers.version, servers.lastseen FROM servers ");
 
         // If either player or mods are requested, join the tables
@@ -92,8 +91,6 @@ public class Search {
         if (!mods.isEmpty()) mods.forEach((mod) -> query.append("modid = ? OR "));
         query.replace(query.length() - 4, query.length(), "");
         query.append("ORDER BY lastseen DESC");
-
-        return query;
     }
 
     public void runQuery(boolean firstRun) {
@@ -171,6 +168,12 @@ public class Search {
         for (int entry : page.keySet()) {
             buttons.add(Button.of(ButtonStyle.SUCCESS, "SearchButton" + entry, String.valueOf(entry)));
         }
+
+        if (page.isEmpty()) {
+            System.out.println("No results!");
+            return;
+        }
+
 
         if (totalRows <= 5) {
             // Less than 6 total results, only one page, don't scroll

@@ -120,11 +120,8 @@ public class ServerEmbedBuilder {
             playerInfo.append("```");
         }
 
-        // Create field for mods
-        modInfo.append("Mods: **").append(mods != null ? mods.size() : 0).append("**\n");
-        if (mods == null || mods.isEmpty()) {
-            modInfo.append("```No mods found!```");
-        } else {
+        if (mods != null && !mods.isEmpty()) {
+            modInfo.append("Mods: **").append(mods != null ? mods.size() : 0).append("**\n");
             modInfo.append("```\n");
             int count = 0;
 
@@ -156,7 +153,7 @@ public class ServerEmbedBuilder {
         embed.addField("** -- __Country__ -- **", country != null ? ":flag_" + country.toLowerCase() + ": " + country : ":x: No Country Information", false);
         embed.addField("** -- __Miscellaneous__ -- **", miscInfo.toString(), false);
         embed.addField("** -- __Players__ -- **",  playerInfo.toString(), false);
-        embed.addField("** -- __Mods__ -- **",  modInfo.toString(), false);
+        if (mods != null && !mods.isEmpty()) embed.addField("** -- __Mods__ -- **",  modInfo.toString(), false);
         embed.addField("** -- __Address Information__ -- **", addressInfo.toString(), false);
         return embed.build();
     }
