@@ -35,7 +35,7 @@ public class Search {
     public int offset = 0;
 
     public Search(SlashCommandInteractionEvent event) {
-        interaction = event;
+        this.interaction = event;
     }
 
     public void search() {

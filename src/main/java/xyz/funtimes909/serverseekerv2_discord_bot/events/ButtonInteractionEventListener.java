@@ -11,6 +11,7 @@ public class ButtonInteractionEventListener extends ListenerAdapter {
     @Override
     public void onButtonInteraction(ButtonInteractionEvent event) {
         Search command = SlashCommandListener.searchCommands.get(event.getUser().getId());
+        if (command == null) return;
         Executor executor = Executors.newVirtualThreadPerTaskExecutor();
         event.deferEdit().queue();
 
