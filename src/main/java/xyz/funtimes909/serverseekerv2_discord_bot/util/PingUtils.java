@@ -1,5 +1,6 @@
 package xyz.funtimes909.serverseekerv2_discord_bot.util;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -14,11 +15,13 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class PingUtils {
     private final String address;
     private final short port;
+    private static final StringBuilder motd = new StringBuilder();
     private static final byte[] REQUEST = new byte[] {
             8, // Size: Amount of proceeding bytes [varint]
             0, // ID: Has to be 0
@@ -43,7 +46,6 @@ public class PingUtils {
 
             JsonObject parsedJson = JsonParser.parseString(json).getAsJsonObject();
             String version = null;
-            String motd = null;
             String icon = null;
             Boolean preventsChatReports = null;
             Boolean enforcesSecureChat = null;
@@ -68,12 +70,10 @@ public class PingUtils {
 
             // Description can be either an object or a string
             if (parsedJson.has("description")) {
-                if (parsedJson.get("description").isJsonPrimitive()) {
-                    motd = parsedJson.get("description").getAsString();
-                } else if (parsedJson.get("description").isJsonObject()) {
-                    if (parsedJson.get("description").getAsJsonObject().has("motd")) {
-                        motd = parsedJson.get("description").getAsJsonObject().get("text").getAsString();
-                    }
+                if (parsedJson.get("description").isJsonObject()) {
+                    parseObject(parsedJson.get("description").getAsJsonObject());
+                } else {
+                    motd.append(parsedJson.get("description").getAsString());
                 }
             }
 
@@ -126,7 +126,7 @@ public class PingUtils {
                     .setVersion(version)
                     .setProtocol(protocol)
                     .setFmlNetworkVersion(fmlNetworkVersion)
-                    .setMotd(motd)
+                    .setMotd(motd.toString())
                     .setIcon(icon)
                     .setPreventsReports(preventsChatReports)
                     .setEnforceSecure(enforcesSecureChat)
@@ -138,6 +138,9 @@ public class PingUtils {
                     .build();
 
         } catch (IOException ignored) {}
+        finally {
+            motd.replace(0, motd.length(), "");
+        }
         return null;
     }
 
@@ -162,6 +165,29 @@ public class PingUtils {
             return new String(status);
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    private static void parseObject(JsonObject object) {
+        for (Map.Entry<String, JsonElement> entry : object.asMap().entrySet()) {
+            if (entry.getKey().equals("text")) {
+                motd.append(entry.getValue().getAsString());
+            } else if (entry.getValue().isJsonArray()) {
+                parseArray(entry.getValue().getAsJsonArray());
+            } else if (entry.getValue().isJsonObject()) {
+                parseObject(entry.getValue().getAsJsonObject());
+            }
+        }
+    }
+    private static void parseArray(JsonArray array) {
+        for (JsonElement jsonElement : array) {
+            if (jsonElement.isJsonPrimitive()) {
+                motd.append(jsonElement.getAsString());
+            } else if (jsonElement.isJsonArray()) {
+                parseArray(jsonElement.getAsJsonArray());
+            } else if (jsonElement.isJsonObject()) {
+                parseObject(jsonElement.getAsJsonObject());
+            }
         }
     }
 }
