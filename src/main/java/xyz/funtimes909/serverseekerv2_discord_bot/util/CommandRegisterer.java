@@ -17,6 +17,7 @@ public class CommandRegisterer {
                         .addOption(OptionType.BOOLEAN, "preventsreports", "Search for servers that prevent chat reports")
                         .addOption(OptionType.BOOLEAN, "enforcesecure", "Search for servers that enforce secure chat")
                         .addOption(OptionType.BOOLEAN, "cracked", "Search for servers that are running in offline mode")
+                        .addOption(OptionType.BOOLEAN, "whitelist", "Search for servers that are whitelisted")
                         .addOption(OptionType.STRING, "country", "Search for servers running in a specific country")
                         .addOption(OptionType.INTEGER, "port", "Search for servers running on a specific port")
                         .addOption(OptionType.STRING, "asn", "Search for servers running from a specific ASN")
