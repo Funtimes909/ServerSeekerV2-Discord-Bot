@@ -121,7 +121,7 @@ public class ServerEmbedBuilder {
         }
 
         if (mods != null && !mods.isEmpty()) {
-            modInfo.append("Mods: **").append(mods != null ? mods.size() : 0).append("**\n");
+            modInfo.append("Mods: **").append(mods.size()).append("**\n");
             modInfo.append("```\n");
             int count = 0;
 
