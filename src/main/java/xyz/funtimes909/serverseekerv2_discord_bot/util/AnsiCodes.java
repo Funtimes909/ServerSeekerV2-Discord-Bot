@@ -19,11 +19,8 @@ public enum AnsiCodes {
     PINK('d', "light_purple", 35),
     YELLOW('e', "yellow", 33),
     WHITE('f', "white", 37),
-    RANDOM('k', "obfuscated", 0),
     BOLD('l', "bold", 1),
-    STRIKETHROUGH('m', "strikethrough", 0),
-    UNDERLINE('n', "underline", 4),
-    ITALIC('o', "italic", 0);
+    UNDERLINE('n', "underline", 4);
 
     public static final HashMap<String, AnsiCodes> codes = new HashMap<>();
     public static final HashMap<Character, AnsiCodes> colors = new HashMap<>();

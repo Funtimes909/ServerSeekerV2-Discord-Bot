@@ -90,7 +90,7 @@ public class Search {
         // Add modids to the end of the query
         if (!mods.isEmpty()) mods.forEach((mod) -> query.append("modid = ? OR "));
         query.replace(query.length() - 4, query.length(), "");
-        query.append("ORDER BY lastseen DESC");
+        query.append(" ORDER BY lastseen DESC");
     }
 
     public void runQuery(boolean firstRun) {

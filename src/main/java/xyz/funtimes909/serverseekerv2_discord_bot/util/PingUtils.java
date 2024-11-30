@@ -175,8 +175,17 @@ public class PingUtils {
 
             if (map.containsKey("text")) {
                 if (map.containsKey("color")) {
-                    motd.append('§').append(AnsiCodes.codes.get(map.get("color").getAsString()).c);
+                    if (!map.get("color").getAsString().startsWith("#")) {
+                        motd.append('§').append(AnsiCodes.codes.get(map.get("color").getAsString()).c);
+                    }
                 }
+                if (map.containsKey("bold")) {
+                    motd.append("§l");
+                }
+                if (map.containsKey("underlined")) {
+                    motd.append("§n");
+                }
+
                 motd.append(map.get("text").getAsString());
             }
             if (map.containsKey("extra")) {

@@ -88,7 +88,7 @@ public class ServerEmbedBuilder {
         }
 
         if (description.contains("§")) {
-            description = parseMOTD();
+            description = parseMOTD(description);
         }
 
 
@@ -164,16 +164,20 @@ public class ServerEmbedBuilder {
         return embed.build();
     }
 
-    private String parseMOTD() {
-        String[] segments = description.split("§");
+    private String parseMOTD(String description) {
         StringBuilder motd = new StringBuilder();
 
-        for (String segment : segments) {
-            if (segment.isEmpty()) continue;
-            motd.append("\u001B[0;").append(AnsiCodes.colors.get(segment.charAt(0)).ansi).append("m").append(segment.substring(1));
-        }
+        for (String segment : description.split("§")) {
+            if (segment.isBlank() || segment.charAt(0) == ' ') {
+                motd.append(segment);
+                continue;
+            }
 
+            motd.append("\u001B[")
+                    .append(AnsiCodes.colors.get(segment.charAt(0)).ansi)
+                    .append("m")
+                    .append(segment.substring(1));
+        }
         return motd.toString();
     }
 }
-
