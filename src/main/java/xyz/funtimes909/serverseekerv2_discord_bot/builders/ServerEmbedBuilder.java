@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import xyz.funtimes909.serverseekerv2_discord_bot.records.Mod;
 import xyz.funtimes909.serverseekerv2_discord_bot.records.Player;
 import xyz.funtimes909.serverseekerv2_discord_bot.records.Server;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.AnsiCodes;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.HttpUtils;
 
 import java.awt.*;
@@ -15,7 +16,7 @@ import java.util.List;
 public class ServerEmbedBuilder {
     private final String address;
     private final short port;
-    private final String description;
+    private String description;
     private final String version;
     private final Integer protocol;
     private String country;
@@ -86,6 +87,11 @@ public class ServerEmbedBuilder {
             }
         }
 
+        if (description.contains("§")) {
+            description = parseMOTD();
+        }
+
+
         addressInfo.append("ASN: **").append(asn != null ? asn + "**\n" : "N/A**\n");
 
         if (hostname == null || hostname.isBlank()) {
@@ -143,7 +149,7 @@ public class ServerEmbedBuilder {
                 .setThumbnail("https://funtimes909.xyz/avatar-gif")
                 .setTitle(address + ":" + port)
                 .addField("** -- __Version__ -- **", version + " (" + protocol + ")", false)
-                .addField("** -- __Description__ -- **", description != null ? "```" + description + "```" : "```No description found!```", false);
+                .addField("** -- __Description__ -- **", description != null ? "```ansi\n" + description + "```" : "```No description found!```", false);
 
         if (!ping) {
             embed.addField("** -- __First Seen__ -- **", "<t:" + firstseen + ":R>", false);
@@ -156,6 +162,18 @@ public class ServerEmbedBuilder {
         if (mods != null && !mods.isEmpty()) embed.addField("** -- __Mods__ -- **",  modInfo.toString(), false);
         embed.addField("** -- __Address Information__ -- **", addressInfo.toString(), false);
         return embed.build();
+    }
+
+    private String parseMOTD() {
+        String[] segments = description.split("§");
+        StringBuilder motd = new StringBuilder();
+
+        for (String segment : segments) {
+            if (segment.isEmpty()) continue;
+            motd.append("\u001B[0;").append(AnsiCodes.colors.get(segment.charAt(0)).ansi).append("m").append(segment.substring(1));
+        }
+
+        return motd.toString();
     }
 }
 

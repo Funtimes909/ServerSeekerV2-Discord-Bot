@@ -18,10 +18,10 @@ import java.util.List;
 
 public class Ping {
     public static void ping(SlashCommandInteractionEvent event) {
-        if (event.getOption("address").getAsString().equals("localhost") || event.getOption("address").getAsString().equals("0.0.0.0") || event.getOption("address").getAsString().startsWith("127")) {
-            event.getHook().sendMessage("You can't ping this address!").queue();
-            return;
-        }
+//        if (event.getOption("address").getAsString().equals("localhost") || event.getOption("address").getAsString().equals("0.0.0.0") || event.getOption("address").getAsString().startsWith("127")) {
+//            event.getHook().sendMessage("You can't ping this address!").queue();
+//            return;
+//        }
 
         short port = 25565;
         if (event.getOption("port") != null) port = (short) event.getOption("port").getAsInt();

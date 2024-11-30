@@ -1,6 +1,5 @@
 package xyz.funtimes909.serverseekerv2_discord_bot.util;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -180,7 +179,6 @@ public class PingUtils {
                 }
                 motd.append(map.get("text").getAsString());
             }
-
             if (map.containsKey("extra")) {
                 parseMOTD(map.get("extra"), limit, motd);
             }
