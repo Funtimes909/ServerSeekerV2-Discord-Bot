@@ -71,7 +71,7 @@ public class PingUtils {
             // Description can be either an object or a string
             if (parsedJson.has("description")) {
                 if (parsedJson.get("description").isJsonObject()) {
-                    parseObject(parsedJson.get("description").getAsJsonObject());
+                    parseMOTD(parsedJson.get("description").getAsJsonObject(), 10, motd);
                 } else {
                     motd.append(parsedJson.get("description").getAsString());
                 }
@@ -168,25 +168,29 @@ public class PingUtils {
         }
     }
 
-    private static void parseObject(JsonObject object) {
-        for (Map.Entry<String, JsonElement> entry : object.asMap().entrySet()) {
-            if (entry.getKey().equals("text")) {
-                motd.append(entry.getValue().getAsString());
-            } else if (entry.getValue().isJsonArray()) {
-                parseArray(entry.getValue().getAsJsonArray());
-            } else if (entry.getValue().isJsonObject()) {
-                parseObject(entry.getValue().getAsJsonObject());
+    private static void parseMOTD(JsonElement element, int limit, StringBuilder motd) {
+        if (limit == 0) return;
+
+        if (element.isJsonObject()) {
+            Map<String, JsonElement> map = element.getAsJsonObject().asMap();
+
+            if (map.containsKey("text")) {
+                if (map.containsKey("color")) {
+                    motd.append('§').append(AnsiCodes.codes.get(map.get("color").getAsString()).c);
+                }
+                motd.append(map.get("text").getAsString());
             }
-        }
-    }
-    private static void parseArray(JsonArray array) {
-        for (JsonElement jsonElement : array) {
-            if (jsonElement.isJsonPrimitive()) {
-                motd.append(jsonElement.getAsString());
-            } else if (jsonElement.isJsonArray()) {
-                parseArray(jsonElement.getAsJsonArray());
-            } else if (jsonElement.isJsonObject()) {
-                parseObject(jsonElement.getAsJsonObject());
+
+            if (map.containsKey("extra")) {
+                parseMOTD(map.get("extra"), limit, motd);
+            }
+        } else {
+            for (JsonElement jsonElement : element.getAsJsonArray()) {
+                if (jsonElement.isJsonPrimitive()) {
+                    motd.append(jsonElement.getAsString());
+                } else {
+                    parseMOTD(jsonElement, limit, motd);
+                }
             }
         }
     }
