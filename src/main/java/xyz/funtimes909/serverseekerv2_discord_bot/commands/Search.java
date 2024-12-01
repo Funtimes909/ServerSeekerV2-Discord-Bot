@@ -167,11 +167,7 @@ public class Search {
             buttons.add(Button.of(ButtonStyle.SUCCESS, "SearchButton" + index, String.valueOf(index)));
         }
 
-        if (page.isEmpty()) {
-            System.out.println("No results!");
-            return;
-        }
-
+        if (page.isEmpty()) return;
 
         if (totalRows <= 5) {
             // Less than 6 total results, only one page, don't scroll

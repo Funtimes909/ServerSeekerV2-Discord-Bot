@@ -28,9 +28,6 @@ public enum AnsiCodes {
     static {
         for (AnsiCodes v: AnsiCodes.values()) {
             codes.put(v.name, v);
-        }
-
-        for (AnsiCodes v: AnsiCodes.values()) {
             colors.put(v.c, v);
         }
     }
