@@ -11,7 +11,9 @@ import xyz.funtimes909.serverseekerv2_discord_bot.util.AnsiCodes;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.HttpUtils;
 
 import java.awt.*;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Stack;
 
 public class ServerEmbedBuilder {
     private final String address;
@@ -91,7 +93,6 @@ public class ServerEmbedBuilder {
             description = parseMOTD(description);
         }
 
-
         addressInfo.append("ASN: **").append(asn != null ? asn + "**\n" : "N/A**\n");
 
         if (hostname == null || hostname.isBlank()) {
@@ -166,17 +167,24 @@ public class ServerEmbedBuilder {
 
     private String parseMOTD(String description) {
         StringBuilder motd = new StringBuilder();
+        StringBuilder formatCode = new StringBuilder();
 
-        for (String segment : description.split("§")) {
-            if (segment.isBlank() || segment.charAt(0) == ' ') {
-                motd.append(segment);
+        for (String line : description.split("§")) {
+            if (line.charAt(0) == ' ') {
+                motd.append(line);
                 continue;
             }
 
-            motd.append("\u001B[")
-                    .append(AnsiCodes.colors.get(segment.charAt(0)).ansi)
-                    .append("m")
-                    .append(segment.substring(1));
+            int code = AnsiCodes.colors.get(line.charAt(0)).ansi;
+
+            if (code < 5) {
+                formatCode.append("\u001B[").append(code).append(";00m");
+            } else {
+                formatCode.append("\u001B[0;").append(code).append("m");
+            }
+
+            motd.append(formatCode).append(line.substring(1));
+            formatCode.setLength(0);
         }
         return motd.toString();
     }
