@@ -17,6 +17,7 @@ import xyz.funtimes909.serverseekerv2_discord_bot.records.Player;
 import xyz.funtimes909.serverseekerv2_discord_bot.records.Server;
 import xyz.funtimes909.serverseekerv2_discord_bot.records.ServerEmbed;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.Database;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.PingUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -200,41 +201,10 @@ public class Search {
             statement.setString(1, address);
             statement.setShort(2, port);
 
-            ResultSet results = statement.executeQuery();
-            Server.Builder server = new Server.Builder();
-            List<Player> players = new ArrayList<>();
-            List<Mod> mods = new ArrayList<>();
+            Server server = PingUtils.buildResultsToObject(statement.executeQuery());
 
-            while (results.next()) {
-                server.setAddress(results.getString("address"));
-                server.setPort(results.getShort("port"));
-                server.setMotd(results.getString("motd"));
-                server.setVersion(results.getString("version"));
-                server.setFirstSeen(results.getLong("firstseen"));
-                server.setLastSeen(results.getLong("lastseen"));
-                server.setProtocol(results.getInt("protocol"));
-                server.setCountry(results.getString("country"));
-                server.setAsn(results.getString("asn"));
-                server.setReverseDns(results.getString("reversedns"));
-                server.setOrganization(results.getString("organization"));
-                server.setWhitelist((Boolean) results.getObject("whitelist"));
-                server.setEnforceSecure((Boolean) results.getObject("enforceSecure"));
-                server.setCracked((Boolean) results.getObject("cracked"));
-                server.setPreventsReports((Boolean) results.getObject("preventsReports"));
-                server.setMaxPlayers(results.getInt("maxPlayers"));
-                server.setTimesSeen(results.getInt("timesSeen"));
-                server.setFmlNetworkVersion(results.getInt("fmlnetworkversion"));
-
-                if (results.getString("playername") != null) players.add(new Player(results.getString("playername"), results.getString("playeruuid"), results.getLong("lastseen")));
-                if (results.getString("modid") != null) mods.add(new Mod(results.getString("modid"), results.getString("modmarker")));
-            }
-
-            server.setPlayers(players);
-            server.setMods(mods);
-            statement.close();
-            results.close();
-
-            ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server.build());
+            if (server == null) return;
+            ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server);
             MessageEmbed embed = embedBuilder.build(false);
 
             if (embed == null) {

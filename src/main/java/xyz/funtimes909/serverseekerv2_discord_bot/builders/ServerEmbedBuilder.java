@@ -170,8 +170,8 @@ public class ServerEmbedBuilder {
         StringBuilder formatCode = new StringBuilder();
 
         for (String line : description.split("§")) {
-            if (line.charAt(0) == ' ' || line.isBlank()) {
-//                motd.append(line);
+            if ( line.isBlank() || line.charAt(0) == ' ') {
+                motd.append(line);
                 continue;
             }
 
