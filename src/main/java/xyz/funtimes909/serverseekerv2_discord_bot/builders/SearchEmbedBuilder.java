@@ -13,16 +13,16 @@ import java.util.HashMap;
 import java.util.List;
 
 public class SearchEmbedBuilder {
-    public static MessageEmbed parse(HashMap<Integer, ServerEmbed> servers, int rowCount, int page) {
+    public static MessageEmbed parse(List<ServerEmbed> servers, int rowCount, int page) {
         List<MessageEmbed.Field> fields = new ArrayList<>();
         int longestAddress = 0;
 
-        for (ServerEmbed entry : servers.values()) {
+        for (ServerEmbed entry : servers) {
             if (entry.address().length() > longestAddress) longestAddress = entry.address().length();
         }
 
         int index = 1;
-        for (ServerEmbed entry : servers.values()) {
+        for (ServerEmbed entry : servers) {
             StringBuilder address = new StringBuilder("``").append(entry.address()).append("``");
             StringBuilder version = new StringBuilder("``").append(entry.version()).append("``");
             String timestamp = "<t:" + entry.timestamp() + ":R>";

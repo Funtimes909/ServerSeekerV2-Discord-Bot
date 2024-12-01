@@ -150,23 +150,21 @@ public class Search {
     }
 
     public void scrollResults(boolean firstRun, boolean forward) {
-        HashMap<Integer, ServerEmbed> page = new HashMap<>();
+        List<ServerEmbed> page = new ArrayList<>();
         List<Button> buttons = new ArrayList<>();
         List<LayoutComponent> pageButtons = new ArrayList<>();
 
         // Iterate through results by 5 and add them to the page results, set pointer back 10 results for scrolling backwards
         if (!forward) pointer -= 10;
-        int index = 1;
         int count = pointer;
         for (int i = count; (count + 5) > i; i++) {
             if (results.get(i) == null) continue;
-            page.put(index, results.get(i));
+            page.add(results.get(i));
             pointer++;
-            index++;
         }
 
-        for (int entry : page.keySet()) {
-            buttons.add(Button.of(ButtonStyle.SUCCESS, "SearchButton" + entry, String.valueOf(entry)));
+        for (int index = 1; index < page.size() + 1; index++) {
+            buttons.add(Button.of(ButtonStyle.SUCCESS, "SearchButton" + index, String.valueOf(index)));
         }
 
         if (page.isEmpty()) {
