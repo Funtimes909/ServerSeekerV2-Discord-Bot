@@ -16,14 +16,10 @@ public class SearchEmbedBuilder {
     public static MessageEmbed parse(HashMap<Integer, ServerEmbed> servers, int rowCount, int page) {
         List<MessageEmbed.Field> fields = new ArrayList<>();
         int longestAddress = 0;
-        int longestVersion = 0;
 
         for (ServerEmbed entry : servers.values()) {
             if (entry.address().length() > longestAddress) longestAddress = entry.address().length();
-            if (entry.version().length() > longestVersion) longestVersion = entry.version().length();
         }
-
-        if (longestVersion > 24) longestVersion = 24;
 
         int index = 1;
         for (ServerEmbed entry : servers.values()) {
@@ -41,12 +37,13 @@ public class SearchEmbedBuilder {
                 }
             }
 
-            // Make everything the same length
-            if (longestVersion == 24 && version.length() >= longestVersion) {
-                version.replace(0, version.length(), version.substring(0, longestVersion) + "...``");
+            if (version.length() > 18) {
+                version.setLength(18);
+                version.replace(version.length() - 2, version.length(), "``");
             }
 
-            while (version.length() < longestVersion) {
+            // Make everything the same length
+            while (version.length() < 18) {
                 version.insert(version.length() - 2, " ");
             }
 
