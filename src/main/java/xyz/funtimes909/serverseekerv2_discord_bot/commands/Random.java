@@ -21,7 +21,7 @@ public class Random {
         try (Connection conn = Database.getConnection(event.getMessageChannel())) {
             Statement statement = conn.createStatement();
             long startTime = System.currentTimeMillis() / 1000;
-            String query = "SELECT * FROM servers LEFT JOIN playerhistory ON servers.address = playerhistory.address AND servers.port = playerhistory.port LEFT JOIN mods ON servers.address = mods.address AND servers.port = mods.port ORDER BY RANDOM() LIMIT 1";
+            String query = "SELECT * FROM servers ORDER BY RANDOM() LIMIT 1";
             Main.logger.debug("Query took {}ms", System.currentTimeMillis() / 1000L - startTime);
 
             ResultSet results = statement.executeQuery(query);
