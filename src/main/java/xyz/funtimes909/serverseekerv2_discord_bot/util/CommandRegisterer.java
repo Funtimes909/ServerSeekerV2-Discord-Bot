@@ -34,8 +34,8 @@ public class CommandRegisterer {
                         .addOption(OptionType.STRING, "hostname", "Reverse DNS name of the server"),
 
                 Commands.slash("blacklist", "Blacklist a user from using the bot")
-                        .addOption(OptionType.USER, "user", "Which user add/remove from the blacklist")
-                        .addOptions(new OptionData(OptionType.STRING, "operation", "Whether to add or remove a user from the blacklist")
+                        .addOption(OptionType.USER, "user", "Which user add/remove from the blacklist", true)
+                        .addOptions(new OptionData(OptionType.STRING, "operation", "Whether to add or remove a user from the blacklist", true)
                                 .addChoice("add", "Add")
                                 .addChoice("remove", "Remove")),
 
