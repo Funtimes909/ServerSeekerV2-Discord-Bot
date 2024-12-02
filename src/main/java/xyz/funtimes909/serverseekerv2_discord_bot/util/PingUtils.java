@@ -3,6 +3,7 @@ package xyz.funtimes909.serverseekerv2_discord_bot.util;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 import xyz.funtimes909.serverseekerv2_discord_bot.records.Mod;
 import xyz.funtimes909.serverseekerv2_discord_bot.records.Player;
 import xyz.funtimes909.serverseekerv2_discord_bot.records.Server;
@@ -204,7 +205,7 @@ public class PingUtils {
 
             return server.build();
         } catch (SQLException e) {
-            e.printStackTrace();
+            Main.logger.error("Failed to build a server object!", e);
             return null;
         }
     }
