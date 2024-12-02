@@ -34,7 +34,6 @@ public class Ping {
             return;
         }
 
-        updateServer(server);
         ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server);
         MessageEmbed embed = embedBuilder.build(true);
 
@@ -44,6 +43,7 @@ public class Ping {
         }
 
         event.getHook().sendMessageEmbeds(embed).queue();
+        updateServer(server);
     }
 
     private static void updateServer(Server server) {
