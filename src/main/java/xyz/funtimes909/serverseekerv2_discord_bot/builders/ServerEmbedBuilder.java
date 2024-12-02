@@ -170,7 +170,7 @@ public class ServerEmbedBuilder {
         StringBuilder motd = new StringBuilder();
 
         for (String line : description.split("§")) {
-            if (line.isBlank() || line.charAt(0) == ' ') {
+            if (line.isBlank() || line.charAt(0) == ' '|| !AnsiCodes.colors.containsKey(line.charAt(0))) {
                 motd.append(line);
                 continue;
             }
@@ -179,7 +179,8 @@ public class ServerEmbedBuilder {
 
             motd.append(code < 5 ?
                     "\u001B[" + code + ";00m" + line.substring(1) :
-                    "\u001B[0;" + code + "m" + line.substring(1));
+                    "\u001B[0;" + code + "m" + line.substring(1)
+            );
         }
         return motd.toString();
     }
