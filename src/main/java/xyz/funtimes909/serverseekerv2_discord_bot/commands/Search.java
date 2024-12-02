@@ -12,8 +12,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.SearchEmbedBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.ServerEmbedBuilder;
-import xyz.funtimes909.serverseekerv2_discord_bot.records.Mod;
-import xyz.funtimes909.serverseekerv2_discord_bot.records.Player;
 import xyz.funtimes909.serverseekerv2_discord_bot.records.Server;
 import xyz.funtimes909.serverseekerv2_discord_bot.records.ServerEmbed;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.Database;

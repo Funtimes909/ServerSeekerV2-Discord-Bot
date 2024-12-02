@@ -4,18 +4,13 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.ServerEmbedBuilder;
-import xyz.funtimes909.serverseekerv2_discord_bot.records.Mod;
-import xyz.funtimes909.serverseekerv2_discord_bot.records.Player;
 import xyz.funtimes909.serverseekerv2_discord_bot.records.Server;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.Database;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PingUtils;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Random {
     public static void random(SlashCommandInteractionEvent event) {

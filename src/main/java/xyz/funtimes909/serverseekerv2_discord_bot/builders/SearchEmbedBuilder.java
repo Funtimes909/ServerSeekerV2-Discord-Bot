@@ -9,7 +9,6 @@ import xyz.funtimes909.serverseekerv2_discord_bot.util.HttpUtils;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class SearchEmbedBuilder {

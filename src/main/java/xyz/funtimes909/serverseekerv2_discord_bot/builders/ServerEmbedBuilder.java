@@ -11,9 +11,7 @@ import xyz.funtimes909.serverseekerv2_discord_bot.util.AnsiCodes;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.HttpUtils;
 
 import java.awt.*;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Stack;
 
 public class ServerEmbedBuilder {
     private final String address;
