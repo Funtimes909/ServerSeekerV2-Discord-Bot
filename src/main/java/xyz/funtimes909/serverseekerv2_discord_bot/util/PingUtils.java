@@ -48,9 +48,6 @@ public class PingUtils {
 
             JsonObject parsedJson = JsonParser.parseString(json).getAsJsonObject();
             String version = null;
-            String icon = null;
-            Boolean preventsChatReports = null;
-            Boolean enforcesSecureChat = null;
             Boolean cracked = null;
             Integer protocol = null;
             Integer fmlNetworkVersion = null;
@@ -65,11 +62,6 @@ public class PingUtils {
                 protocol = parsedJson.get("version").getAsJsonObject().get("protocol").getAsInt();
             }
 
-            // Check for icon
-            if (parsedJson.has("favicon")) {
-                icon = parsedJson.get("favicon").getAsString();
-            }
-
             // Description can be either an object or a string
             if (parsedJson.has("description")) {
                 if (parsedJson.get("description").isJsonObject()) {
@@ -77,14 +69,6 @@ public class PingUtils {
                 } else {
                     motd.append(parsedJson.get("description").getAsString());
                 }
-            }
-
-            if (parsedJson.has("enforcesSecureChat")) {
-                enforcesSecureChat = parsedJson.get("enforcesSecureChat").getAsBoolean();
-            }
-
-            if (parsedJson.has("preventsChatReports")) {
-                preventsChatReports = parsedJson.get("preventsChatReports").getAsBoolean();
             }
 
             // Forge servers send back information about mods
@@ -129,9 +113,9 @@ public class PingUtils {
                     .setProtocol(protocol)
                     .setFmlNetworkVersion(fmlNetworkVersion)
                     .setMotd(motd.toString())
-                    .setIcon(icon)
-                    .setPreventsReports(preventsChatReports)
-                    .setEnforceSecure(enforcesSecureChat)
+                    .setIcon(parsedJson.has("icon") ? parsedJson.get("icon").getAsString() : null)
+                    .setPreventsReports(parsedJson.has("preventsChatReports") ? parsedJson.get("preventsChatReports").getAsBoolean() : null)
+                    .setEnforceSecure(parsedJson.has("enforcesSecureChat") ? parsedJson.get("enforcesSecureChat").getAsBoolean() : null)
                     .setCracked(cracked)
                     .setMaxPlayers(maxPlayers)
                     .setOnlinePlayers(onlinePlayers)
@@ -141,7 +125,7 @@ public class PingUtils {
 
         } catch (IOException ignored) {}
         finally {
-            motd.replace(0, motd.length(), "");
+            motd.setLength(0);
         }
         return null;
     }
