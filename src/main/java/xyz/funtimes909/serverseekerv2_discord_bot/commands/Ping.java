@@ -24,10 +24,11 @@ public class Ping {
 //        }
 
         short port = 25565;
-        if (event.getOption("port") != null) port = (short) event.getOption("port").getAsInt();
+        if (event.getOption("port") != null) {
+            port = (short) event.getOption("port").getAsInt();
+        }
 
-        PingUtils ping = new PingUtils(event.getOption("address").getAsString(), port);
-        Server server = ping.parse();
+        Server server = PingUtils.parse(event.getOption("address").getAsString(), port);
 
         if (server == null) {
             event.getHook().sendMessage("Server did not connect!").queue();

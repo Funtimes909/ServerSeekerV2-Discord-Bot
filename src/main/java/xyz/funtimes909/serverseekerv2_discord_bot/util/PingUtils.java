@@ -21,8 +21,6 @@ import java.util.Map;
 import java.util.UUID;
 
 public class PingUtils {
-    private final String address;
-    private final short port;
     private static final StringBuilder motd = new StringBuilder();
     private static final byte[] REQUEST = new byte[] {
             8, // Size: Amount of proceeding bytes [varint]
@@ -35,12 +33,7 @@ public class PingUtils {
             0, // ID
     };
 
-    public PingUtils(String address, short port) {
-        this.address = address;
-        this.port = port;
-    }
-
-    public Server parse() {
+    public static Server parse(String address, short port) {
         try (Socket conn = new Socket()) {
             conn.connect(new  InetSocketAddress(address, port));
             String json = ping(conn);
@@ -97,8 +90,7 @@ public class PingUtils {
 
                             // Offline mode servers use v3 UUID's for players, while regular servers use v4, this is a really easy way to check if a server is offline mode
                             if (UUID.fromString(uuid).version() == 3) cracked = true;
-                            Player player = new Player(name, uuid, System.currentTimeMillis() / 1000 );
-                            playerList.add(player);
+                            playerList.add(new Player(name, uuid, System.currentTimeMillis() / 1000));
                         }
                     }
                 }
@@ -130,7 +122,7 @@ public class PingUtils {
         return null;
     }
 
-    public String ping(Socket connection) {
+    public static String ping(Socket connection) {
         try (OutputStream out = connection.getOutputStream()) {
             out.write(REQUEST);
             InputStream in = connection.getInputStream();
