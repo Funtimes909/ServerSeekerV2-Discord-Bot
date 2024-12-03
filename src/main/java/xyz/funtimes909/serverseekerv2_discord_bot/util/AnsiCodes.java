@@ -20,7 +20,8 @@ public enum AnsiCodes {
     YELLOW('e', "yellow", 33),
     WHITE('f', "white", 37),
     BOLD('l', "bold", 1),
-    UNDERLINE('n', "underline", 4);
+    UNDERLINE('n', "underline", 4),
+    RESET('r', "reset", 50);
 
     public static final HashMap<String, AnsiCodes> codes = new HashMap<>();
     public static final HashMap<Character, AnsiCodes> colors = new HashMap<>();

@@ -168,12 +168,18 @@ public class ServerEmbedBuilder {
         StringBuilder motd = new StringBuilder();
 
         for (String line : description.split("§")) {
-            if (line.isBlank() || line.charAt(0) == ' '|| !AnsiCodes.colors.containsKey(line.charAt(0))) {
+            if (line.isBlank() || !AnsiCodes.colors.containsKey(line.charAt(0))) {
                 motd.append(line);
                 continue;
             }
 
             int code = AnsiCodes.colors.get(line.charAt(0)).ansi;
+
+            // Use 50 as a reset code
+            if (code == 50) {
+                motd.append("\u001B[0m").append(line.substring(1));
+                continue;
+            }
 
             motd.append(code < 5 ?
                     "\u001B[" + code + ";00m" + line.substring(1) :
