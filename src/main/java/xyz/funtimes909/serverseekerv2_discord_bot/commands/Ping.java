@@ -49,27 +49,9 @@ public class Ping {
 
     private static void updateServer(Server server) {
         try (Connection conn = Database.getConnection(null)) {
+            if (conn == null) return;
             String address = server.getAddress();
             short port = server.getPort();
-            long timestamp = server.getLastSeen();
-            String country = server.getCountry();
-            String asn = server.getAsn();
-            String reverseDns = server.getReverseDns();
-            String organization = server.getOrganization();
-            String version = server.getVersion();
-            Integer protocol = server.getProtocol();
-            Integer fmlNetworkVersion = server.getFmlNetworkVersion();
-            String motd = server.getMotd();
-            String icon = server.getIcon();
-            int timesSeen = server.getTimesSeen();
-            Boolean preventsReports = server.getPreventsReports();
-            Boolean enforceSecure = server.getEnforceSecure();
-            Boolean whitelist = server.getWhitelist();
-            Boolean cracked = server.getCracked();
-            Integer maxPlayers = server.getMaxPlayers();
-            Integer onlinePlayers = server.getOnlinePlayers();
-            List<Player> players = server.getPlayers();
-            List<Mod> mods = server.getMods();
 
             // Attempt to insert new server, if address and port already exist, update relevant information
             PreparedStatement insertServer = conn.prepareStatement("INSERT INTO Servers " +
@@ -114,31 +96,31 @@ public class Ping {
                     "OnlinePlayers = EXCLUDED.OnlinePlayers");
 
             // Set most values as objects to insert a null if value doesn't exist
-            insertServer.setString(1, address);
-            insertServer.setInt(2, port);
-            insertServer.setLong(3, timestamp);
-            insertServer.setLong(4, timestamp);
-            insertServer.setString(5, country);
-            insertServer.setString(6, asn);
-            insertServer.setString(7, reverseDns);
-            insertServer.setString(8, organization);
-            insertServer.setString(9, version);
-            insertServer.setObject(10, protocol, Types.INTEGER);
-            insertServer.setObject(11, fmlNetworkVersion, Types.INTEGER);
-            insertServer.setString(12, motd);
-            insertServer.setString(13, icon);
-            insertServer.setInt(14, timesSeen);
-            insertServer.setObject(15, preventsReports, Types.BOOLEAN);
-            insertServer.setObject(16, enforceSecure, Types.BOOLEAN);
-            insertServer.setObject(17, whitelist, Types.BOOLEAN);
-            insertServer.setObject(18, cracked, Types.BOOLEAN);
-            insertServer.setObject(19, maxPlayers, Types.INTEGER);
-            insertServer.setObject(20, onlinePlayers, Types.INTEGER);
+            insertServer.setString(1, server.getAddress());
+            insertServer.setInt(2, server.getPort());
+            insertServer.setLong(3, server.getLastSeen());
+            insertServer.setLong(4, server.getLastSeen());
+            insertServer.setString(5, server.getCountry());
+            insertServer.setString(6, server.getAsn());
+            insertServer.setString(7, server.getReverseDns());
+            insertServer.setString(8, server.getOrganization());
+            insertServer.setString(9, server.getVersion());
+            insertServer.setObject(10, server.getProtocol(), Types.INTEGER);
+            insertServer.setObject(11, server.getFmlNetworkVersion(), Types.INTEGER);
+            insertServer.setString(12, server.getMotd());
+            insertServer.setString(13, server.getIcon());
+            insertServer.setInt(14, server.getTimesSeen());
+            insertServer.setObject(15, server.getPreventsReports(), Types.BOOLEAN);
+            insertServer.setObject(16, server.getEnforceSecure(), Types.BOOLEAN);
+            insertServer.setObject(17, server.getWhitelist(), Types.BOOLEAN);
+            insertServer.setObject(18, server.getCracked(), Types.BOOLEAN);
+            insertServer.setObject(19, server.getMaxPlayers(), Types.INTEGER);
+            insertServer.setObject(20, server.getOnlinePlayers(), Types.INTEGER);
             insertServer.executeUpdate();
             insertServer.close();
 
             // Add players, update LastSeen and Name (Potential name change) if duplicate
-            if (!players.isEmpty()) {
+            if (!server.getPlayers().isEmpty()) {
                 PreparedStatement updatePlayers = conn.prepareStatement("INSERT INTO PlayerHistory (Address, Port, PlayerUUID, PlayerName, FirstSeen, LastSeen) VALUES (?, ?, ?, ?, ?, ?) " +
                         "ON CONFLICT (Address, Port, PlayerUUID) DO UPDATE SET " +
                         "LastSeen = EXCLUDED.LastSeen," +
@@ -148,7 +130,7 @@ public class Ping {
                 updatePlayers.setString(1, address);
                 updatePlayers.setShort(2, port);
 
-                for (Player player : players) {
+                for (Player player : server.getPlayers()) {
                     updatePlayers.setString(3, player.uuid());
                     updatePlayers.setString(4, player.name());
                     updatePlayers.setLong(5, player.lastseen());
@@ -162,7 +144,7 @@ public class Ping {
             }
 
             // Add mods, do nothing if duplicate
-            if (!mods.isEmpty()) {
+            if (!server.getMods().isEmpty()) {
                 PreparedStatement updateMods = conn.prepareStatement("INSERT INTO Mods (Address, Port, ModId, ModMarker) " +
                         "VALUES (?, ?, ?, ?)" +
                         "ON CONFLICT (Address, Port, ModId) DO NOTHING");
@@ -171,7 +153,7 @@ public class Ping {
                 updateMods.setString(1, address);
                 updateMods.setShort(2, port);
 
-                for (Mod mod : mods) {
+                for (Mod mod : server.getMods()) {
                     updateMods.setString(3, mod.modid());
                     updateMods.setString(4, mod.modmarker());
                     updateMods.addBatch();
