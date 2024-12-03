@@ -10,28 +10,41 @@ import java.util.Set;
 
 public class PermissionsManager {
     public static Set<String> blacklist = new HashSet<>();
+    public static Set<String> servers = new HashSet<>();
     public static Set<String> trustedUsers = new HashSet<>();
 
     static {
         try (
                 BufferedReader blacklistReader = new BufferedReader(new FileReader("blacklist.txt"));
-                BufferedReader trustedUsersReader = new BufferedReader(new FileReader("trusted_users.txt"));
+                BufferedReader usersReader = new BufferedReader(new FileReader("trusted_users.txt"));
+                BufferedReader serversReader = new BufferedReader(new FileReader("blacklisted_servers.txt"));
         )   {
                 String line;
+                // Load the blacklist
                 while ((line = blacklistReader.readLine()) != null) {
                     blacklist.add(line);
                 }
 
-                while ((line = trustedUsersReader.readLine()) != null) {
+                // Load blacklisted servers
+                while ((line = serversReader.readLine()) != null) {
+                    servers.add(line);
+                }
+
+                // Load the trusted users
+                while ((line = usersReader.readLine()) != null) {
                     trustedUsers.add(line);
                 }
         } catch (IOException e) {
-            Main.logger.error("Failed to read blacklist or trusted users file!");
+            Main.logger.error("Failed to read a required file!", e);
         }
     }
 
     public static boolean blacklistCheck(String userId) {
         return blacklist.contains(userId);
+    }
+
+    public static boolean blacklistServerCheck(String userId) {
+        return servers.contains(userId);
     }
 
     public static boolean trustedUsersCheck(String userId) {

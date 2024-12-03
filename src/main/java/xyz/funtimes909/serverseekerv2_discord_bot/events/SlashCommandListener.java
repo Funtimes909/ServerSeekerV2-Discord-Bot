@@ -14,10 +14,17 @@ public class SlashCommandListener extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         if (PermissionsManager.blacklistCheck(event.getUser().getId())) {
-            Main.logger.info("Blacklisted user attempted to run command! {} Ran {}", event.getUser().getName(), event.getName());
+            Main.logger.warn("Blacklisted user attempted to run command! {} Ran {}", event.getUser().getName(), event.getName());
             event.reply("You are blacklisted!").setEphemeral(true).queue();
             return;
         }
+
+        if (PermissionsManager.blacklistServerCheck(event.getGuild().getId())) {
+            Main.logger.warn("{} in blacklisted server, {} attempted to run {}", event.getUser().getName(), event.getGuild().getName(), event.getName());
+            event.reply("This server is blacklisted!").queue();
+            return;
+        }
+
 
         Main.logger.info("Command: {} run by {} [{}] ({} options)", event.getName(), event.getUser().getName(), event.getUser().getId(), event.getOptions().size());
         event.deferReply().queue();

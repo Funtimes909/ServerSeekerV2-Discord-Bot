@@ -6,6 +6,7 @@ build/
 blacklist.txt
 trusted_users.txt
 exclude.txt
+blacklisted_servers.txt
 
 ### IntelliJ IDEA ###
 .idea
