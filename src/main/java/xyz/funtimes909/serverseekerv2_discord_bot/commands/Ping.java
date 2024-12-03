@@ -23,11 +23,7 @@ public class Ping {
 //            return;
 //        }
 
-        short port = 25565;
-        if (event.getOption("port") != null) {
-            port = (short) event.getOption("port").getAsInt();
-        }
-
+        short port = event.getOption("port") == null ? 25565 : Short.parseShort(event.getOption("port").getAsString());
         Server server = PingUtils.parse(event.getOption("address").getAsString(), port);
 
         if (server == null) {

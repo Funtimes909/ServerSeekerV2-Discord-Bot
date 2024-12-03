@@ -12,19 +12,11 @@ public class AutoCompleteBot extends ListenerAdapter {
     @Override
     public void onCommandAutoCompleteInteraction(CommandAutoCompleteInteractionEvent event) {
         if (event.getName().equalsIgnoreCase("search") && event.getFocusedOption().getName().equalsIgnoreCase("country")) {
-            if (event.getFocusedOption().getValue().equalsIgnoreCase("")) {
-                List<Command.Choice> options = CommandRegisterer.countries.entrySet().stream()
-                        .filter(word -> word.getKey().startsWith("A"))
-                        .map(word -> new Command.Choice(word.getKey(), word.getValue()))
-                        .limit(25)
-                        .toList();
-
-                event.replyChoices(options).queue();
-                return;
-            }
 
             List<Command.Choice> options = CommandRegisterer.countries.entrySet().stream()
-                    .filter(word -> word.getKey().startsWith(event.getFocusedOption().getValue()))
+                    .filter(event.getFocusedOption().getValue().isEmpty() ?
+                            word -> word.getKey().startsWith("A") :
+                            word -> word.getKey().startsWith(event.getFocusedOption().getValue()))
                     .map(word -> new Command.Choice(word.getKey(), word.getValue()))
                     .limit(25)
                     .toList();
