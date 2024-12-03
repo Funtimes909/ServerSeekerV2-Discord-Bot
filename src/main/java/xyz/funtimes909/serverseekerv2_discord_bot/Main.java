@@ -10,7 +10,7 @@ import xyz.funtimes909.serverseekerv2_discord_bot.events.ButtonInteractionEventL
 import xyz.funtimes909.serverseekerv2_discord_bot.events.SlashCommandListener;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.CommandRegisterer;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.Database;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.PermissionsCheck;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.PermissionsManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,12 +53,9 @@ public class Main {
             ownerId = config.get("owner_id").getAsString();
 
             // Warn user about configs should some of them not exist
+            if (url.isBlank()) throw new RuntimeException("Error! No postgres URL specified!");
             if (username.isBlank()) logger.warn("Warning! No postgres username specified. Attempting to use default username \"postgres\"");
             if (password.isBlank()) logger.warn("Warning! No postgres password specified. You should setup a password for your database");
-            if (url.isBlank()) throw new RuntimeException("Error! No postgres URL specified!");
-
-            Database.initPool();
-            PermissionsCheck.initPermissions();
 
             File blacklist = new File("blacklist.txt");
             File trusted = new File("trusted_users.txt");

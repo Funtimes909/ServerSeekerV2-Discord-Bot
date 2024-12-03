@@ -14,7 +14,7 @@ import java.sql.SQLException;
 public class Database {
     private static final BasicDataSource dataSource = new BasicDataSource();
 
-    public static void initPool() {
+    static {
         dataSource.setUrl("jdbc:postgresql://" + Main.url);
         dataSource.setPassword(Main.password);
         dataSource.setUsername(Main.username);
