@@ -35,7 +35,8 @@ public class PingUtils {
 
     public static Server parse(String address, short port) {
         try (Socket conn = new Socket()) {
-            conn.connect(new  InetSocketAddress(address, port));
+            conn.setSoTimeout(4000);
+            conn.connect(new  InetSocketAddress(address, port), 4000);
             String json = ping(conn);
             if (json == null) return null;
 
@@ -123,9 +124,12 @@ public class PingUtils {
     }
 
     public static String ping(Socket connection) {
-        try (OutputStream out = connection.getOutputStream()) {
+        try (
+                OutputStream out = connection.getOutputStream();
+                InputStream in = connection.getInputStream();
+                connection;
+        ) {
             out.write(REQUEST);
-            InputStream in = connection.getInputStream();
             // Skip the first varint which indicates the total size of the packet.
             // Later we properly read a varint that contains the length of the json, so we use that
             for (byte i = 0; i < 5; i ++)
@@ -137,9 +141,6 @@ public class PingUtils {
             int json_length = VarInt.decode_varint(in);
             // Finally read the bytes
             byte[] status = in.readNBytes(json_length);
-            // Close all resources
-            connection.close();
-            in.close();
             return new String(status);
         } catch (Exception e) {
             return null;
