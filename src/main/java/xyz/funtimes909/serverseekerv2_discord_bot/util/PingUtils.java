@@ -106,7 +106,7 @@ public class PingUtils {
                     .setProtocol(protocol)
                     .setFmlNetworkVersion(fmlNetworkVersion)
                     .setMotd(motd.toString())
-                    .setIcon(parsedJson.has("icon") ? parsedJson.get("icon").getAsString() : null)
+                    .setIcon(parsedJson.has("favicon") ? parsedJson.get("favicon").getAsString() : null)
                     .setPreventsReports(parsedJson.has("preventsChatReports") ? parsedJson.get("preventsChatReports").getAsBoolean() : null)
                     .setEnforceSecure(parsedJson.has("enforcesSecureChat") ? parsedJson.get("enforcesSecureChat").getAsBoolean() : null)
                     .setCracked(cracked)
