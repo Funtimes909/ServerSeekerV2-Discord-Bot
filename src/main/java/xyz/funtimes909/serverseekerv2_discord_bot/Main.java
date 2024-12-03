@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import xyz.funtimes909.serverseekerv2_discord_bot.events.AutoCompleteBot;
 import xyz.funtimes909.serverseekerv2_discord_bot.events.ButtonInteractionEventListener;
 import xyz.funtimes909.serverseekerv2_discord_bot.events.SlashCommandListener;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.CommandRegisterer;
@@ -68,6 +69,7 @@ public class Main {
             client = JDABuilder.createDefault(token)
                     .addEventListeners(new SlashCommandListener())
                     .addEventListeners(new ButtonInteractionEventListener())
+                    .addEventListeners(new AutoCompleteBot())
                     .build();
 
             CommandRegisterer.registerCommands(client);

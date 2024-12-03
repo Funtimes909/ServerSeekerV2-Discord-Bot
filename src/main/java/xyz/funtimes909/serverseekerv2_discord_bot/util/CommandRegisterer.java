@@ -1,11 +1,36 @@
 package xyz.funtimes909.serverseekerv2_discord_bot.util;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
+
 public class CommandRegisterer {
+    public static final HashMap<String, String> countries = new HashMap<>();
+
+    static {
+        try (BufferedReader reader = new BufferedReader(new FileReader("country-codes.json"))) {
+            JsonArray countries = JsonParser.parseReader(reader).getAsJsonArray();
+
+            for (JsonElement country : countries) {
+                CommandRegisterer.countries.put(
+                        country.getAsJsonObject().get("name").getAsString(),
+                        country.getAsJsonObject().get("code").getAsString()
+                );
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void registerCommands(JDA client) {
         client.updateCommands().addCommands(
                 Commands.slash("search", "Searches for servers with advanced filters")
@@ -18,7 +43,6 @@ public class CommandRegisterer {
                         .addOption(OptionType.BOOLEAN, "enforcesecure", "Search for servers that enforce secure chat")
                         .addOption(OptionType.BOOLEAN, "cracked", "Search for servers that are running in offline mode")
                         .addOption(OptionType.BOOLEAN, "whitelist", "Search for servers that are whitelisted")
-                        .addOption(OptionType.STRING, "country", "Search for servers running in a specific country")
                         .addOption(OptionType.INTEGER, "port", "Search for servers running on a specific port")
                         .addOption(OptionType.STRING, "asn", "Search for servers running from a specific ASN")
                         .addOption(OptionType.INTEGER, "seenbefore", "Search for servers scanned before a specific unix timestamp")
@@ -31,6 +55,7 @@ public class CommandRegisterer {
                         .addOption(OptionType.INTEGER, "protocol", "Search for servers using a specific protocol")
                         .addOption(OptionType.BOOLEAN, "forge", "Search for servers running Forge")
                         .addOption(OptionType.INTEGER, "forgeversion", "Search for servers running a specific FML Network version")
+                        .addOption(OptionType.STRING, "country", "Search for servers running in a specific country", false, true)
                         .addOption(OptionType.STRING, "hostname", "Reverse DNS name of the server"),
 
                 Commands.slash("blacklist", "Blacklist a user from using the bot")
