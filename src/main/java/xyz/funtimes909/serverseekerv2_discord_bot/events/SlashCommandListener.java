@@ -7,9 +7,13 @@ import xyz.funtimes909.serverseekerv2_discord_bot.commands.*;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PermissionsManager;
 
 import java.util.HashMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class SlashCommandListener extends ListenerAdapter {
     public static final HashMap<String, Search> searchCommands = new HashMap<>();
+    private static final Executor executor = Executors.newVirtualThreadPerTaskExecutor();
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
@@ -25,24 +29,22 @@ public class SlashCommandListener extends ListenerAdapter {
             return;
         }
 
-
         Main.logger.info("Command: {} run by {} [{}] ({} options)", event.getName(), event.getUser().getName(), event.getUser().getId(), event.getOptions().size());
         event.deferReply().queue();
         switch (event.getName()) {
             case "search" -> {
                 Search command = new Search(event);
-                command.search();
+                executor.execute(command::search);
                 searchCommands.put(event.getUser().getId(), command);
-                System.out.println(event.getUser().getId());
             }
-            case "stats" -> Stats.stats(event);
-            case "random" -> Random.random(event);
-            case "ping" -> Ping.ping(event);
-            case "info" -> Info.info(event);
-            case "takedown" -> Takedown.takedown(event);
-            case "blacklist" -> Blacklist.blacklist(event);
-            case "playerhistory" -> Playerhistory.playerhistory(event);
-            case "track" -> Track.track(event);
+            case "stats" -> executor.execute(() -> Stats.stats(event));
+            case "random" -> executor.execute(() -> Random.random(event));
+            case "ping" -> executor.execute(() -> Ping.ping(event));
+            case "info" -> executor.execute(() -> Info.info(event));
+            case "takedown" -> executor.execute(() -> Takedown.takedown(event));
+            case "blacklist" -> executor.execute(() -> Blacklist.blacklist(event));
+            case "playerhistory" -> executor.execute(() -> Playerhistory.playerhistory(event));
+            case "track" -> executor.execute(() -> Track.track(event));
         }
     }
 }
