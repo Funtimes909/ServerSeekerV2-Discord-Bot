@@ -2,7 +2,7 @@ package xyz.funtimes909.serverseekerv2_discord_bot.commands;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.PermissionsCheck;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.PermissionsManager;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -13,7 +13,7 @@ public class Blacklist {
         String user = event.getOption("user").getAsString();
         String username = event.getOption("user").getAsUser().getName();
 
-        if (!PermissionsCheck.ownerCheck(id) && !PermissionsCheck.trustedUsersCheck(id)) {
+        if (!PermissionsManager.ownerCheck(id) && !PermissionsManager.trustedUsersCheck(id)) {
             event.getHook().sendMessage("Sorry! You are not authorized to run this command!").setEphemeral(true).queue();
             return;
         }
@@ -23,17 +23,17 @@ public class Blacklist {
             return;
         }
 
-        if (PermissionsCheck.trustedUsers.contains(user)) {
+        if (PermissionsManager.trustedUsers.contains(user)) {
             event.getHook().sendMessage("You can't blacklist a trusted user!").setEphemeral(true).queue();
             return;
         }
 
         if (event.getOption("operation").getAsString().equalsIgnoreCase("add")) {
-            if (PermissionsCheck.blacklist.contains(user)) {
+            if (PermissionsManager.blacklist.contains(user)) {
                 event.getHook().sendMessage("<@" + user + "> is already blacklisted!").setEphemeral(true).queue();
                 return;
             }
-            PermissionsCheck.blacklist.add(user);
+            PermissionsManager.blacklist.add(user);
 
             try (FileWriter file = new FileWriter("blacklist.txt", true)) {
                 file.write(user + "\n");
@@ -45,11 +45,11 @@ public class Blacklist {
         }
 
         if (event.getOption("operation").getAsString().equalsIgnoreCase("remove")) {
-            if (!PermissionsCheck.blacklist.contains(user)) {
+            if (!PermissionsManager.blacklist.contains(user)) {
                 event.getHook().sendMessage("<@" + user + "> is not blacklisted!").setEphemeral(true).queue();
                 return;
             }
-            PermissionsCheck.blacklist.remove(id);
+            PermissionsManager.blacklist.remove(id);
         }
     }
 }

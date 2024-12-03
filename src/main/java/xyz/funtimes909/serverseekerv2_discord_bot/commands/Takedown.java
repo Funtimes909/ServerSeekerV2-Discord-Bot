@@ -3,7 +3,7 @@ package xyz.funtimes909.serverseekerv2_discord_bot.commands;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.Database;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.PermissionsCheck;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.PermissionsManager;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -19,7 +19,7 @@ public class Takedown {
         String id = event.getInteraction().getUser().getId();
         String address = event.getOption("address").getAsString();
 
-        if (!PermissionsCheck.ownerCheck(id) && !PermissionsCheck.trustedUsersCheck(id)) {
+        if (!PermissionsManager.ownerCheck(id) && !PermissionsManager.trustedUsersCheck(id)) {
             event.getHook().sendMessage("Sorry! You are not authorized to run this command!").setEphemeral(true).queue();
             return;
         }

@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 import xyz.funtimes909.serverseekerv2_discord_bot.commands.*;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.PermissionsCheck;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.PermissionsManager;
 
 import java.util.HashMap;
 
@@ -13,7 +13,7 @@ public class SlashCommandListener extends ListenerAdapter {
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-        if (PermissionsCheck.blacklistCheck(event.getUser().getId())) {
+        if (PermissionsManager.blacklistCheck(event.getUser().getId())) {
             Main.logger.info("Blacklisted user attempted to run command! {} Ran {}", event.getUser().getName(), event.getName());
             event.reply("You are blacklisted!").setEphemeral(true).queue();
             return;
