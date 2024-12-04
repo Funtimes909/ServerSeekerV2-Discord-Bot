@@ -1,12 +1,12 @@
 package xyz.funtimes909.serverseekerv2_discord_bot.util;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -18,16 +18,15 @@ public class CommandRegisterer {
 
     static {
         try (BufferedReader reader = new BufferedReader(new FileReader("country-codes.json"))) {
-            JsonArray countries = JsonParser.parseReader(reader).getAsJsonArray();
-
-            for (JsonElement country : countries) {
+            for (JsonElement country : JsonParser.parseReader(reader).getAsJsonArray()) {
                 CommandRegisterer.countries.put(
                         country.getAsJsonObject().get("name").getAsString(),
                         country.getAsJsonObject().get("code").getAsString()
                 );
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            Main.logger.error("Failed to load country-codes.json");
+            throw new RuntimeException(e);
         }
     }
 
@@ -55,14 +54,23 @@ public class CommandRegisterer {
                         .addOption(OptionType.INTEGER, "protocol", "Search for servers using a specific protocol")
                         .addOption(OptionType.BOOLEAN, "forge", "Search for servers running Forge")
                         .addOption(OptionType.INTEGER, "forgeversion", "Search for servers running a specific FML Network version")
+                        .addOption(OptionType.STRING, "hostname", "Reverse DNS name of the server")
                         .addOption(OptionType.STRING, "country", "Search for servers running in a specific country", false, true)
-                        .addOption(OptionType.STRING, "hostname", "Reverse DNS name of the server"),
+                        .addOptions(new OptionData(OptionType.STRING, "software", "Searches for servers running a specific server software", false)
+                                .addChoice("Java", "Java")
+                                .addChoice("Bedrock", "Bedrock")
+                                .addChoice("Forge", "Forge")
+                                .addChoice("Neoforge", "Neoforge")
+                                .addChoice("Paper", "Paper")
+                                .addChoice("Spigot", "Spigot")
+                                .addChoice("Bukkit", "Bukkit")
+                                .addChoice("Thermos", "Thermos")),
 
                 Commands.slash("blacklist", "Blacklist a user from using the bot")
                         .addOption(OptionType.USER, "user", "Which user add/remove from the blacklist", true)
                         .addOptions(new OptionData(OptionType.STRING, "operation", "Whether to add or remove a user from the blacklist", true)
-                                .addChoice("add", "Add")
-                                .addChoice("remove", "Remove")),
+                                .addChoice("Add", "Add")
+                                .addChoice("Remove", "Remove")),
 
                 Commands.slash("playerinfo", "Shows information about a player")
                                 .addOption(OptionType.STRING, "player", "The player to show", true),
