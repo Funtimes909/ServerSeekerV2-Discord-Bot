@@ -59,7 +59,7 @@ public class PingUtils {
             // Description can be either an object or a string
             if (parsedJson.has("description")) {
                 if (parsedJson.get("description").isJsonObject()) {
-                    parseMOTD(parsedJson.get("description").getAsJsonObject(), 10, motd);
+                    buildMOTD(parsedJson.get("description").getAsJsonObject(), 10, motd);
                 } else {
                     motd.append(parsedJson.get("description").getAsString());
                 }
@@ -187,7 +187,7 @@ public class PingUtils {
         }
     }
 
-    private static void parseMOTD(JsonElement element, int limit, StringBuilder motd) {
+    public static void buildMOTD(JsonElement element, int limit, StringBuilder motd) {
         if (limit == 0) return;
 
         if (element.isJsonObject()) {
@@ -209,16 +209,41 @@ public class PingUtils {
                 motd.append(map.get("text").getAsString());
             }
             if (map.containsKey("extra")) {
-                parseMOTD(map.get("extra"), limit, motd);
+                buildMOTD(map.get("extra"), limit, motd);
             }
         } else {
             for (JsonElement jsonElement : element.getAsJsonArray()) {
                 if (jsonElement.isJsonPrimitive()) {
                     motd.append(jsonElement.getAsString());
                 } else {
-                    parseMOTD(jsonElement, limit, motd);
+                    buildMOTD(jsonElement, limit, motd);
                 }
             }
         }
+    }
+
+    public static String parseMOTD(String description) {
+        StringBuilder motd = new StringBuilder();
+
+        for (String line : description.split("§")) {
+            if (line.isBlank() || !AnsiCodes.colors.containsKey(line.charAt(0))) {
+                motd.append(line);
+                continue;
+            }
+
+            int code = AnsiCodes.colors.get(line.charAt(0)).ansi;
+
+            // Use 50 as a reset code
+            if (code == 50) {
+                motd.append("\u001B[0m").append(line.substring(1));
+                continue;
+            }
+
+            motd.append(code < 5 ?
+                    "\u001B[" + code + ";00m" + line.substring(1) :
+                    "\u001B[0;" + code + "m" + line.substring(1)
+            );
+        }
+        return motd.toString();
     }
 }

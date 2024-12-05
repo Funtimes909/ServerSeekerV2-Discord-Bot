@@ -9,6 +9,7 @@ import xyz.funtimes909.serverseekerv2_discord_bot.records.Player;
 import xyz.funtimes909.serverseekerv2_discord_bot.records.Server;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.AnsiCodes;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.HttpUtils;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.PingUtils;
 
 import java.awt.*;
 import java.util.List;
@@ -89,22 +90,12 @@ public class ServerEmbedBuilder {
 
         if (description.contains("§")) {
             System.out.println(description);
-            description = parseMOTD(description);
+            description = PingUtils.parseMOTD(description);
         }
 
         addressInfo.append("ASN: **").append(asn != null ? asn + "**\n" : "N/A**\n");
-
-        if (hostname == null || hostname.isBlank()) {
-            addressInfo.append("Hostname: **").append("N/A**\n");
-        } else {
-            addressInfo.append("Hostname: **").append(hostname).append("**\n");
-        }
-
-        if (organization == null || organization.isBlank()) {
-            addressInfo.append("Organization: **").append("N/A**\n");
-        } else {
-            addressInfo.append("Organization: **").append(organization).append("**\n");
-        }
+        addressInfo.append("Hostname: **").append(hostname != null ? hostname + "**\n" : "N/A**\n");
+        addressInfo.append("Organization: **").append(organization != null ? organization + "**\n" : "N/A**\n");
 
         if (firstseen == 0) firstseen = System.currentTimeMillis() / 1000;
 
@@ -162,30 +153,5 @@ public class ServerEmbedBuilder {
         if (mods != null && !mods.isEmpty()) embed.addField("** -- __Mods__ -- **",  modInfo.toString(), false);
         embed.addField("** -- __Address Information__ -- **", addressInfo.toString(), false);
         return embed.build();
-    }
-
-    private String parseMOTD(String description) {
-        StringBuilder motd = new StringBuilder();
-
-        for (String line : description.split("§")) {
-            if (line.isBlank() || !AnsiCodes.colors.containsKey(line.charAt(0))) {
-                motd.append(line);
-                continue;
-            }
-
-            int code = AnsiCodes.colors.get(line.charAt(0)).ansi;
-
-            // Use 50 as a reset code
-            if (code == 50) {
-                motd.append("\u001B[0m").append(line.substring(1));
-                continue;
-            }
-
-            motd.append(code < 5 ?
-                    "\u001B[" + code + ";00m" + line.substring(1) :
-                    "\u001B[0;" + code + "m" + line.substring(1)
-            );
-        }
-        return motd.toString();
     }
 }
