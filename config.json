@@ -3,6 +3,8 @@
   "postgres_url": "localhost:5432/",
   "postgres_user": "postgres",
   "postgres_password": ":3",
+  "api_url": "https://api.funtimes909.xyz/",
+  "api_token": ":3",
   "masscan_exclude_file": "exclude.txt",
   "owner_id": "OWNER_ID"
 }

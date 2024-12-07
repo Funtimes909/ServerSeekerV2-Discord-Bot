@@ -23,6 +23,8 @@ public class Main {
     public static String username;
     public static String password;
     public static String url;
+    public static String apiUrl;
+    public static String apiToken;
     public static String ownerId;
     public static final Logger logger = LoggerFactory.getLogger("ServerSeekerV2");
     public static JDA client;
@@ -48,6 +50,8 @@ public class Main {
             username = config.get("postgres_user").getAsString();
             password = config.get("postgres_password").getAsString();
             url = config.get("postgres_url").getAsString();
+            apiUrl = config.get("api_url").getAsString();
+            apiToken = config.get("api_token").getAsString();
             exclude = config.get("masscan_exclude_file").getAsString();
             ownerId = config.get("owner_id").getAsString();
 
