@@ -1,2 +1,2 @@
 rootProject.name = 'ServerSeekerV2-Discord-Bot'
-
+include 'bot', 'core'
