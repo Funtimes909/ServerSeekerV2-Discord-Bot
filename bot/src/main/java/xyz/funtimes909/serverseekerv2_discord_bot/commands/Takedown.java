@@ -3,6 +3,7 @@ package xyz.funtimes909.serverseekerv2_discord_bot.commands;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.Database;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.GenericErrorEmbed;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PermissionsManager;
 
 import java.io.BufferedWriter;
@@ -30,7 +31,7 @@ public class Takedown {
         }
 
         if (event.getOption("remove-entries") != null && event.getOption("remove-entries").getAsBoolean()) {
-            try (Connection conn = Database.getConnection(event.getMessageChannel())) {
+            try (Connection conn = Database.getConnection()) {
                 PreparedStatement playerhistory = conn.prepareStatement("DELETE FROM playerhistory WHERE address = ?");
                 playerhistory.setString(1, address);
 
@@ -45,6 +46,7 @@ public class Takedown {
                 servers.executeUpdate();
             } catch (SQLException e) {
                 Main.logger.error("Error removing entries from database", e);
+                GenericErrorEmbed.errorEmbed(event.getMessageChannel(), e.getMessage());
             }
 
             try (BufferedWriter writer = new BufferedWriter(new FileWriter("exclude.txt", true))) {

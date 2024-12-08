@@ -1,6 +1,8 @@
 package xyz.funtimes909.serverseekerv2_discord_bot.util;
 
 
+import xyz.funtimes909.serverseekerv2_discord_bot.Main;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -20,11 +22,11 @@ public class HttpUtils {
         }
     }
 
-    public static void apiRequest(String ip, String query) {
+    public static String apiRequest(String ip, String query) {
         try (HttpClient client = HttpClient.newHttpClient()) {
 
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("http://ip-api.com/json/" + ip + "?fields=status,message,continent,countryCode,org,as,reverse,query"))
+                    .uri(URI.create(Main.apiUrl + query))
                     .build();
 
             HttpResponse<String> response = client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).join();

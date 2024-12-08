@@ -16,8 +16,12 @@ public class AutoCompleteBot extends ListenerAdapter {
             List<Command.Choice> options = CommandRegisterer.countries.entrySet().stream()
                     .filter(event.getFocusedOption().getValue().isEmpty() ?
                             word -> word.getKey().startsWith("A") :
-                            word -> word.getKey().startsWith(event.getFocusedOption().getValue()))
-                    .map(word -> new Command.Choice(word.getKey(), word.getValue()))
+                            word -> word.getKey().startsWith(event.getFocusedOption().getValue())
+                    )
+                    .map(word -> new Command.Choice(
+                            word.getKey(),
+                            word.getValue())
+                    )
                     .limit(25)
                     .toList();
 

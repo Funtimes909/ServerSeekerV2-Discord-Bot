@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.PlayerhistoryEmbedBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.Database;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.GenericErrorEmbed;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -22,8 +23,12 @@ public class Playerhistory {
             return;
         }
 
-        try (Connection conn = Database.getConnection(event.getMessageChannel())) {
-            if (conn == null) return;
+        try (Connection conn = Database.getConnection()) {
+            if (conn == null) {
+                GenericErrorEmbed.errorEmbed(event.getMessageChannel(), "Failed to connect to database!");
+                return;
+            }
+
             PreparedStatement statement = null;
 
             if (event.getOption("player") != null) {
@@ -45,13 +50,17 @@ public class Playerhistory {
             }
 
             results.beforeFirst();
-            MessageEmbed embed = PlayerhistoryEmbedBuilder.build(results, event.getOption("player") != null ? event.getOption("player").getAsString() : event.getOption("address").getAsString());
-            List<ItemComponent> buttons = new ArrayList<>();
+            MessageEmbed embed = PlayerhistoryEmbedBuilder.build(results, event.getOption("player") != null ?
+                    event.getOption("player").getAsString() :
+                    event.getOption("address").getAsString()
+            );
 
             if (embed == null) {
-                event.getHook().sendMessage("Something went wrong running this command!").queue();
+                GenericErrorEmbed.errorEmbed(event.getMessageChannel(), "Something went wrong running this command!");
                 return;
             }
+
+            List<ItemComponent> buttons = new ArrayList<>();
 
             for (int i = 0; i < rowCount; i++) {
                 buttons.add(Button.success(String.valueOf(i + 1), String.valueOf(i + 1)));
@@ -67,6 +76,7 @@ public class Playerhistory {
             results.close();
         } catch (SQLException e) {
             Main.logger.warn("Exception when running the playerhistory command!", e);
+            GenericErrorEmbed.errorEmbed(event.getMessageChannel(), e.getMessage());
         }
     }
 }

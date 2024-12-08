@@ -8,6 +8,7 @@ import xyz.funtimes909.serverseekerv2_core.records.Server;
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.ServerEmbedBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.Database;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.GenericErrorEmbed;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PingUtils;
 
 import java.sql.Connection;
@@ -37,7 +38,7 @@ public class Ping {
         MessageEmbed embed = embedBuilder.build(true);
 
         if (embed == null) {
-            event.getHook().sendMessage("Something went wrong running this command!").queue();
+            GenericErrorEmbed.errorEmbed(event.getMessageChannel(), "Embed is null!");
             return;
         }
 
@@ -46,7 +47,7 @@ public class Ping {
     }
 
     private static void updateServer(Server server) {
-        try (Connection conn = Database.getConnection(null)) {
+        try (Connection conn = Database.getConnection()) {
             if (conn == null) return;
             String address = server.getAddress();
             short port = server.getPort();

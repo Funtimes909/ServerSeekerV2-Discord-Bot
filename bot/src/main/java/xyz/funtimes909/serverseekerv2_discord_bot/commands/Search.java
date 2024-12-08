@@ -15,6 +15,7 @@ import xyz.funtimes909.serverseekerv2_discord_bot.builders.SearchEmbedBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.ServerEmbedBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.records.ServerEmbed;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.Database;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.GenericErrorEmbed;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PingUtils;
 
 import java.sql.Connection;
@@ -93,7 +94,7 @@ public class Search {
     }
 
     public void runQuery(boolean firstRun) {
-        try (Connection conn = Database.getConnection(interaction.getChannel())) {
+        try (Connection conn = Database.getConnection()) {
             if (conn == null) return;
 
             // Append offset
@@ -144,7 +145,7 @@ public class Search {
             }
         } catch (SQLException e) {
             Main.logger.error("Error while running search query!", e);
-            interaction.getHook().sendMessage("Error while running search query!").queue();
+            GenericErrorEmbed.errorEmbed(interaction.getMessageChannel(), e.getMessage());
         }
     }
 
@@ -187,13 +188,21 @@ public class Search {
 
         // Show accurate page count if pointer is over 5, otherwise display only one page
         MessageEmbed embed = SearchEmbedBuilder.parse(page, totalRows, totalRows <= 5 ? 1 : (pointer / 5));
-        if (firstRun) interaction.getHook().sendMessageEmbeds(embed).setComponents(pageButtons).queue();
-        else interaction.getHook().editOriginalEmbeds(embed).setComponents(pageButtons).queue();
+
+        // Send embed, update if already sent
+        if (firstRun) {
+            interaction.getHook().sendMessageEmbeds(embed).setComponents(pageButtons).queue();
+        } else {
+            interaction.getHook().editOriginalEmbeds(embed).setComponents(pageButtons).queue();
+        }
     }
 
     public void serverSelectedButtonEvent(String address, short port, ButtonInteractionEvent event) {
-        try (Connection conn = Database.getConnection(interaction.getChannel())) {
-            if (conn == null) return;
+        try (Connection conn = Database.getConnection()) {
+            if (conn == null) {
+                GenericErrorEmbed.errorEmbed(interaction.getMessageChannel(), "Could not connect to database!");
+                return;
+            }
 
             PreparedStatement statement = conn.prepareStatement("SELECT * FROM servers LEFT JOIN playerhistory ON servers.address = playerhistory.address AND servers.port = playerhistory.port LEFT JOIN mods ON servers.address = mods.address AND servers.port = mods.port WHERE servers.address = ? AND servers.port = ?");
             statement.setString(1, address);
@@ -201,7 +210,9 @@ public class Search {
 
             Server server = PingUtils.buildResultsToObject(statement.executeQuery());
 
-            if (server == null) return;
+            if (server == null) {
+                GenericErrorEmbed.errorEmbed(interaction.getMessageChannel(), "Error occured");
+            }
             ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server);
             MessageEmbed embed = embedBuilder.build(false);
 
