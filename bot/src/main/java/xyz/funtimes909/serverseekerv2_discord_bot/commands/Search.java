@@ -212,7 +212,9 @@ public class Search {
 
             if (server == null) {
                 GenericErrorEmbed.errorEmbed(interaction.getMessageChannel(), "Error occured");
+                return;
             }
+
             ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server);
             MessageEmbed embed = embedBuilder.build(false);
 

@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import xyz.funtimes909.serverseekerv2_core.records.Mod;
 import xyz.funtimes909.serverseekerv2_core.records.Player;
 import xyz.funtimes909.serverseekerv2_core.records.Server;
+import xyz.funtimes909.serverseekerv2_core.types.ServerType;
 import xyz.funtimes909.serverseekerv2_core.util.HTTPUtils;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PingUtils;
 
@@ -16,6 +17,7 @@ import java.util.List;
 public class ServerEmbedBuilder {
     private final String address;
     private final short port;
+    private final ServerType type;
     private String description;
     private final String version;
     private final Integer protocol;
@@ -38,6 +40,7 @@ public class ServerEmbedBuilder {
     public ServerEmbedBuilder(Server server) {
         address = server.getAddress();
         port = server.getPort();
+        type = server.getServerType();
         description = server.getMotd();
         version = server.getVersion();
         protocol = server.getProtocol();
@@ -62,6 +65,7 @@ public class ServerEmbedBuilder {
         StringBuilder miscInfo = new StringBuilder();
         StringBuilder addressInfo = new StringBuilder();
         StringBuilder playerInfo = new StringBuilder();
+        StringBuilder softwareInfo = new StringBuilder();
         StringBuilder modInfo = new StringBuilder();
 
         // Miscellaneous info
@@ -70,10 +74,6 @@ public class ServerEmbedBuilder {
         miscInfo.append("Cracked: **").append(cracked != null ? cracked + "**\n" : "N/A**\n");
         miscInfo.append("Prevents Chat Reports: **").append(preventsReports != null ? preventsReports + "**\n" : "N/A**\n");
         miscInfo.append("Enforces Secure Chat: **").append(enforceSecure != null ? enforceSecure + "**\n" : "N/A**\n");
-        if (fmlNetworkVersion != null && fmlNetworkVersion != 0) {
-            miscInfo.append("Forge: **").append("true**\n");
-            miscInfo.append("Forge Version: **").append(fmlNetworkVersion).append("**\n");
-        }
 
         // Address information
         if (ping) {
@@ -132,6 +132,12 @@ public class ServerEmbedBuilder {
             modInfo.append("```");
         }
 
+        softwareInfo.append("Server Type: **").append(type != null ? type.name() + "**\n" : "N/A**\n");
+        if (fmlNetworkVersion != null && fmlNetworkVersion != 0) {
+            softwareInfo.append("Forge: **").append("true**\n");
+            softwareInfo.append("Forge Version: **").append(fmlNetworkVersion).append("**\n");
+        }
+
         // Build server information embed
         EmbedBuilder embed = new EmbedBuilder()
                 .setColor(new Color(0, 255, 0))
@@ -147,6 +153,7 @@ public class ServerEmbedBuilder {
         }
 
         embed.addField("** -- __Country__ -- **", country != null ? ":flag_" + country.toLowerCase() + ": " + country : ":x: No Country Information", false);
+        embed.addField("** -- __Server Software__ -- **", softwareInfo.toString(), false);
         embed.addField("** -- __Miscellaneous__ -- **", miscInfo.toString(), false);
         embed.addField("** -- __Players__ -- **",  playerInfo.toString(), false);
         if (mods != null && !mods.isEmpty()) embed.addField("** -- __Mods__ -- **",  modInfo.toString(), false);
