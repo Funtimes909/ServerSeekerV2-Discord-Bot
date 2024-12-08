@@ -1,28 +1,20 @@
 package xyz.funtimes909.serverseekerv2_discord_bot.util;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import xyz.funtimes909.serverseekerv2_core.records.Mod;
 import xyz.funtimes909.serverseekerv2_core.records.Player;
 import xyz.funtimes909.serverseekerv2_core.records.Server;
 import xyz.funtimes909.serverseekerv2_core.types.AnsiCodes;
-import xyz.funtimes909.serverseekerv2_core.util.MotdUtils;
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class PingUtils {
-    private static final StringBuilder motd = new StringBuilder();
     private static final byte[] REQUEST = new byte[] {
             8, // Size: Amount of proceeding bytes [varint]
             0, // ID: Has to be 0
@@ -33,97 +25,6 @@ public class PingUtils {
             1, // Size
             0, // ID
     };
-
-    public static Server parse(String address, short port) {
-        try (Socket conn = new Socket()) {
-            conn.setSoTimeout(4000);
-            conn.connect(new  InetSocketAddress(address, port), 4000);
-            String json = ping(conn);
-            if (json == null) return null;
-
-            JsonObject parsedJson = JsonParser.parseString(json).getAsJsonObject();
-            String version = null;
-            Boolean cracked = null;
-            Integer protocol = null;
-            Integer fmlNetworkVersion = null;
-            Integer maxPlayers = null;
-            Integer onlinePlayers = null;
-            List<Player> playerList = new ArrayList<>();
-            List<Mod> modsList  = new ArrayList<>();
-
-            // Minecraft server information
-            if (parsedJson.has("version")) {
-                version = parsedJson.get("version").getAsJsonObject().get("name").getAsString();
-                protocol = parsedJson.get("version").getAsJsonObject().get("protocol").getAsInt();
-            }
-
-            // Description can be either an object or a string
-            if (parsedJson.has("description")) {
-                if (parsedJson.get("description").isJsonObject()) {
-                    MotdUtils.buildMOTD(parsedJson.get("description").getAsJsonObject(), 10, motd);
-                } else {
-                    motd.append(parsedJson.get("description").getAsString());
-                }
-            }
-
-            // Forge servers send back information about mods
-            if (parsedJson.has("forgeData")) {
-                fmlNetworkVersion = parsedJson.get("forgeData").getAsJsonObject().get("fmlNetworkVersion").getAsInt();
-                if (parsedJson.get("forgeData").getAsJsonObject().has("mods")) {
-                    for (JsonElement modJson : parsedJson.get("forgeData").getAsJsonObject().get("mods").getAsJsonArray().asList()) {
-                        String modId = modJson.getAsJsonObject().get("modId").getAsString();
-                        String modmarker = modJson.getAsJsonObject().get("modmarker").getAsString();
-
-                        Mod mod = new Mod(modId, modmarker);
-                        modsList.add(mod);
-                    }
-                }
-            }
-
-            // Check for players
-            if (parsedJson.has("players")) {
-                maxPlayers = parsedJson.get("players").getAsJsonObject().get("max").getAsInt();
-                onlinePlayers = parsedJson.get("players").getAsJsonObject().get("online").getAsInt();
-                if (parsedJson.get("players").getAsJsonObject().has("sample")) {
-                    for (JsonElement playerJson : parsedJson.get("players").getAsJsonObject().get("sample").getAsJsonArray().asList()) {
-                        if (playerJson.getAsJsonObject().has("name") && playerJson.getAsJsonObject().has("id")) {
-                            String name = playerJson.getAsJsonObject().get("name").getAsString();
-                            String uuid = playerJson.getAsJsonObject().get("id").getAsString();
-
-                            // Offline mode servers use v3 UUID's for players, while regular servers use v4, this is a really easy way to check if a server is offline mode
-                            if (UUID.fromString(uuid).version() == 3) cracked = true;
-                            long timestamp = System.currentTimeMillis() / 1000;
-                            playerList.add(new Player(name, uuid, timestamp, timestamp));
-                        }
-                    }
-                }
-            }
-
-            // Build server
-            return new Server.Builder()
-                    .setAddress(address)
-                    .setPort(port)
-                    .setLastSeen(System.currentTimeMillis() / 1000)
-                    .setVersion(version)
-                    .setProtocol(protocol)
-                    .setFmlNetworkVersion(fmlNetworkVersion)
-                    .setMotd(motd.toString())
-                    .setIcon(parsedJson.has("favicon") ? parsedJson.get("favicon").getAsString() : null)
-                    .setPreventsReports(parsedJson.has("preventsChatReports") ? parsedJson.get("preventsChatReports").getAsBoolean() : null)
-                    .setEnforceSecure(parsedJson.has("enforcesSecureChat") ? parsedJson.get("enforcesSecureChat").getAsBoolean() : null)
-                    .setCracked(cracked)
-                    .setMaxPlayers(maxPlayers)
-                    .setOnlinePlayers(onlinePlayers)
-                    .setPlayers(playerList)
-                    .setMods(modsList)
-                    .build();
-
-        } catch (IOException ignored) {}
-        finally {
-            motd.setLength(0);
-        }
-        return null;
-    }
 
     public static String ping(Socket connection) {
         try (

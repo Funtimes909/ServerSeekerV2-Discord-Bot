@@ -4,8 +4,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import xyz.funtimes909.serverseekerv2_core.util.HTTPUtils;
 import xyz.funtimes909.serverseekerv2_discord_bot.records.ServerEmbed;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.HttpUtils;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ public class SearchEmbedBuilder {
             if (entry.country() != null) {
                 address.insert(0, ":flag_" + entry.country().toLowerCase() + ": **:** ");
             } else {
-                String primaryResponse = HttpUtils.run(entry.address());
+                String primaryResponse = HTTPUtils.run(entry.address());
                 if (primaryResponse != null) {
                     JsonObject parsedPrimaryResponse = JsonParser.parseString(primaryResponse).getAsJsonObject();
                     if (parsedPrimaryResponse.has("countryCode")) address.insert(0, ":flag_" + parsedPrimaryResponse.get("countryCode").getAsString().toLowerCase() + ": **:** ");

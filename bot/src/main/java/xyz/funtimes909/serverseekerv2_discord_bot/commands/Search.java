@@ -14,7 +14,7 @@ import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.SearchEmbedBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.ServerEmbedBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.records.ServerEmbed;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.Database;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.ConnectionPool;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.GenericErrorEmbed;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PingUtils;
 
@@ -94,7 +94,7 @@ public class Search {
     }
 
     public void runQuery(boolean firstRun) {
-        try (Connection conn = Database.getConnection()) {
+        try (Connection conn = ConnectionPool.getConnection()) {
             if (conn == null) return;
 
             // Append offset
@@ -198,7 +198,7 @@ public class Search {
     }
 
     public void serverSelectedButtonEvent(String address, short port, ButtonInteractionEvent event) {
-        try (Connection conn = Database.getConnection()) {
+        try (Connection conn = ConnectionPool.getConnection()) {
             if (conn == null) {
                 GenericErrorEmbed.errorEmbed(interaction.getMessageChannel(), "Could not connect to database!");
                 return;

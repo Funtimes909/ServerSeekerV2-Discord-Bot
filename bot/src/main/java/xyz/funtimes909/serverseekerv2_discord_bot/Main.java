@@ -26,8 +26,8 @@ public class Main {
     public static String apiUrl;
     public static String apiToken;
     public static String ownerId;
-    public static final Logger logger = LoggerFactory.getLogger("ServerSeekerV2");
     public static JDA client;
+    public static final Logger logger = LoggerFactory.getLogger("ServerSeekerV2");
 
     public static void main(String[] args) {
         String configFile;

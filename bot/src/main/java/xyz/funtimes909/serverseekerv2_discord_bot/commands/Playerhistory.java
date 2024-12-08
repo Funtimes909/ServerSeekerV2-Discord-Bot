@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.PlayerhistoryEmbedBuilder;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.Database;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.ConnectionPool;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.GenericErrorEmbed;
 
 import java.sql.Connection;
@@ -23,7 +23,7 @@ public class Playerhistory {
             return;
         }
 
-        try (Connection conn = Database.getConnection()) {
+        try (Connection conn = ConnectionPool.getConnection()) {
             if (conn == null) {
                 GenericErrorEmbed.errorEmbed(event.getMessageChannel(), "Failed to connect to database!");
                 return;

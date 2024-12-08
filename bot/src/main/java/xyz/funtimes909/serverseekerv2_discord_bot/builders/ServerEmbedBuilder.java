@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import xyz.funtimes909.serverseekerv2_core.records.Mod;
 import xyz.funtimes909.serverseekerv2_core.records.Player;
 import xyz.funtimes909.serverseekerv2_core.records.Server;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.HttpUtils;
+import xyz.funtimes909.serverseekerv2_core.util.HTTPUtils;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PingUtils;
 
 import java.awt.*;
@@ -77,7 +77,7 @@ public class ServerEmbedBuilder {
 
         // Address information
         if (ping) {
-            String primaryResponse = HttpUtils.run(address);
+            String primaryResponse = HTTPUtils.run(address);
             if (primaryResponse != null) {
                 JsonObject parsedPrimaryResponse = JsonParser.parseString(primaryResponse).getAsJsonObject();
                 if (parsedPrimaryResponse.has("reverse")) hostname = parsedPrimaryResponse.get("reverse").getAsString();

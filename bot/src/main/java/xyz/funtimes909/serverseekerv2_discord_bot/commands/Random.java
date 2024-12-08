@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import xyz.funtimes909.serverseekerv2_core.records.Server;
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.ServerEmbedBuilder;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.Database;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.ConnectionPool;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PingUtils;
 
 import java.sql.Connection;
@@ -14,7 +14,7 @@ import java.sql.Statement;
 
 public class Random {
     public static void random(SlashCommandInteractionEvent event) {
-        try (Connection conn = Database.getConnection()) {
+        try (Connection conn = ConnectionPool.getConnection()) {
             Statement statement = conn.createStatement();
             long startTime = System.currentTimeMillis() / 1000;
             String query = "SELECT * FROM servers LEFT JOIN playerhistory ON servers.address = playerhistory.address AND servers.port = playerhistory.port LEFT JOIN mods ON servers.address = mods.address AND servers.port = mods.port ORDER BY RANDOM() LIMIT 1";
