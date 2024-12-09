@@ -87,7 +87,7 @@ public class ServerEmbedBuilder {
             }
         }
 
-        if (description.contains("§")) {
+        if (description != null && description.contains("§")) {
             System.out.println(description);
             description = PingUtils.parseMOTD(description);
         }
@@ -141,7 +141,7 @@ public class ServerEmbedBuilder {
         // Build server information embed
         EmbedBuilder embed = new EmbedBuilder()
                 .setColor(new Color(0, 255, 0))
-                .setAuthor("ServerSeekerV2", "https://funtimes909.xyz/assets/images/serverseekerv2-icon-cropped.png")
+                .setAuthor("ServerSeekerV2", "https://cdn.discordapp.com/app-icons/1300318661168594975/cb3825c45b033454cf027a878e96196c.png")
                 .setThumbnail("https://funtimes909.xyz/avatar-gif")
                 .setTitle(address + ":" + port)
                 .addField("** -- __Version__ -- **", version + " (" + protocol + ")", false)
