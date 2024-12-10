@@ -1,6 +1,5 @@
 package xyz.funtimes909.serverseekerv2_discord_bot.commands;
 
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;

@@ -1,6 +1,7 @@
 package xyz.funtimes909.serverseekerv2_discord_bot.builders;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -17,33 +18,19 @@ public class PlayerhistoryEmbedBuilder {
                 .setFooter("Funtimes909", "https://funtimes909.xyz/avatar-gif")
                 .setColor(new Color(0, 255, 0));
 
-
-        for (int i = 0; i < playersArray.size(); i++) {
-            JsonObject player = playersArray.get(i).getAsJsonObject();
-            StringBuilder address = new StringBuilder(player.get("address").getAsString());
+        int i = 1;
+        for (JsonElement result : playersArray.getAsJsonArray()) {
+            JsonObject resultObj = result.getAsJsonObject();
+            StringBuilder address = new StringBuilder(resultObj.get("address").getAsString());
             address.setLength(16);
 
-            // Determine emoji
-            String emoji = switch (i) {
-                case 1 -> ":one:";
-                case 2 -> ":two:";
-                case 3 -> ":three:";
-                case 4 -> ":four:";
-                case 5 -> ":five:";
-                case 6 -> ":six:";
-                case 7 -> ":seven:";
-                case 8 -> ":eight:";
-                case 9 -> ":nine:";
-                case 10 -> ":ten:";
-                default -> ":x:";
-            };
-
             // Add a field for every player
-            embed.addField(emoji + " **``" +
+            embed.addField(":number_" + i + ": **``" +
                     address + "``**  **``" +
-                    player.get("playername").getAsString() + "``**  <t:" +
-                    player.get("lastseen").getAsString() + ":R>", "_ _", false);
+                    resultObj.get("playername").getAsString() + "``**  <t:" +
+                    resultObj.get("lastseen").getAsString() + ":R>", "_ _", false);
 
+            i++;
         }
 
         return embed.build();
