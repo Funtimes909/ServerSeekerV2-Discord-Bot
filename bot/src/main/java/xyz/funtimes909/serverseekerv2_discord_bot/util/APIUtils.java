@@ -1,6 +1,7 @@
 package xyz.funtimes909.serverseekerv2_discord_bot.util;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 
@@ -21,7 +22,14 @@ public class APIUtils {
 
             HttpResponse<String> response = client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).join();
             if (response.statusCode() == 429) return null;
-            return JsonParser.parseString(response.body()).getAsJsonArray();
+            System.out.println(response.body());
+            JsonElement json = JsonParser.parseString(response.body());
+
+            if (json instanceof JsonArray) {
+                return (JsonArray) json;
+            } else {
+                return null;
+            }
         }
     }
 }

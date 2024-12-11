@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 
 import java.awt.*;
 
-public class PlayerhistoryEmbedBuilder {
+public class PlayerhistorySearchBuilder {
     public static MessageEmbed build(JsonArray playersArray, String title) {
         if (playersArray.isEmpty()) return null;
 
