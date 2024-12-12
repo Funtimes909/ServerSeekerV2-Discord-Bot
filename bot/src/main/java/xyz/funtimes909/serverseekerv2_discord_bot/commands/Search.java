@@ -23,6 +23,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 public class Search {
     private final Map<String, OptionMapping> parameters = new HashMap<>();
@@ -211,21 +212,21 @@ public class Search {
             Server server = PingUtils.buildResultsToObject(statement.executeQuery());
 
             if (server == null) {
-                GenericErrorEmbed.errorEmbed(interaction.getMessageChannel(), "Error occured");
+                GenericErrorEmbed.errorEmbed(interaction.getMessageChannel(), "Server could not be built!");
                 return;
             }
 
             ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server);
-            MessageEmbed embed = embedBuilder.build(false);
-
+            MessageEmbed embed = embedBuilder.build(event.getMessageChannel(), true).get();
             if (embed == null) {
-                event.getInteraction().getHook().sendMessage("Something went wrong executing that command!").setEphemeral(true).queue();
+                event.getHook().sendMessage("Server did not connect!").queue();
                 return;
             }
 
-            event.getInteraction().getHook().sendMessageEmbeds(embed).queue();
-        } catch (SQLException e) {
+            event.getHook().sendMessageEmbeds(embed).queue();
+        } catch (SQLException | ExecutionException | InterruptedException e) {
             Main.logger.error("Error while executing query!", e);
+            GenericErrorEmbed.errorEmbed(interaction.getMessageChannel(), e.getMessage());
         }
     }
 }

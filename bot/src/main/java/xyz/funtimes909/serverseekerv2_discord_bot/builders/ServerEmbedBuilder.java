@@ -4,15 +4,23 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.utils.FileUpload;
 import xyz.funtimes909.serverseekerv2_core.records.Mod;
 import xyz.funtimes909.serverseekerv2_core.records.Player;
 import xyz.funtimes909.serverseekerv2_core.records.Server;
 import xyz.funtimes909.serverseekerv2_core.types.ServerType;
 import xyz.funtimes909.serverseekerv2_core.util.HTTPUtils;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.Base64Decoder;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PingUtils;
 
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class ServerEmbedBuilder {
     private final String address;
@@ -20,12 +28,13 @@ public class ServerEmbedBuilder {
     private final ServerType type;
     private String description;
     private final String version;
+    private final String icon;
     private final Integer protocol;
     private final String country;
     private final String asn;
     private final String hostname;
     private final String organization;
-    private long firstseen;
+    private final long firstseen;
     private final long lastseen;
     private final int timesSeen;
     private final Boolean whitelist;
@@ -42,6 +51,7 @@ public class ServerEmbedBuilder {
         type = server.getServerType();
         description = server.getMotd();
         version = server.getVersion();
+        icon = server.getIcon();
         protocol = server.getProtocol();
         country = server.getCountry();
         asn = server.getAsn();
@@ -59,11 +69,12 @@ public class ServerEmbedBuilder {
         mods = server.getMods();
     }
 
-    public MessageEmbed build(boolean ping) {
+    public CompletableFuture<MessageEmbed> build(MessageChannel channel, boolean ping) {
         StringBuilder miscInfo = new StringBuilder();
         StringBuilder addressInfo = new StringBuilder();
         StringBuilder playerInfo = new StringBuilder();
         StringBuilder modInfo = new StringBuilder();
+        File image;
 
         String versionInfo = (type != null ? type.name().charAt(0) +
                 type.name().substring(1).toLowerCase() +
@@ -152,23 +163,37 @@ public class ServerEmbedBuilder {
         miscInfo.append("Prevents Chat Reports: **").append(preventsReports != null ? preventsReports + "**\n" : "N/A**\n");
         miscInfo.append("Enforces Secure Chat: **").append(enforceSecure != null ? enforceSecure + "**\n" : "N/A**\n");
 
-        // Build server information embed
-        EmbedBuilder embed = new EmbedBuilder()
-                .setColor(new Color(0, 255, 0))
-                .setAuthor("ServerSeekerV2", "https://cdn.discordapp.com/app-icons/1300318661168594975/cb3825c45b033454cf027a878e96196c.png")
-                .setThumbnail("https://funtimes909.xyz/avatar-gif")
-                .setTitle(address + ":" + port)
-                .addField("** -- __Version__ -- **", versionInfo, false)
-                .addField("** -- __Description__ -- **", description != null ? "```ansi\n" + description + "```" : "```No description found!```", false);
-
-        if (!ping) {
-            embed.addField("** -- __Timestamps__ -- **", timestamps, false);
+        if (icon != null && !icon.isBlank()) {
+            image = Base64Decoder.decode(icon.split(",")[1], address + ":" + port + ".png");
+        } else {
+            image = new File("default_icon.png");
         }
 
-        embed.addField("** -- __Miscellaneous__ -- **", miscInfo.toString(), false);
-        embed.addField("** -- __Players__ -- **",  playerInfo.toString(), false);
-        if (mods != null && !mods.isEmpty()) embed.addField("** -- __Mods__ -- **",  modInfo.toString(), false);
-        embed.addField("** -- __Address Information__ -- **", addressInfo.toString(), false);
-        return embed.build();
+        // Send icon to discord and use that attachment link as icon
+        CompletableFuture<MessageEmbed> future = new CompletableFuture<>();
+        channel.sendFiles(FileUpload.fromData(image, address + ":" + port + ".png")).queue(message -> {
+            EmbedBuilder embed = new EmbedBuilder()
+                    .setColor(new Color(0, 255, 0))
+                    .setAuthor("ServerSeekerV2", "https://cdn.discordapp.com/app-icons/1300318661168594975/cb3825c45b033454cf027a878e96196c.png")
+                    .setThumbnail(message.getAttachments().getFirst().getUrl())
+                    .setTitle(address + ":" + port)
+                    .addField("** -- __Version__ -- **", versionInfo, false)
+                    .addField("** -- __Description__ -- **", description != null ? "```ansi\n" + description + "```" : "```No description found!```", false);
+
+            if (!ping) {
+                embed.addField("** -- __Timestamps__ -- **", timestamps, false);
+            }
+
+            embed.addField("** -- __Miscellaneous__ -- **", miscInfo.toString(), false);
+            embed.addField("** -- __Players__ -- **",  playerInfo.toString(), false);
+            if (mods != null && !mods.isEmpty()) embed.addField("** -- __Mods__ -- **",  modInfo.toString(), false);
+            embed.addField("** -- __Address Information__ -- **", addressInfo.toString(), false);
+            future.complete(embed.build());
+        });
+
+        try {
+            Files.delete(Path.of(address + ":" + port + ".png"));
+        } catch (IOException ignored) {}
+        return future;
     }
 }

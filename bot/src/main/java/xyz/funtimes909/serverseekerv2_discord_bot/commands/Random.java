@@ -11,6 +11,7 @@ import xyz.funtimes909.serverseekerv2_discord_bot.util.PingUtils;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.concurrent.ExecutionException;
 
 public class Random {
     public static void random(SlashCommandInteractionEvent event) {
@@ -24,10 +25,10 @@ public class Random {
             if (server == null) return;
 
             ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server);
-            MessageEmbed embed = embedBuilder.build(false);
+            MessageEmbed embed = embedBuilder.build(event.getMessageChannel(), true).get();
 
             if (embed != null) event.getHook().sendMessageEmbeds(embed).queue();
-        } catch (SQLException e) {
+        } catch (SQLException | ExecutionException | InterruptedException e) {
             Main.logger.warn("SQL Exception while running the random command!", e);
         }
     }
