@@ -11,6 +11,7 @@ import xyz.funtimes909.serverseekerv2_core.records.Player;
 import xyz.funtimes909.serverseekerv2_core.records.Server;
 import xyz.funtimes909.serverseekerv2_core.types.ServerType;
 import xyz.funtimes909.serverseekerv2_core.util.HTTPUtils;
+import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.Base64Decoder;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PingUtils;
 
@@ -74,17 +75,26 @@ public class ServerEmbedBuilder {
         StringBuilder addressInfo = new StringBuilder();
         StringBuilder playerInfo = new StringBuilder();
         StringBuilder modInfo = new StringBuilder();
-        File image;
-
-        String versionInfo = (type != null ? type.name().charAt(0) +
-                type.name().substring(1).toLowerCase() +
-                " " : " ") +
-                (version != null ? version + " " : " ") +
-                (protocol != null ? "**(" + protocol + ")** " : " ");
+        StringBuilder versionInfo = new StringBuilder();
 
         if (description != null && description.contains("§")) {
             System.out.println(description);
             description = PingUtils.parseMOTD(description);
+        }
+
+        if (Character.isDigit(version.charAt(0)) && type != null) {
+            versionInfo.append(type.name().charAt(0))
+                    .append(type.name().substring(1).toLowerCase())
+                    .append(" ")
+                    .append(version)
+                    .append(" (")
+                    .append(protocol)
+                    .append(")");
+        } else {
+            versionInfo.append(version)
+                    .append(" (")
+                    .append(protocol)
+                    .append(")");
         }
 
         String timestamps =
@@ -163,6 +173,7 @@ public class ServerEmbedBuilder {
         miscInfo.append("Prevents Chat Reports: **").append(preventsReports != null ? preventsReports + "**\n" : "N/A**\n");
         miscInfo.append("Enforces Secure Chat: **").append(enforceSecure != null ? enforceSecure + "**\n" : "N/A**\n");
 
+        File image;
         if (icon != null && !icon.isBlank()) {
             image = Base64Decoder.decode(icon.split(",")[1], address + ":" + port + ".png");
         } else {
@@ -177,7 +188,7 @@ public class ServerEmbedBuilder {
                     .setAuthor("ServerSeekerV2", "https://cdn.discordapp.com/app-icons/1300318661168594975/cb3825c45b033454cf027a878e96196c.png")
                     .setThumbnail(message.getAttachments().getFirst().getUrl())
                     .setTitle(address + ":" + port)
-                    .addField("** -- __Version__ -- **", versionInfo, false)
+                    .addField("** -- __Version__ -- **", versionInfo.toString(), false)
                     .addField("** -- __Description__ -- **", description != null ? "```ansi\n" + description + "```" : "```No description found!```", false);
 
             if (!ping) {
@@ -193,7 +204,10 @@ public class ServerEmbedBuilder {
 
         try {
             Files.delete(Path.of(address + ":" + port + ".png"));
-        } catch (IOException ignored) {}
+        } catch (IOException e) {
+            Main.logger.warn("Failed to delete file! {}", address + ":" + port + ".png");
+        }
+
         return future;
     }
 }
