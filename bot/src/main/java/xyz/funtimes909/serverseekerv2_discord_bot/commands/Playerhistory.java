@@ -25,8 +25,8 @@ public class Playerhistory {
                 "history?player=" + event.getOption("player").getAsString() :
                 "history?address=" + event.getOption("address").getAsString();
 
-        JsonArray response = APIUtils.api(query);
-        if (response == null) {
+        JsonArray response = (JsonArray) APIUtils.api(query);
+        if (response == null || !response.isJsonArray()) {
             event.getHook().sendMessage("No results!").queue();
             return;
         }

@@ -28,25 +28,6 @@ public class ButtonInteractionEventListener extends ListenerAdapter {
             executor.execute(() -> Playerhistory.optionSelected(event));
             return;
         }
-
-        switch (event.getComponentId()) {
-            case "PagePrevious":
-                if (command.pointer <= 6 && command.totalRows >= 6) {
-                    command.offset -= 100;
-                    command.pointer = 1;
-                    command.runQuery(false);
-                }
-                executor.execute(() -> command.scrollResults(false, false));
-                break;
-            case "PageNext":
-                if (command.pointer >= 46) {
-                    command.offset += 50;
-                    command.pointer = 1;
-                    command.runQuery(false);
-                }
-                executor.execute(() -> command.scrollResults(false, true));
-                break;
-        }
     }
 
     private static String findField(ButtonInteractionEvent event, int fieldNumber) {

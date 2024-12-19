@@ -1,6 +1,5 @@
 package xyz.funtimes909.serverseekerv2_discord_bot.builders;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -12,8 +11,8 @@ import java.awt.*;
 public class ServerHistoryEmbedBuilder {
     public static MessageEmbed build(String address) {
 
-        JsonArray response = APIUtils.api("history?address=" + address);
-        if (response == null || response.isEmpty()) return null;
+        JsonElement response = APIUtils.api("history?address=" + address);
+        if (response == null || !response.isJsonArray()) return null;
 
         EmbedBuilder embed = new EmbedBuilder()
                 .setAuthor("ServerSeekerV2", "https://discord.gg/WEErxAP8kz", "https://funtimes909.xyz/assets/images/serverseekerv2-icon-cropped.png")

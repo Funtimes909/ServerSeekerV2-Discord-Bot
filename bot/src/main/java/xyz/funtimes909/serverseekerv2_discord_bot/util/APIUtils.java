@@ -1,6 +1,5 @@
 package xyz.funtimes909.serverseekerv2_discord_bot.util;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
@@ -11,7 +10,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public class APIUtils {
-    public static JsonArray api(String query) {
+    public static JsonElement api(String query) {
         System.out.println(Main.apiUrl + query);
         try (HttpClient client = HttpClient.newHttpClient()) {
 
@@ -23,13 +22,8 @@ public class APIUtils {
             HttpResponse<String> response = client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).join();
             if (response.statusCode() == 429) return null;
             System.out.println(response.body());
-            JsonElement json = JsonParser.parseString(response.body());
+            return JsonParser.parseString(response.body());
 
-            if (json instanceof JsonArray) {
-                return (JsonArray) json;
-            } else {
-                return null;
-            }
         }
     }
 }

@@ -1,38 +1,47 @@
 package xyz.funtimes909.serverseekerv2_discord_bot.builders;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import xyz.funtimes909.serverseekerv2_core.util.HTTPUtils;
-import xyz.funtimes909.serverseekerv2_discord_bot.records.ServerEmbed;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SearchEmbedBuilder {
-    public static MessageEmbed parse(List<ServerEmbed> servers, int rowCount, int page) {
+    public static MessageEmbed parse(JsonArray servers, int rowCount, int page) {
         List<MessageEmbed.Field> fields = new ArrayList<>();
         int longestAddress = 0;
 
-        for (ServerEmbed entry : servers) {
-            if (entry.address().length() > longestAddress) longestAddress = entry.address().length();
+        for (JsonElement server : servers) {
+            JsonObject serverJson = server.getAsJsonObject();
+
+            if (serverJson.get("address").getAsString().length() > longestAddress) {
+                longestAddress = serverJson.get("address").getAsString().length();
+            }
         }
 
         int index = 1;
-        for (ServerEmbed entry : servers) {
-            StringBuilder address = new StringBuilder("``").append(entry.address()).append("``");
-            StringBuilder version = new StringBuilder("``").append(entry.version()).append("``");
-            String timestamp = "<t:" + entry.timestamp() + ":R>";
+        for (JsonElement server : servers) {
+            JsonObject entry = server.getAsJsonObject();
 
-            if (entry.country() != null) {
-                address.insert(0, ":flag_" + entry.country().toLowerCase() + ": **:** ");
+            StringBuilder address = new StringBuilder("``").append(entry.get("address").getAsString()).append("``");
+            StringBuilder version = new StringBuilder("``").append(entry.get("version").getAsString()).append("``");
+            String timestamp = "<t:" + entry.get("lastseen") + ":R>";
+
+            if (!entry.get("country").isJsonNull()) {
+                address.insert(0, ":flag_" + entry.get("country").getAsString().toLowerCase() + ": **:** ");
             } else {
-                String primaryResponse = HTTPUtils.run(entry.address());
+                String primaryResponse = HTTPUtils.run(entry.get("address").getAsString());
                 if (primaryResponse != null) {
                     JsonObject parsedPrimaryResponse = JsonParser.parseString(primaryResponse).getAsJsonObject();
-                    if (parsedPrimaryResponse.has("countryCode")) address.insert(0, ":flag_" + parsedPrimaryResponse.get("countryCode").getAsString().toLowerCase() + ": **:** ");
+                    if (parsedPrimaryResponse.has("countryCode")) {
+                        address.insert(0, ":flag_" + parsedPrimaryResponse.get("countryCode").getAsString().toLowerCase() + ": **:** ");
+                    }
                 }
             }
 
