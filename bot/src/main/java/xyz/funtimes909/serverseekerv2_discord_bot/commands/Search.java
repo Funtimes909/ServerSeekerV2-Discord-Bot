@@ -1,6 +1,7 @@
 package xyz.funtimes909.serverseekerv2_discord_bot.commands;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -10,11 +11,16 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
+import xyz.funtimes909.serverseekerv2_core.records.Server;
+import xyz.funtimes909.serverseekerv2_core.util.ServerObjectBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.SearchEmbedBuilder;
+import xyz.funtimes909.serverseekerv2_discord_bot.builders.ServerEmbedBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.APIUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static xyz.funtimes909.serverseekerv2_discord_bot.util.APIUtils.api;
 
 public class Search {
     private final SlashCommandInteractionEvent interaction;
@@ -75,7 +81,7 @@ public class Search {
     }
 
     private void runQuery() {
-        JsonArray response = (JsonArray) APIUtils.api(endpoint + query);
+        JsonArray response = (JsonArray) api(endpoint + query);
 
         if (response == null || !response.isJsonArray()) {
             interaction.getHook().sendMessage("Something went wrong!").queue();
@@ -112,6 +118,24 @@ public class Search {
     }
 
     public void serverSelectedButtonEvent(String address, short port, ButtonInteractionEvent event) {
+        JsonArray response = (JsonArray) APIUtils.api(
+                "servers?address=" +
+                        address +
+                        "&port=" +
+                        port
+        );
 
+        if (response == null) {
+            event.getHook().sendMessage("No results!").queue();
+            return;
+        }
+
+        JsonObject object = response.get(0).getAsJsonObject();
+        Server server = ServerObjectBuilder.buildServerFromApiResponse(object);
+
+        ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server);
+        MessageEmbed embed = embedBuilder.build(false);
+
+        event.getHook().sendMessageEmbeds(embed).queue();
     }
 }

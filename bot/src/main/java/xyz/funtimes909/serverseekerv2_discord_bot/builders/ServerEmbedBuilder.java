@@ -87,7 +87,7 @@ public class ServerEmbedBuilder {
             }
         }
 
-        if (description.contains("§")) {
+        if (description != null && description.contains("§")) {
             System.out.println(description);
             description = PingUtils.parseMOTD(description);
         }
@@ -95,8 +95,6 @@ public class ServerEmbedBuilder {
         addressInfo.append("ASN: **").append(asn != null ? asn + "**\n" : "N/A**\n");
         addressInfo.append("Hostname: **").append(hostname != null ? hostname + "**\n" : "N/A**\n");
         addressInfo.append("Organization: **").append(organization != null ? organization + "**\n" : "N/A**\n");
-
-        if (firstseen == 0) firstseen = System.currentTimeMillis() / 1000;
 
         // Create field for players
         playerInfo.append("Players: **").append(players != null ? players.size() + "/" + maxPlayers : 0).append("**\n");
