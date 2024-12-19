@@ -8,9 +8,9 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import xyz.funtimes909.serverseekerv2_core.records.Server;
 import xyz.funtimes909.serverseekerv2_core.util.ServerObjectBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.SearchEmbedBuilder;
@@ -26,7 +26,8 @@ public class Search {
     private final SlashCommandInteractionEvent interaction;
     private final String endpoint = "servers?";
     private StringBuilder query = new StringBuilder();
-    public int rowCount = 1600;
+    public int rowCount = 100;
+    public int offset = 0;
     public int pointer = 0;
 
     public Search(SlashCommandInteractionEvent event) {
@@ -39,20 +40,14 @@ public class Search {
             return;
         }
 
-        // Build Query
         buildQuery(interaction.getOptions());
-
-        // Run query
-        runQuery();
+        runQuery(true);
     }
 
     public void buildQuery(List<OptionMapping> options) {
         query = new StringBuilder();
 
-        for (OptionMapping option : options) {
-            System.out.println(option.getName());
-        }
-
+        // Tidy this up
         for (OptionMapping option : options) {
             switch (option.getName()) {
                 case "version" -> query.append("version=").append(option.getAsString()).append("&");
@@ -75,12 +70,13 @@ public class Search {
                 case "maxplayers" -> query.append("maxplayers=").append(option.getAsString()).append("&");
             }
         }
-
-        query.append("&limit=5 ");
-        query.deleteCharAt(query.length() - 1);
+        query.append("limit=5&offset=").append(offset);
     }
 
-    private void runQuery() {
+    public void runQuery(boolean firstRun) {
+        query.replace(query.lastIndexOf("="), query.length(), "=" + offset);
+        System.out.println(query);
+
         JsonArray response = (JsonArray) api(endpoint + query);
 
         if (response == null || !response.isJsonArray()) {
@@ -88,12 +84,11 @@ public class Search {
             return;
         }
 
-
-        List<Button> buttons = new ArrayList<>();
+        List<ItemComponent> buttons = new ArrayList<>();
         List<LayoutComponent> pageButtons = new ArrayList<>();
 
         for (int i = 1; i < response.size() + 1; i++) {
-            buttons.add(Button.of(ButtonStyle.SUCCESS, "SearchButton" + i, String.valueOf(i)));
+            buttons.add(Button.success("SearchButton" + i, String.valueOf(i)));
         }
 
         if (rowCount <= 5) {
@@ -102,19 +97,24 @@ public class Search {
         } else if (pointer >= (rowCount - 6)) {
             // Last page, don't let the user scroll forwards anymore
             pageButtons.add(ActionRow.of(buttons));
-            pageButtons.add(ActionRow.of(Button.primary("PagePrevious",Emoji.fromFormatted("U+2B05")), Button.primary("PageNext", Emoji.fromFormatted("U+27A1")).asDisabled()));
+            pageButtons.add(ActionRow.of(Button.primary("SearchPrevious", Emoji.fromFormatted("U+2B05")), Button.primary("SearchNext", Emoji.fromFormatted("U+27A1")).asDisabled()));
         } else if (pointer <= 6) {
             // First page, don't let the user scroll back
             pageButtons.add(ActionRow.of(buttons));
-            pageButtons.add(ActionRow.of(Button.primary("PagePrevious", Emoji.fromFormatted("U+2B05")).asDisabled(), Button.primary("PageNext", Emoji.fromFormatted("U+27A1"))));
+            pageButtons.add(ActionRow.of(Button.primary("SearchPrevious", Emoji.fromFormatted("U+2B05")).asDisabled(), Button.primary("SearchNext", Emoji.fromFormatted("U+27A1"))));
         } else {
             // Normal page, let the user scroll both directions
             pageButtons.add(ActionRow.of(buttons));
-            pageButtons.add(ActionRow.of(Button.primary("PagePrevious", Emoji.fromFormatted("U+2B05")), Button.primary("PageNext", Emoji.fromFormatted("U+27A1"))));
+            pageButtons.add(ActionRow.of(Button.primary("SearchPrevious", Emoji.fromFormatted("U+2B05")), Button.primary("SearchNext", Emoji.fromFormatted("U+27A1"))));
         }
 
         MessageEmbed embed = SearchEmbedBuilder.parse(response, rowCount, (pointer / 5));
-        interaction.getHook().sendMessageEmbeds(embed).addComponents(pageButtons).queue();
+
+        if (firstRun) {
+            interaction.getHook().sendMessageEmbeds(embed).setComponents(pageButtons).queue();
+        } else {
+            interaction.getHook().editOriginalEmbeds(embed).setComponents(pageButtons).queue();
+        }
     }
 
     public void serverSelectedButtonEvent(String address, short port, ButtonInteractionEvent event) {

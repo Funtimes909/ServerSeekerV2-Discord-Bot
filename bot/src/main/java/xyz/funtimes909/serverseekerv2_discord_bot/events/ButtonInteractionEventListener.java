@@ -14,19 +14,35 @@ public class ButtonInteractionEventListener extends ListenerAdapter {
     @Override
     public void onButtonInteraction(ButtonInteractionEvent event) {
         Search command = SlashCommandListener.searchCommands.get(event.getUser().getId());
-        if (event.getComponentId().startsWith("SearchButton") && command == null) {
+        if (event.getComponentId().startsWith("Search") && command == null) {
             return;
         }
 
         event.deferEdit().queue();
 
         if (event.getComponentId().startsWith("SearchButton")) {
-            int button = Integer.parseInt(event.getComponentId().split("SearchButton")[1]);
-            executor.execute(() -> command.serverSelectedButtonEvent(findField(event, button), (short) 25565, event));
+            executor.execute(() -> command.serverSelectedButtonEvent(
+                    findField(event, Integer.parseInt(event.getComponentId().split("SearchButton")[1])),
+                    (short) 25565,
+                    event
+            ));
             return;
         } else if (event.getComponentId().startsWith("PlayerHistory")) {
             executor.execute(() -> Playerhistory.optionSelected(event));
             return;
+        }
+
+        switch (event.getComponentId()) {
+            case "SearchPrevious":
+                command.offset -= 5;
+                command.pointer -= 5;
+                executor.execute(() -> command.runQuery(false));
+                break;
+            case "SearchNext":
+                command.offset += 5;
+                command.pointer += 5;
+                executor.execute(() -> command.runQuery(false));
+                break;
         }
     }
 
@@ -42,6 +58,8 @@ public class ButtonInteractionEventListener extends ListenerAdapter {
                 .get()
                 .getName();
 
-        return fieldName.substring(fieldName.indexOf("`") + 2).replaceAll("``", "").split(" ")[0];
+        return fieldName.substring(fieldName.indexOf("`") + 2)
+                .replaceAll("``", "")
+                .split(" ")[0];
     }
 }
