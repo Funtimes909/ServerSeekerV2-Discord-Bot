@@ -1,6 +1,7 @@
 package xyz.funtimes909.serverseekerv2_discord_bot.commands;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -47,27 +48,12 @@ public class Search {
     public void buildQuery(List<OptionMapping> options) {
         query = new StringBuilder();
 
-        // Tidy this up
         for (OptionMapping option : options) {
             switch (option.getName()) {
-                case "version" -> query.append("version=").append(option.getAsString()).append("&");
-                case "software" -> query.append("software=").append(option.getAsString().toUpperCase()).append("&");
-                case "description" -> query.append("motd=").append(option.getAsString()).append("&");
-                case "country" -> query.append("country=").append(option.getAsString()).append("&");
-                case "asn" -> query.append("asn=").append(option.getAsString()).append("&");
-                case "org" -> query.append("org=").append(option.getAsString()).append("&");
-                case "hostname" -> query.append("hostname=").append(option.getAsString()).append("&");
-                case "icon" -> query.append("icon=").append(option.getAsString()).append("&");
                 case "preventsreports" -> query.append("prevents_reports=").append(option.getAsString()).append("&");
-                case "whitelist" -> query.append("whitelist=").append(option.getAsString()).append("&");
-                case "cracked" -> query.append("cracked=").append(option.getAsString()).append("&");
                 case "enforcessecurechat" -> query.append("enforce_secure_chat=").append(option.getAsString()).append("&");
-                case "empty" -> query.append("empty=").append(option.getAsString()).append("&");
-                case "full" -> query.append("full=").append(option.getAsString()).append("&");
-                case "seenafter" -> query.append("seenafter").append(option.getAsString()).append("&");
-                case "seenbefore" -> query.append("seenbefore").append(option.getAsString()).append("&");
-                case "onlineplayers" -> query.append("onlineplayers=").append(option.getAsString()).append("&");
-                case "maxplayers" -> query.append("maxplayers=").append(option.getAsString()).append("&");
+                case "description" -> query.append("motd=").append(option.getAsString()).append("&");
+                default -> query.append(option.getName()).append("=").append(option.getAsString()).append("&");
             }
         }
         query.append("limit=5&offset=").append(offset);
@@ -75,19 +61,24 @@ public class Search {
 
     public void runQuery(boolean firstRun) {
         query.replace(query.lastIndexOf("="), query.length(), "=" + offset);
-        System.out.println(query);
-
-        JsonArray response = (JsonArray) api(endpoint + query);
+        JsonElement response = api(endpoint + query);
 
         if (response == null || !response.isJsonArray()) {
-            interaction.getHook().sendMessage("Something went wrong!").queue();
+            interaction.getHook().sendMessage("No results!").queue();
+            return;
+        }
+
+        JsonArray array = response.getAsJsonArray();
+
+        if (array.isEmpty()) {
+            interaction.getHook().sendMessage("No results!").queue();
             return;
         }
 
         List<ItemComponent> buttons = new ArrayList<>();
         List<LayoutComponent> pageButtons = new ArrayList<>();
 
-        for (int i = 1; i < response.size() + 1; i++) {
+        for (int i = 1; i < array.size() + 1; i++) {
             buttons.add(Button.success("SearchButton" + i, String.valueOf(i)));
         }
 
@@ -108,7 +99,7 @@ public class Search {
             pageButtons.add(ActionRow.of(Button.primary("SearchPrevious", Emoji.fromFormatted("U+2B05")), Button.primary("SearchNext", Emoji.fromFormatted("U+27A1"))));
         }
 
-        MessageEmbed embed = SearchEmbedBuilder.parse(response, rowCount, (pointer / 5));
+        MessageEmbed embed = SearchEmbedBuilder.parse(array, rowCount, (pointer / 5));
 
         if (firstRun) {
             interaction.getHook().sendMessageEmbeds(embed).setComponents(pageButtons).queue();
