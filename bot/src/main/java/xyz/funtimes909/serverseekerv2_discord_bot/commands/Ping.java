@@ -16,6 +16,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.concurrent.ExecutionException;
 
 public class Ping {
     public static void ping(SlashCommandInteractionEvent event) {
@@ -47,15 +48,19 @@ public class Ping {
             return;
         }
 
-        ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server);
-        MessageEmbed embed = embedBuilder.build(true);
+        try {
+            ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server);
+            MessageEmbed embed = embedBuilder.build(event.getMessageChannel(), true).get();
+            if (embed == null) {
+                event.getHook().sendMessage("Server did not connect!").queue();
+                return;
+            }
 
-        if (embed == null) {
-            GenericErrorEmbed.errorEmbed(event.getMessageChannel(), "Embed is null!");
-            return;
+            event.getHook().sendMessageEmbeds(embed).queue();
+        } catch (InterruptedException | ExecutionException e) {
+            GenericErrorEmbed.errorEmbed(event.getMessageChannel(), e.getMessage());
         }
 
-        event.getHook().sendMessageEmbeds(embed).queue();
         try (Connection conn = ConnectionPool.getConnection()) {
             if (conn != null) {
                 Database.updateServer(conn, server);

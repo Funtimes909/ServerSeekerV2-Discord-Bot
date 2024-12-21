@@ -4,15 +4,24 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.utils.FileUpload;
 import xyz.funtimes909.serverseekerv2_core.records.Mod;
 import xyz.funtimes909.serverseekerv2_core.records.Player;
 import xyz.funtimes909.serverseekerv2_core.records.Server;
 import xyz.funtimes909.serverseekerv2_core.types.ServerType;
 import xyz.funtimes909.serverseekerv2_core.util.HTTPUtils;
+import xyz.funtimes909.serverseekerv2_discord_bot.Main;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.Base64Decoder;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PingUtils;
 
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class ServerEmbedBuilder {
     private final String address;
@@ -20,12 +29,13 @@ public class ServerEmbedBuilder {
     private final ServerType type;
     private String description;
     private final String version;
+    private final String icon;
     private final Integer protocol;
-    private String country;
-    private String asn;
-    private String hostname;
-    private String organization;
-    private long firstseen;
+    private final String country;
+    private final String asn;
+    private final String hostname;
+    private final String organization;
+    private final long firstseen;
     private final long lastseen;
     private final int timesSeen;
     private final Boolean whitelist;
@@ -33,7 +43,6 @@ public class ServerEmbedBuilder {
     private final Boolean cracked;
     private final Boolean preventsReports;
     private final Integer maxPlayers;
-    private final Integer fmlNetworkVersion;
     private final List<Player> players;
     private final List<Mod> mods;
 
@@ -43,6 +52,7 @@ public class ServerEmbedBuilder {
         type = server.getServerType();
         description = server.getMotd();
         version = server.getVersion();
+        icon = server.getIcon();
         protocol = server.getProtocol();
         country = server.getCountry();
         asn = server.getAsn();
@@ -56,45 +66,71 @@ public class ServerEmbedBuilder {
         cracked = server.getCracked();
         preventsReports = server.getPreventsReports();
         maxPlayers = server.getMaxPlayers();
-        fmlNetworkVersion = server.getFmlNetworkVersion();
         players = server.getPlayers();
         mods = server.getMods();
     }
 
-    public MessageEmbed build(boolean ping) {
+    public CompletableFuture<MessageEmbed> build(MessageChannel channel, boolean ping) {
         StringBuilder miscInfo = new StringBuilder();
         StringBuilder addressInfo = new StringBuilder();
         StringBuilder playerInfo = new StringBuilder();
-        StringBuilder softwareInfo = new StringBuilder();
         StringBuilder modInfo = new StringBuilder();
-
-        // Miscellaneous info
-        if (!ping) miscInfo.append("Times Seen: **").append(timesSeen).append("**\n");
-        miscInfo.append("Whitelist: **").append(whitelist != null ? whitelist + "**\n" : "N/A**\n");
-        miscInfo.append("Cracked: **").append(cracked != null ? cracked + "**\n" : "N/A**\n");
-        miscInfo.append("Prevents Chat Reports: **").append(preventsReports != null ? preventsReports + "**\n" : "N/A**\n");
-        miscInfo.append("Enforces Secure Chat: **").append(enforceSecure != null ? enforceSecure + "**\n" : "N/A**\n");
-
-        // Address information
-        if (ping) {
-            String primaryResponse = HTTPUtils.run(address);
-            if (primaryResponse != null) {
-                JsonObject parsedPrimaryResponse = JsonParser.parseString(primaryResponse).getAsJsonObject();
-                if (parsedPrimaryResponse.has("reverse")) hostname = parsedPrimaryResponse.get("reverse").getAsString();
-                if (parsedPrimaryResponse.has("countryCode")) country = parsedPrimaryResponse.get("countryCode").getAsString();
-                if (parsedPrimaryResponse.has("org")) organization = parsedPrimaryResponse.get("org").getAsString();
-                if (parsedPrimaryResponse.has("as")) asn = parsedPrimaryResponse.get("as").getAsString();
-            }
-        }
+        StringBuilder versionInfo = new StringBuilder();
 
         if (description != null && description.contains("§")) {
             System.out.println(description);
             description = PingUtils.parseMOTD(description);
         }
 
-        addressInfo.append("ASN: **").append(asn != null ? asn + "**\n" : "N/A**\n");
-        addressInfo.append("Hostname: **").append(hostname != null ? hostname + "**\n" : "N/A**\n");
-        addressInfo.append("Organization: **").append(organization != null ? organization + "**\n" : "N/A**\n");
+        if (Character.isDigit(version.charAt(0)) && type != null) {
+            versionInfo.append(type.name().charAt(0))
+                    .append(type.name().substring(1).toLowerCase())
+                    .append(" ")
+                    .append(version)
+                    .append(" (")
+                    .append(protocol)
+                    .append(")");
+        } else {
+            versionInfo.append(version)
+                    .append(" (")
+                    .append(protocol)
+                    .append(")");
+        }
+
+        String timestamps =
+                "First Seen: <t:" + firstseen + ":R>\n" +
+                "Last Seen: <t:" + lastseen + ":R>";
+
+        // Address information
+        if (ping) {
+            String response = HTTPUtils.run(address);
+            if (response != null) {
+                JsonObject parsed = JsonParser.parseString(response).getAsJsonObject();
+
+                addressInfo.append(parsed.get("countryCode").getAsString().isBlank() ?
+                        "Country: **N/A** \n" :
+                        "Country: **" + parsed.get("countryCode").getAsString() + "**\n");
+
+                addressInfo.append(parsed.get("reverse").getAsString().isBlank() ?
+                        "Hostname: **N/A** \n" :
+                        "Hostname: **" + parsed.get("reverse").getAsString() + "**\n");
+
+                addressInfo.append(parsed.get("org").getAsString().isBlank() ?
+                        "Organization: **N/A** \n" :
+                        "Organization: **" + parsed.get("org").getAsString() + "**\n");
+
+                addressInfo.append(parsed.get("as").getAsString().isBlank() ?
+                        "ASN: **N/A**" :
+                        "ASN: **" + parsed.get("as").getAsString() + "**");
+            }
+        } else {
+            addressInfo.append("Country: **").append(country != null ?
+                    country + " :flag_" + country.toLowerCase() + ": \n" :
+                    "No country information available!").append("**\n");
+            addressInfo.append("Hostname: **").append(hostname != null ? hostname + "**\n" : "N/A**\n");
+            addressInfo.append("Organization: **").append(organization != null ? organization + "**\n" : "N/A**\n");
+            addressInfo.append("ASN: **").append(asn != null ? asn + "**" : "N/A**");
+        }
 
         // Create field for players
         playerInfo.append("Players: **").append(players != null ? players.size() + "/" + maxPlayers : 0).append("**\n");
@@ -130,32 +166,48 @@ public class ServerEmbedBuilder {
             modInfo.append("```");
         }
 
-        softwareInfo.append("Server Type: **").append(type != null ? type.name() + "**\n" : "N/A**\n");
-        if (fmlNetworkVersion != null && fmlNetworkVersion != 0) {
-            softwareInfo.append("Forge: **").append("true**\n");
-            softwareInfo.append("Forge Version: **").append(fmlNetworkVersion).append("**\n");
+        // Miscellaneous info
+        if (!ping) miscInfo.append("Times Seen: **").append(timesSeen).append("**\n");
+        miscInfo.append("Whitelist: **").append(whitelist != null ? whitelist + "**\n" : "N/A**\n");
+        miscInfo.append("Cracked: **").append(cracked != null ? cracked + "**\n" : "N/A**\n");
+        miscInfo.append("Prevents Chat Reports: **").append(preventsReports != null ? preventsReports + "**\n" : "N/A**\n");
+        miscInfo.append("Enforces Secure Chat: **").append(enforceSecure != null ? enforceSecure + "**\n" : "N/A**\n");
+
+        File image;
+        if (icon != null && !icon.isBlank()) {
+            image = Base64Decoder.decode(icon.split(",")[1], address + ":" + port + ".png");
+        } else {
+            image = new File("default_icon.png");
         }
 
-        // Build server information embed
-        EmbedBuilder embed = new EmbedBuilder()
-                .setColor(new Color(0, 255, 0))
-                .setAuthor("ServerSeekerV2", "https://cdn.discordapp.com/app-icons/1300318661168594975/cb3825c45b033454cf027a878e96196c.png?size=512")
-                .setThumbnail("https://funtimes909.xyz/avatar-gif")
-                .setTitle(address + ":" + port)
-                .addField("** -- __Version__ -- **", version + " (" + protocol + ")", false)
-                .addField("** -- __Description__ -- **", description != null ? "```ansi\n" + description + "```" : "```No description found!```", false);
+        // Send icon to discord and use that attachment link as icon
+        CompletableFuture<MessageEmbed> future = new CompletableFuture<>();
+        channel.sendFiles(FileUpload.fromData(image, address + ":" + port + ".png")).queue(message -> {
+            EmbedBuilder embed = new EmbedBuilder()
+                    .setColor(new Color(0, 255, 0))
+                    .setAuthor("ServerSeekerV2", "https://cdn.discordapp.com/app-icons/1300318661168594975/cb3825c45b033454cf027a878e96196c.png?size=512")
+                    .setThumbnail(message.getAttachments().getFirst().getUrl())
+                    .setTitle(address + ":" + port)
+                    .addField("** -- __Version__ -- **", versionInfo.toString(), false)
+                    .addField("** -- __Description__ -- **", description != null ? "```ansi\n" + description + "```" : "```No description found!```", false);
 
-        if (!ping) {
-            embed.addField("** -- __First Seen__ -- **", "<t:" + firstseen + ":R>", false);
-            embed.addField("** -- __Last Seen__ -- **", "<t:" + lastseen + ":R>", false);
+            if (!ping) {
+                embed.addField("** -- __Timestamps__ -- **", timestamps, false);
+            }
+
+            embed.addField("** -- __Miscellaneous__ -- **", miscInfo.toString(), false);
+            embed.addField("** -- __Players__ -- **",  playerInfo.toString(), false);
+            if (mods != null && !mods.isEmpty()) embed.addField("** -- __Mods__ -- **",  modInfo.toString(), false);
+            embed.addField("** -- __Address Information__ -- **", addressInfo.toString(), false);
+            future.complete(embed.build());
+        });
+
+        try {
+            Files.delete(Path.of(address + ":" + port + ".png"));
+        } catch (IOException e) {
+            Main.logger.warn("Failed to delete file! {}", address + ":" + port + ".png");
         }
 
-        embed.addField("** -- __Country__ -- **", country != null ? ":flag_" + country.toLowerCase() + ": " + country : ":x: No Country Information", false);
-        embed.addField("** -- __Server Software__ -- **", softwareInfo.toString(), false);
-        embed.addField("** -- __Miscellaneous__ -- **", miscInfo.toString(), false);
-        embed.addField("** -- __Players__ -- **",  playerInfo.toString(), false);
-        if (mods != null && !mods.isEmpty()) embed.addField("** -- __Mods__ -- **",  modInfo.toString(), false);
-        embed.addField("** -- __Address Information__ -- **", addressInfo.toString(), false);
-        return embed.build();
+        return future;
     }
 }

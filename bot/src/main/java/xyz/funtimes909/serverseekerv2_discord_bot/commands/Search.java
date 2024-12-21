@@ -17,11 +17,12 @@ import xyz.funtimes909.serverseekerv2_core.util.ServerObjectBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.SearchEmbedBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.ServerEmbedBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.APIUtils;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.GenericErrorEmbed;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static xyz.funtimes909.serverseekerv2_discord_bot.util.APIUtils.api;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 public class Search {
     private final SlashCommandInteractionEvent interaction;
@@ -61,7 +62,7 @@ public class Search {
 
     public void runQuery(boolean firstRun) {
         query.replace(query.lastIndexOf("="), query.length(), "=" + offset);
-        JsonElement response = api(endpoint + query);
+        JsonElement response = APIUtils.api(endpoint + query);
 
         if (response == null || !response.isJsonArray()) {
             interaction.getHook().sendMessage("No results!").queue();
@@ -101,6 +102,7 @@ public class Search {
 
         MessageEmbed embed = SearchEmbedBuilder.parse(array, rowCount, (pointer / 5));
 
+        // Send embed, update if already sent
         if (firstRun) {
             interaction.getHook().sendMessageEmbeds(embed).setComponents(pageButtons).queue();
         } else {
@@ -124,8 +126,12 @@ public class Search {
         JsonObject object = response.get(0).getAsJsonObject();
         Server server = ServerObjectBuilder.buildServerFromApiResponse(object);
         ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server);
-        MessageEmbed embed = embedBuilder.build(false);
+        CompletableFuture<MessageEmbed> embed = embedBuilder.build(event.getChannel(), false);
 
-        event.getHook().sendMessageEmbeds(embed).queue();
+        try {
+            event.getHook().sendMessageEmbeds(embed.get()).queue();
+        } catch (ExecutionException | InterruptedException e) {
+            GenericErrorEmbed.errorEmbed(event.getChannel(), e.getMessage());
+        }
     }
 }

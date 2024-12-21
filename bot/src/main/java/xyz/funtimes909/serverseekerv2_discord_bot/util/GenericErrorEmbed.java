@@ -14,7 +14,7 @@ public class GenericErrorEmbed {
         if (channel != null) {
             MessageEmbed embed = new EmbedBuilder()
                     .setColor(new Color(0xFF0000))
-                    .setTitle("Fatal error occured!!")
+                    .setTitle("Fatal error occurred!")
                     .addField("Error Message", error, false)
                     .build();
 
