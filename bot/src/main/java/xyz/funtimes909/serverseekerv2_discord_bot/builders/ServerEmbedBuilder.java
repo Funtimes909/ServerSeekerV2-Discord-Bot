@@ -37,7 +37,6 @@ public class ServerEmbedBuilder {
     private final String organization;
     private final long firstseen;
     private final long lastseen;
-    private final int timesSeen;
     private final Boolean whitelist;
     private final Boolean enforceSecure;
     private final Boolean cracked;
@@ -60,7 +59,6 @@ public class ServerEmbedBuilder {
         organization = server.getOrganization();
         firstseen = server.getFirstSeen();
         lastseen = server.getLastSeen();
-        timesSeen = server.getTimesSeen();
         whitelist = server.getWhitelist();
         enforceSecure = server.getEnforceSecure();
         cracked = server.getCracked();
@@ -78,7 +76,6 @@ public class ServerEmbedBuilder {
         StringBuilder versionInfo = new StringBuilder();
 
         if (description != null && description.contains("§")) {
-            System.out.println(description);
             description = PingUtils.parseMOTD(description);
         }
 
@@ -109,7 +106,7 @@ public class ServerEmbedBuilder {
 
                 addressInfo.append(parsed.get("countryCode").getAsString().isBlank() ?
                         "Country: **N/A** \n" :
-                        "Country: **" + parsed.get("countryCode").getAsString() + "**\n");
+                        "Country: **" + parsed.get("countryCode").getAsString() + " :flag_" + country.toLowerCase() + ":**\n");
 
                 addressInfo.append(parsed.get("reverse").getAsString().isBlank() ?
                         "Hostname: **N/A** \n" :
@@ -125,8 +122,8 @@ public class ServerEmbedBuilder {
             }
         } else {
             addressInfo.append("Country: **").append(country != null ?
-                    country + " :flag_" + country.toLowerCase() + ": \n" :
-                    "No country information available!").append("**\n");
+                    country + " :flag_" + country.toLowerCase() + ":" :
+                    "N/A").append("**\n");
             addressInfo.append("Hostname: **").append(hostname != null ? hostname + "**\n" : "N/A**\n");
             addressInfo.append("Organization: **").append(organization != null ? organization + "**\n" : "N/A**\n");
             addressInfo.append("ASN: **").append(asn != null ? asn + "**" : "N/A**");
@@ -167,7 +164,6 @@ public class ServerEmbedBuilder {
         }
 
         // Miscellaneous info
-        if (!ping) miscInfo.append("Times Seen: **").append(timesSeen).append("**\n");
         miscInfo.append("Whitelist: **").append(whitelist != null ? whitelist + "**\n" : "N/A**\n");
         miscInfo.append("Cracked: **").append(cracked != null ? cracked + "**\n" : "N/A**\n");
         miscInfo.append("Prevents Chat Reports: **").append(preventsReports != null ? preventsReports + "**\n" : "N/A**\n");
