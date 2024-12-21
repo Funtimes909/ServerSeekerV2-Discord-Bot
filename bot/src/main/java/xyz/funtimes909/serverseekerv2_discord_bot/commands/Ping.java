@@ -3,6 +3,7 @@ package xyz.funtimes909.serverseekerv2_discord_bot.commands;
 import com.google.gson.JsonParser;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import xyz.funtimes909.serverseekerv2_core.database.Database;
 import xyz.funtimes909.serverseekerv2_core.records.Server;
 import xyz.funtimes909.serverseekerv2_core.util.ServerObjectBuilder;
@@ -50,14 +51,15 @@ public class Ping {
 
         try {
             ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server);
-            MessageEmbed embed = embedBuilder.build(event.getMessageChannel(), true).get();
+            MessageCreateAction embed = embedBuilder.build(event.getMessageChannel(), true);
+
             if (embed == null) {
                 event.getHook().sendMessage("Server did not connect!").queue();
                 return;
             }
 
-            event.getHook().sendMessageEmbeds(embed).queue();
-        } catch (InterruptedException | ExecutionException e) {
+            embed.queue();
+        } catch (IOException e) {
             GenericErrorEmbed.errorEmbed(event.getMessageChannel(), e.getMessage());
         }
 

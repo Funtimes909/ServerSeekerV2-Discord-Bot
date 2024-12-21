@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import xyz.funtimes909.serverseekerv2_core.records.Server;
 import xyz.funtimes909.serverseekerv2_core.util.ServerObjectBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.SearchEmbedBuilder;
@@ -19,6 +20,7 @@ import xyz.funtimes909.serverseekerv2_discord_bot.builders.ServerEmbedBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.APIUtils;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.GenericErrorEmbed;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -123,14 +125,14 @@ public class Search {
             return;
         }
 
-        JsonObject object = response.get(0).getAsJsonObject();
-        Server server = ServerObjectBuilder.buildServerFromApiResponse(object);
-        ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server);
-        CompletableFuture<MessageEmbed> embed = embedBuilder.build(event.getChannel(), false);
-
         try {
-            event.getHook().sendMessageEmbeds(embed.get()).queue();
-        } catch (ExecutionException | InterruptedException e) {
+            JsonObject object = response.get(0).getAsJsonObject();
+            Server server = ServerObjectBuilder.buildServerFromApiResponse(object);
+            ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server);
+            MessageCreateAction embed = embedBuilder.build(event.getChannel(), false);
+
+            embed.queue();
+        } catch (IOException e) {
             GenericErrorEmbed.errorEmbed(event.getChannel(), e.getMessage());
         }
     }

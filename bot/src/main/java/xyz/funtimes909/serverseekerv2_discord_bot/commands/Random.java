@@ -4,12 +4,14 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import xyz.funtimes909.serverseekerv2_core.records.Server;
 import xyz.funtimes909.serverseekerv2_core.util.ServerObjectBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.ServerEmbedBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.APIUtils;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.GenericErrorEmbed;
 
+import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -22,19 +24,19 @@ public class Random {
             return;
         }
 
-        JsonObject object = response.getAsJsonObject();
-        Server server = ServerObjectBuilder.buildServerFromApiResponse(object);
-        ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server);
-        CompletableFuture<MessageEmbed> embed = embedBuilder.build(event.getChannel(), false);
-
-        if (embed == null) {
-            event.getHook().sendMessage("No results!").queue();
-            return;
-        }
-
         try {
-            event.getHook().sendMessageEmbeds(embed.get()).queue();
-        } catch (ExecutionException | InterruptedException e) {
+            JsonObject object = response.getAsJsonObject();
+            Server server = ServerObjectBuilder.buildServerFromApiResponse(object);
+            ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server);
+            MessageCreateAction embed = embedBuilder.build(event.getChannel(), false);
+
+            if (embed == null) {
+                event.getHook().sendMessage("No results!").queue();
+                return;
+            }
+
+            embed.queue();
+        } catch (IOException e) {
             GenericErrorEmbed.errorEmbed(event.getChannel(), e.getMessage());
         }
     }

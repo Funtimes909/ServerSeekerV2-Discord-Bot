@@ -5,6 +5,7 @@ import com.google.gson.JsonParser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import xyz.funtimes909.serverseekerv2_core.records.Mod;
 import xyz.funtimes909.serverseekerv2_core.records.Player;
@@ -20,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -68,7 +70,7 @@ public class ServerEmbedBuilder {
         mods = server.getMods();
     }
 
-    public CompletableFuture<MessageEmbed> build(MessageChannel channel, boolean ping) {
+    public MessageCreateAction build(MessageChannel channel, boolean ping) throws IOException {
         StringBuilder miscInfo = new StringBuilder();
         StringBuilder addressInfo = new StringBuilder();
         StringBuilder playerInfo = new StringBuilder();
@@ -169,41 +171,32 @@ public class ServerEmbedBuilder {
         miscInfo.append("Prevents Chat Reports: **").append(preventsReports != null ? preventsReports + "**\n" : "N/A**\n");
         miscInfo.append("Enforces Secure Chat: **").append(enforceSecure != null ? enforceSecure + "**\n" : "N/A**\n");
 
-        File image;
+        byte[] image;
         if (icon != null && !icon.isBlank()) {
-            image = Base64Decoder.decode(icon.split(",")[1], address + ":" + port + ".png");
+            image = Base64.getDecoder().decode(icon.split(",")[1]);
         } else {
-            image = new File("default_icon.png");
+            image = Files.readAllBytes(new File("default_icon.png").toPath());
         }
 
         // Send icon to discord and use that attachment link as icon
-        CompletableFuture<MessageEmbed> future = new CompletableFuture<>();
-        channel.sendFiles(FileUpload.fromData(image, address + ":" + port + ".png")).queue(message -> {
-            EmbedBuilder embed = new EmbedBuilder()
-                    .setColor(new Color(0, 255, 0))
-                    .setAuthor("ServerSeekerV2", "https://cdn.discordapp.com/app-icons/1300318661168594975/cb3825c45b033454cf027a878e96196c.png?size=512")
-                    .setThumbnail(message.getAttachments().getFirst().getUrl())
-                    .setTitle(address + ":" + port)
-                    .addField("** -- __Version__ -- **", versionInfo.toString(), false)
-                    .addField("** -- __Description__ -- **", description != null ? "```ansi\n" + description + "```" : "```No description found!```", false);
+        EmbedBuilder embed = new EmbedBuilder()
+                .setColor(new Color(0, 255, 0))
+                .setAuthor("ServerSeekerV2", "https://cdn.discordapp.com/app-icons/1300318661168594975/cb3825c45b033454cf027a878e96196c.png?size=512")
+                .setThumbnail("attachment://icon.png") // The icon file
+                .setTitle(address + ":" + port)
+                .addField("** -- __Version__ -- **", versionInfo.toString(), false)
+                .addField("** -- __Description__ -- **", description != null ? "```ansi\n" + description + "```" : "```No description found!```", false);
 
-            if (!ping) {
-                embed.addField("** -- __Timestamps__ -- **", timestamps, false);
-            }
-
-            embed.addField("** -- __Miscellaneous__ -- **", miscInfo.toString(), false);
-            embed.addField("** -- __Players__ -- **",  playerInfo.toString(), false);
-            if (mods != null && !mods.isEmpty()) embed.addField("** -- __Mods__ -- **",  modInfo.toString(), false);
-            embed.addField("** -- __Address Information__ -- **", addressInfo.toString(), false);
-            future.complete(embed.build());
-        });
-
-        try {
-            Files.delete(Path.of(address + ":" + port + ".png"));
-        } catch (IOException e) {
-            Main.logger.warn("Failed to delete file! {}", address + ":" + port + ".png");
+        if (!ping) {
+            embed.addField("** -- __Timestamps__ -- **", timestamps, false);
         }
 
-        return future;
+        embed.addField("** -- __Miscellaneous__ -- **", miscInfo.toString(), false);
+        embed.addField("** -- __Players__ -- **",  playerInfo.toString(), false);
+        if (mods != null && !mods.isEmpty()) embed.addField("** -- __Mods__ -- **",  modInfo.toString(), false);
+        embed.addField("** -- __Address Information__ -- **", addressInfo.toString(), false);
+
+
+        return channel.sendFiles(FileUpload.fromData(image, "icon.png")).setEmbeds(embed.build());
     }
 }
