@@ -1,7 +1,6 @@
 package xyz.funtimes909.serverseekerv2_discord_bot.commands;
 
 import com.google.gson.JsonParser;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import xyz.funtimes909.serverseekerv2_core.database.Database;
@@ -17,7 +16,6 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.concurrent.ExecutionException;
 
 public class Ping {
     public static void ping(SlashCommandInteractionEvent event) {

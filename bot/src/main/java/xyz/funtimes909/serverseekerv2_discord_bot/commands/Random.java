@@ -2,7 +2,6 @@ package xyz.funtimes909.serverseekerv2_discord_bot.commands;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import xyz.funtimes909.serverseekerv2_core.records.Server;
@@ -12,8 +11,6 @@ import xyz.funtimes909.serverseekerv2_discord_bot.util.APIUtils;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.GenericErrorEmbed;
 
 import java.io.IOException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 public class Random {
     public static void random(SlashCommandInteractionEvent event) {

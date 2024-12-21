@@ -3,7 +3,6 @@ package xyz.funtimes909.serverseekerv2_discord_bot.builders;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -12,18 +11,14 @@ import xyz.funtimes909.serverseekerv2_core.records.Player;
 import xyz.funtimes909.serverseekerv2_core.records.Server;
 import xyz.funtimes909.serverseekerv2_core.types.ServerType;
 import xyz.funtimes909.serverseekerv2_core.util.HTTPUtils;
-import xyz.funtimes909.serverseekerv2_discord_bot.Main;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.Base64Decoder;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PingUtils;
 
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Base64;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 public class ServerEmbedBuilder {
     private final String address;

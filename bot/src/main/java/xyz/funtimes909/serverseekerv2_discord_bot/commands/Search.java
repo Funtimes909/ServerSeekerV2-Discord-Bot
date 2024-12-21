@@ -23,8 +23,6 @@ import xyz.funtimes909.serverseekerv2_discord_bot.util.GenericErrorEmbed;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 public class Search {
     private final SlashCommandInteractionEvent interaction;

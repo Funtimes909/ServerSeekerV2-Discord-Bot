@@ -1,21 +1,14 @@
 package xyz.funtimes909.serverseekerv2_discord_bot.commands;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.APIUtils;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.ConnectionPool;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.GenericErrorEmbed;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PermissionsManager;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.Inet4Address;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.regex.Pattern;
 
 public class Takedown {
