@@ -9,19 +9,21 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import xyz.funtimes909.serverseekerv2_core.util.HTTPUtils;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class SearchEmbedBuilder {
     public static MessageEmbed parse(JsonArray servers, int rowCount, int page) {
-        List<MessageEmbed.Field> fields = new ArrayList<>();
+        EmbedBuilder embed = new EmbedBuilder()
+                .setColor(new Color(0, 255, 0))
+                .setTitle("Page: " + page + " (Total Results: " + rowCount + ")")
+                .setAuthor("ServerSeekerV2", "https://discord.gg/WEErxAP8kz", "https://funtimes909.xyz/assets/images/serverseekerv2-icon-cropped.png")
+                .setFooter("Funtimes909", "https://funtimes909.xyz/avatar-gif");
+
         int longestAddress = 0;
+        for (JsonElement entry : servers) {
+            JsonObject object = entry.getAsJsonObject();
 
-        for (JsonElement server : servers) {
-            JsonObject serverJson = server.getAsJsonObject();
-
-            if (serverJson.get("address").getAsString().length() > longestAddress) {
-                longestAddress = serverJson.get("address").getAsString().length();
+            if (object.get("address").getAsString().length() > longestAddress) {
+                longestAddress = object.get("address").getAsString().length();
             }
         }
 
@@ -34,13 +36,19 @@ public class SearchEmbedBuilder {
             String timestamp = "<t:" + entry.get("lastseen") + ":R>";
 
             if (!entry.get("country").isJsonNull()) {
-                address.insert(0, ":flag_" + entry.get("country").getAsString().toLowerCase() + ": **:** ");
+                address.insert(0, ":flag_" + entry.get("country").getAsString().toLowerCase() + ": : ");
             } else {
                 String primaryResponse = HTTPUtils.run(entry.get("address").getAsString());
                 if (primaryResponse != null) {
                     JsonObject parsedPrimaryResponse = JsonParser.parseString(primaryResponse).getAsJsonObject();
                     if (parsedPrimaryResponse.has("countryCode")) {
-                        address.insert(0, ":flag_" + parsedPrimaryResponse.get("countryCode").getAsString().toLowerCase() + ": **:** ");
+                        address.insert(
+                                0,
+                                ":flag_" + parsedPrimaryResponse.get("countryCode")
+                                        .getAsString()
+                                        .toLowerCase() +
+                                        ": : "
+                        );
                     }
                 }
             }
@@ -50,28 +58,17 @@ public class SearchEmbedBuilder {
                 version.replace(version.length() - 2, version.length(), "``");
             }
 
-            // Make everything the same length
             while (version.length() < 18) {
                 version.insert(version.length() - 2, " ");
             }
 
-            while (address.length() < longestAddress + 20) {
+            while (address.length() < longestAddress + 18) {
                 address.insert(address.length() - 2, " ");
             }
 
-            MessageEmbed.Field addressField = new MessageEmbed.Field(index + ". " + address + " - " + version + " - " + timestamp, "_ _", false);
-            fields.add(addressField);
-            index++;
-        }
-
-        EmbedBuilder embed = new EmbedBuilder()
-                .setColor(new Color(0, 255, 0))
-                .setTitle("Page: " + page + " (Total Results: " + rowCount + ")")
-                .setAuthor("ServerSeekerV2", "https://discord.gg/WEErxAP8kz", "https://funtimes909.xyz/assets/images/serverseekerv2-icon-cropped.png")
-                .setFooter("Funtimes909", "https://funtimes909.xyz/avatar-gif");
-
-        for (MessageEmbed.Field field : fields) {
+            MessageEmbed.Field field = new MessageEmbed.Field(index + ". " + address + " - " + version + " - " + timestamp, "_ _", false);
             embed.addField(field);
+            index++;
         }
 
         return embed.build();

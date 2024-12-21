@@ -10,7 +10,6 @@ import java.awt.*;
 
 public class ServerHistoryEmbedBuilder {
     public static MessageEmbed build(String address) {
-
         JsonElement response = APIUtils.api("history?address=" + address);
         if (response == null || !response.isJsonArray()) return null;
 
@@ -20,22 +19,20 @@ public class ServerHistoryEmbedBuilder {
                 .setFooter("Funtimes909", "https://funtimes909.xyz/avatar-gif")
                 .setColor(new Color(0, 255, 0));
 
-        StringBuilder stringBuilder = new StringBuilder();
-
         for (JsonElement element : response.getAsJsonArray()) {
             JsonObject object = element.getAsJsonObject();
 
             StringBuilder ip = new StringBuilder(object.get("playername"). getAsString());
             ip.setLength(16);
 
-            stringBuilder.append("**``")
-                    .append(ip)
-                    .append("``** <t:")
-                    .append(object.get("lastseen").getAsString())
-                    .append(":R>\n");
-        }
+            String entry = "**``" +
+                    ip +
+                    "``** <t:" +
+                    object.get("lastseen").getAsString() +
+                    ":R>\n";
 
-        embed.addField("_ _", stringBuilder.toString(), false);
+            embed.addField("_ _", entry, false);
+        }
 
         return embed.build();
     }
