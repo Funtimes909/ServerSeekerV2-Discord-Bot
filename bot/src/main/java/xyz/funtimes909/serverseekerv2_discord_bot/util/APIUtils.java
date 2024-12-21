@@ -16,12 +16,11 @@ public class APIUtils {
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(Main.apiUrl + query))
-                    .header("x-auth-key",  Main.apiToken)
+                    .header("X-Auth-Key",  Main.apiToken)
                     .build();
 
             HttpResponse<String> response = client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).join();
             if (response.statusCode() == 429) return null;
-            System.out.println(response.body());
             return JsonParser.parseString(response.body());
 
         }

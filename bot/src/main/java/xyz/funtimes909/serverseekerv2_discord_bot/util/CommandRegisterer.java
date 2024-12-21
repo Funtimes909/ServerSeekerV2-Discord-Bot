@@ -33,7 +33,6 @@ public class CommandRegisterer {
     public static void registerCommands(JDA client) {
         client.updateCommands().addCommands(
                 Commands.slash("search", "Searches for servers with advanced filters")
-                        .addOption(OptionType.STRING, "player", "Search for servers that a player is currently playing on")
                         .addOption(OptionType.STRING, "version", "Search for servers using a specific minecraft version")
                         .addOption(OptionType.STRING, "description", "Search for servers with a specific description")
                         .addOption(OptionType.INTEGER, "playercount", "Search for servers with a specific amount of players online")
@@ -52,8 +51,6 @@ public class CommandRegisterer {
                         .addOption(OptionType.BOOLEAN, "full", "Search for servers with a full player count")
                         .addOption(OptionType.BOOLEAN, "empty", "Search for servers that have no players online")
                         .addOption(OptionType.INTEGER, "protocol", "Search for servers using a specific protocol")
-                        .addOption(OptionType.BOOLEAN, "forge", "Search for servers running Forge")
-                        .addOption(OptionType.INTEGER, "forgeversion", "Search for servers running a specific FML Network version")
                         .addOption(OptionType.STRING, "hostname", "Reverse DNS name of the server")
                         .addOption(OptionType.STRING, "country", "Search for servers running in a specific country", false, true)
                         .addOptions(new OptionData(OptionType.STRING, "software", "Searches for servers running a specific server software", false)
