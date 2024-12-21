@@ -56,7 +56,7 @@ public class CommandRegisterer {
                         .addOptions(new OptionData(OptionType.STRING, "software", "Searches for servers running a specific server software", false)
                                 .addChoice("Java", "JAVA")
                                 .addChoice("Neoforge", "NEOFORGE")
-                                .addChoice("Forge", "FORGE")
+                                .addChoice("Forge", "LEXFORGE")
                                 .addChoice("Paper", "PAPER")
                                 .addChoice("Spigot", "SPIGOT")
                                 .addChoice("Bukkit", "BUKKIT")
