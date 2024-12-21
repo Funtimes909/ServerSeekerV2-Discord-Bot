@@ -21,6 +21,11 @@ public class Playerhistory {
             return;
         }
 
+        if (event.getOption("player") == null && event.getOption("address") == null) {
+            event.getHook().sendMessage("Please select an option!").queue();
+            return;
+        }
+
         String query = event.getOption("player") != null ?
                 "history?player=" + event.getOption("player").getAsString() :
                 "history?address=" + event.getOption("address").getAsString();
@@ -48,7 +53,7 @@ public class Playerhistory {
             buttons.add(Button.success("PlayerHistory" + i, String.valueOf(i)));
         }
 
-        // Add buttons
+        // Add buttons to message
         if (results.size() < 5) {
             event.getHook().sendMessageEmbeds(embed).addActionRow(buttons).queue();
         } else {
@@ -60,8 +65,8 @@ public class Playerhistory {
     }
 
     // Show servers full playerhistory
-    public static void optionSelected(ButtonInteractionEvent event) {
-        MessageEmbed embed = ServerHistoryEmbedBuilder.build("");
+    public static void optionSelected(String address, ButtonInteractionEvent event) {
+        MessageEmbed embed = ServerHistoryEmbedBuilder.build(address);
         if (embed == null) {
             event.getHook().sendMessage("No results!").queue();
             return;

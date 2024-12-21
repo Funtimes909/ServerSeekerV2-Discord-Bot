@@ -108,7 +108,7 @@ public class Search {
         }
     }
 
-    public void serverSelectedButtonEvent(String address, short port, ButtonInteractionEvent event) {
+    public void optionSelected(String address, short port, ButtonInteractionEvent event) {
         JsonArray response = (JsonArray) APIUtils.api(
                 "servers?address=" +
                         address +
@@ -123,7 +123,6 @@ public class Search {
 
         JsonObject object = response.get(0).getAsJsonObject();
         Server server = ServerObjectBuilder.buildServerFromApiResponse(object);
-
         ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server);
         MessageEmbed embed = embedBuilder.build(false);
 

@@ -13,53 +13,60 @@ public class ButtonInteractionEventListener extends ListenerAdapter {
 
     @Override
     public void onButtonInteraction(ButtonInteractionEvent event) {
-        Search command = SlashCommandListener.searchCommands.get(event.getUser().getId());
-        if (event.getComponentId().startsWith("Search") && command == null) {
+        Search searchCommand = SlashCommandListener.searchCommands.get(event.getUser().getId());
+        if (event.getComponentId().startsWith("Search") && searchCommand == null) {
             return;
         }
 
         event.deferEdit().queue();
 
+        // Handle selection buttons for searches and playerhistory
         if (event.getComponentId().startsWith("SearchButton")) {
-            executor.execute(() -> command.serverSelectedButtonEvent(
-                    findField(event, Integer.parseInt(event.getComponentId().split("SearchButton")[1])),
+            executor.execute(() ->
+                    searchCommand.optionSelected(
+                    getAddress(event, Integer.parseInt(event.getComponentId().split("SearchButton")[1])),
                     (short) 25565,
                     event
             ));
+
             return;
         } else if (event.getComponentId().startsWith("PlayerHistory")) {
-            executor.execute(() -> Playerhistory.optionSelected(event));
+            executor.execute(() ->
+                    Playerhistory.optionSelected(getAddress(event,
+                            Integer.parseInt(
+                                    event.getComponentId().split("PlayerHistory")[1]
+                            )), event
+                    ));
+
             return;
         }
 
         switch (event.getComponentId()) {
             case "SearchPrevious":
-                command.offset -= 5;
-                command.pointer -= 5;
-                executor.execute(() -> command.runQuery(false));
+                searchCommand.offset -= 5;
+                searchCommand.pointer -= 5;
+                executor.execute(() -> searchCommand.runQuery(false));
                 break;
             case "SearchNext":
-                command.offset += 5;
-                command.pointer += 5;
-                executor.execute(() -> command.runQuery(false));
+                searchCommand.offset += 5;
+                searchCommand.pointer += 5;
+                executor.execute(() -> searchCommand.runQuery(false));
                 break;
         }
     }
 
-    private static String findField(ButtonInteractionEvent event, int fieldNumber) {
-        String fieldName = event.getMessage()
+    private static String getAddress(ButtonInteractionEvent event, int fieldNumber) {
+        return event.getMessage()
                 .getEmbeds()
                 .getFirst()
                 .getFields()
                 .stream()
-                .filter(index -> index.getName()
-                .startsWith(String.valueOf(fieldNumber)))
+                .filter(i -> i.getName().startsWith(String.valueOf(fieldNumber)))
                 .findFirst()
                 .get()
-                .getName();
-
-        return fieldName.substring(fieldName.indexOf("`") + 2)
-                .replaceAll("``", "")
-                .split(" ")[0];
+                .getName()
+                .split("``")[1]
+                .split("``")[0]
+                .replaceAll(" ", "");
     }
 }
