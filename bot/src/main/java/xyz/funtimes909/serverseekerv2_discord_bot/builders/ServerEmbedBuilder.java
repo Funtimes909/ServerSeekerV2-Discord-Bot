@@ -185,7 +185,7 @@ public class ServerEmbedBuilder {
         channel.sendFiles(FileUpload.fromData(image, address + ":" + port + ".png")).queue(message -> {
             EmbedBuilder embed = new EmbedBuilder()
                     .setColor(new Color(0, 255, 0))
-                    .setAuthor("ServerSeekerV2", "https://cdn.discordapp.com/app-icons/1300318661168594975/cb3825c45b033454cf027a878e96196c.png")
+                    .setAuthor("ServerSeekerV2", "https://cdn.discordapp.com/app-icons/1300318661168594975/cb3825c45b033454cf027a878e96196c.png?size=512")
                     .setThumbnail(message.getAttachments().getFirst().getUrl())
                     .setTitle(address + ":" + port)
                     .addField("** -- __Version__ -- **", versionInfo.toString(), false)
