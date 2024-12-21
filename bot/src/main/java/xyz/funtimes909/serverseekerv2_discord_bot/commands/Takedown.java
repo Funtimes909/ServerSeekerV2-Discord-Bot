@@ -1,7 +1,10 @@
 package xyz.funtimes909.serverseekerv2_discord_bot.commands;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.APIUtils;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.ConnectionPool;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.GenericErrorEmbed;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PermissionsManager;
@@ -30,35 +33,20 @@ public class Takedown {
             return;
         }
 
-        if (event.getOption("remove-entries") != null && event.getOption("remove-entries").getAsBoolean()) {
-            try (Connection conn = ConnectionPool.getConnection()) {
-                PreparedStatement playerhistory = conn.prepareStatement("DELETE FROM playerhistory WHERE address = ?");
-                playerhistory.setString(1, address);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("exclude.txt", true))) {
+            // Throw an unknown host exception if option isn't an address
+            Inet4Address.getByName(address);
+            writer.write(address + "\n");
 
-                PreparedStatement mods = conn.prepareStatement("DELETE FROM mods WHERE address = ?");
-                mods.setString(1, address);
-
-                PreparedStatement servers = conn.prepareStatement("DELETE FROM servers WHERE address = ?");
-                servers.setString(1, address);
-
-                playerhistory.executeUpdate();
-                mods.executeUpdate();
-                servers.executeUpdate();
-            } catch (SQLException e) {
-                Main.logger.error("Error removing entries from database", e);
-                GenericErrorEmbed.errorEmbed(event.getMessageChannel(), e.getMessage());
+            // Remove entries from the database if requested
+            if (event.getOption("remove-entries") != null && event.getOption("remove-entries").getAsBoolean()) {
+                APIUtils.api("takedown?address=" + address);
             }
 
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter("exclude.txt", true))) {
-                // Throw an unknown host exception if option isn't an address
-                Inet4Address.getByName(address);
-
-                writer.write(address + "\n");
-                event.getHook().sendMessage("Added " + address + " to the exclude file").queue();
-            } catch (IOException e) {
-                event.getHook().sendMessage("Invalid address!").queue();
-                Main.logger.error("Error writing to exclude.txt", e);
-            }
+            event.getHook().sendMessage("Added " + address + " to the exclude file").queue();
+        } catch (IOException e) {
+            event.getHook().sendMessage("Invalid address!").queue();
+            Main.logger.error("Error writing to exclude.txt", e);
         }
     }
 }
