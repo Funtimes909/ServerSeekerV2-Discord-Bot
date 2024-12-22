@@ -37,7 +37,7 @@ public class Track {
             players.add(new TrackedPlayer(player, webhook));
 
             event.getHook().sendMessage("Tracking " + player + " on next scan").queue();
-            gson.toJson(players, new FileWriter("tracks.json"));
+            gson.toJson(players, new FileWriter(Main.tracksFile));
 
         } catch (IOException e) {
             Main.logger.error("Error when running /track!", e);

@@ -19,6 +19,7 @@ import java.nio.file.Paths;
 
 public class Main {
     public static String exclude;
+    public static String tracksFile;
     public static String token;
     public static String username;
     public static String password;
@@ -53,6 +54,7 @@ public class Main {
             apiUrl = config.get("api_url").getAsString();
             apiToken = config.get("api_token").getAsString();
             exclude = config.get("masscan_exclude_file").getAsString();
+            tracksFile = config.get("tracks_file").getAsString();
             ownerId = config.get("owner_id").getAsString();
 
             // Warn user about configs should some of them not exist

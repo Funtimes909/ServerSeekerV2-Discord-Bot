@@ -6,5 +6,6 @@
   "api_url": "https://api.funtimes909.xyz/",
   "api_token": ":3",
   "masscan_exclude_file": "exclude.txt",
+  "tracks_file": "tracks.json",
   "owner_id": "OWNER_ID"
 }
