@@ -57,7 +57,7 @@ public class Search {
                 default -> query.append(option.getName()).append("=").append(option.getAsString()).append("&");
             }
         }
-        query.append("limit=5&offset=").append(offset);
+        query.append("minimal=1&limit=5&offset=").append(offset);
     }
 
     public void runQuery(boolean firstRun) {
