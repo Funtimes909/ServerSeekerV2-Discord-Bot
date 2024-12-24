@@ -76,6 +76,8 @@ public class Search {
             return;
         }
 
+        if (firstRun) pointer += 5;
+
         List<ItemComponent> buttons = new ArrayList<>();
         List<LayoutComponent> pageButtons = new ArrayList<>();
 
@@ -100,7 +102,7 @@ public class Search {
             pageButtons.add(ActionRow.of(Button.primary("SearchPrevious", Emoji.fromFormatted("U+2B05")), Button.primary("SearchNext", Emoji.fromFormatted("U+27A1"))));
         }
 
-        MessageEmbed embed = SearchEmbedBuilder.parse(array, rowCount, (pointer / 5));
+        MessageEmbed embed = SearchEmbedBuilder.parse(array, rowCount, rowCount <= 5 ? 1 : (pointer / 5));
 
         // Send embed, update if already sent
         if (firstRun) {
@@ -118,7 +120,7 @@ public class Search {
                         port
         );
 
-        if (response == null) {
+        if (response == null || response.isEmpty()) {
             event.getHook().sendMessage("No results!").queue();
             return;
         }
