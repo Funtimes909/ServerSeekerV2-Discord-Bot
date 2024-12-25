@@ -26,7 +26,7 @@ public class Takedown {
             return;
         }
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("exclude.txt", true))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(Main.exclude, true))) {
             // Throw an unknown host exception if option isn't an address
             Inet4Address.getByName(address);
             writer.write(address + "\n");
