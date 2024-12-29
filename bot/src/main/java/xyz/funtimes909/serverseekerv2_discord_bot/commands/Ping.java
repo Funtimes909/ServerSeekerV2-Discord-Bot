@@ -19,12 +19,12 @@ import java.sql.SQLException;
 
 public class Ping {
     public static void ping(SlashCommandInteractionEvent event) {
-//        if (event.getOption("address").getAsString().equals("localhost") || event.getOption("address").getAsString().equals("0.0.0.0") || event.getOption("address").getAsString().startsWith("127")) {
-//            event.getHook().sendMessage("You can't ping this address!").queue();
-//            return;
-//        }
-
         String address = event.getOption("address").getAsString();
+        if (address.equals("localhost") || address.equals("0.0.0.0") || address.startsWith("127")) {
+            event.getHook().sendMessage("You can't ping this address!").queue();
+            return;
+        }
+
         short port = event.getOption("port") != null ?
                 Short.parseShort(event.getOption("port").getAsString()) :
                 25565;

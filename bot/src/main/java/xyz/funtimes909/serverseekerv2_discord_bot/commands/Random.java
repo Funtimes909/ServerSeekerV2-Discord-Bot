@@ -14,7 +14,7 @@ import java.io.IOException;
 
 public class Random {
     public static void random(SlashCommandInteractionEvent event) {
-        JsonElement response = APIUtils.api("random");
+        JsonElement response = APIUtils.query("random");
 
         if (response == null || !response.isJsonObject()) {
             event.getHook().sendMessage("No results!").queue();

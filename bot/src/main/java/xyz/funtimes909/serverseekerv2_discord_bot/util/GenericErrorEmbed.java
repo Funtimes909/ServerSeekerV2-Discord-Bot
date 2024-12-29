@@ -15,7 +15,7 @@ public class GenericErrorEmbed {
             MessageEmbed embed = new EmbedBuilder()
                     .setColor(new Color(0xFF0000))
                     .setTitle("Fatal error occurred!")
-                    .addField("Error Message", error, false)
+                    .addField("Error Message", error + "\n This is a bug! please report it at the link below!", false)
                     .build();
 
             channel.sendMessageEmbeds(embed).addActionRow(Button.link("https://github.com/Funtimes909/ServerSeekerV2-Discord-Bot/issues", "Report Bug")).queue();

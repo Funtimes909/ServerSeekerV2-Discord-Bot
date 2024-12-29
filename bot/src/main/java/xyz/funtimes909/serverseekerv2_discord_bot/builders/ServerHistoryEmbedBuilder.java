@@ -10,7 +10,7 @@ import java.awt.*;
 
 public class ServerHistoryEmbedBuilder {
     public static MessageEmbed build(String address) {
-        JsonElement response = APIUtils.api("history?address=" + address);
+        JsonElement response = APIUtils.query("history?address=" + address);
         if (response == null || !response.isJsonArray()) return null;
 
         EmbedBuilder embed = new EmbedBuilder()

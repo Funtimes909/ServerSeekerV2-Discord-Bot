@@ -30,31 +30,22 @@ public class Playerhistory {
                 "history?player=" + event.getOption("player").getAsString() :
                 "history?address=" + event.getOption("address").getAsString();
 
-        JsonElement response = APIUtils.api(query);
-        if (response == null || !response.isJsonArray()) {
+        JsonElement response = APIUtils.query(query);
+        JsonArray array = APIUtils.getAsArray(response);
+
+        if (array == null || array.isEmpty()) {
             event.getHook().sendMessage("No results!").queue();
             return;
         }
 
-        JsonArray results = response.getAsJsonArray();
-        if (results.isEmpty()) {
-            event.getHook().sendMessage("No results!").queue();
-            return;
-        }
-
-        MessageEmbed embed = PlayerhistorySearchBuilder.build(results, query.split("=")[1]);
-        if (embed == null) {
-            event.getHook().sendMessage("No results!").queue();
-            return;
-        }
-
+        MessageEmbed embed = PlayerhistorySearchBuilder.build(array, query.split("=")[1]);
         List<ItemComponent> buttons = new ArrayList<>();
-        for (int i = 1; i < results.size() + 1; i++) {
+        for (int i = 1; i < array.size() + 1; i++) {
             buttons.add(Button.success("PlayerHistory" + i, String.valueOf(i)));
         }
 
         // Add buttons to message
-        if (results.size() < 5) {
+        if (array.size() < 5) {
             event.getHook().sendMessageEmbeds(embed).addActionRow(buttons).queue();
         } else {
             event.getHook().sendMessageEmbeds(embed)

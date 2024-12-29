@@ -62,16 +62,10 @@ public class Search {
 
     public void runQuery(boolean firstRun) {
         query.replace(query.lastIndexOf("="), query.length(), "=" + offset);
-        JsonElement response = APIUtils.api(endpoint + query);
+        JsonElement response = APIUtils.query(endpoint + query);
+        JsonArray array = APIUtils.getAsArray(response);
 
-        if (response == null || !response.isJsonArray()) {
-            interaction.getHook().sendMessage("No results!").queue();
-            return;
-        }
-
-        JsonArray array = response.getAsJsonArray();
-
-        if (array.isEmpty()) {
+        if (array == null || array.isEmpty()) {
             interaction.getHook().sendMessage("No results!").queue();
             return;
         }
@@ -113,7 +107,7 @@ public class Search {
     }
 
     public void optionSelected(String address, short port, ButtonInteractionEvent event) {
-        JsonArray response = (JsonArray) APIUtils.api(
+        JsonArray response = (JsonArray) APIUtils.query(
                 "servers?address=" +
                         address +
                         "&port=" +

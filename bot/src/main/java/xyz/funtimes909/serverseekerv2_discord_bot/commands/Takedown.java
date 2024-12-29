@@ -33,7 +33,7 @@ public class Takedown {
 
             // Remove entries from the database if requested
             if (event.getOption("remove-entries") != null && event.getOption("remove-entries").getAsBoolean()) {
-                APIUtils.api("takedown?address=" + address);
+                APIUtils.query("takedown?address=" + address);
             }
 
             event.getHook().sendMessage("Added " + address + " to the exclude file").queue();

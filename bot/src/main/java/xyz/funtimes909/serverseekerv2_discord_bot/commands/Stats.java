@@ -11,15 +11,11 @@ import java.awt.*;
 
 public class Stats {
     public static void stats(SlashCommandInteractionEvent event) {
-        JsonElement response = APIUtils.api("stats");
+        JsonElement response = APIUtils.query("stats");
+        JsonObject object = APIUtils.getAsObject(response);
 
-        if (response == null || !response.isJsonObject()) {
-            event.getHook().sendMessage("No results!").queue();
-            return;
-        }
-
-        JsonObject object = response.getAsJsonObject();
-        int serverCount = object.get("servers").getAsInt();
+        if (object == null) return;
+        int serverCount = object.get("stats").getAsInt();
 
         MessageEmbed embed = new EmbedBuilder()
                 .setTitle("Stats")
