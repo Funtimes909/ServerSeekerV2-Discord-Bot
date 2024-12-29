@@ -12,7 +12,7 @@ public class Info {
                 .setTitle("ServerSeekerV2", "https://github.com/Funtimes909/ServerSeekerV2")
                 .setColor(new Color(0, 255, 0))
                 .setAuthor("Funtimes909", "https://funtimes909.xyz", "https://funtimes909.xyz/avatar-gif")
-                .setDescription("ServerSeekerV2 is an open source project made by Funtimes909 to scan for Minecraft servers, it supports Java and Bedrock edition Minecraft servers, advanced filters for narrowing down search results, and eventually, a whitelist checker. Get information on specific commands by running /help")
+                .setDescription("ServerSeekerV2 is an open source project by Funtimes909 that scans the internet and logs online minecraft servers and players, advanced filters for searching the database, a whitelist checker, cracked server detection and more!")
                 .build();
 
         event.getHook().sendMessageEmbeds(embed).queue();
