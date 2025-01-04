@@ -191,7 +191,6 @@ public class ServerEmbedBuilder {
         if (mods != null && !mods.isEmpty()) embed.addField("** -- __Mods__ -- **",  modInfo.toString(), false);
         embed.addField("** -- __Address Information__ -- **", addressInfo.toString(), false);
 
-
         return channel.sendFiles(FileUpload.fromData(image, "icon.png")).setEmbeds(embed.build());
     }
 }

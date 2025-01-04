@@ -53,7 +53,15 @@ public class Search {
             switch (option.getName()) {
                 case "preventsreports" -> query.append("prevents_reports=").append(option.getAsString()).append("&");
                 case "enforcessecurechat" -> query.append("enforce_secure_chat=").append(option.getAsString()).append("&");
-                case "description" -> query.append("motd=").append(option.getAsString()).append("&");
+                case "description" -> {
+                    query.append("motd=");
+                    for (String space : option.getAsString().split(" ")) {
+                        query.append(space).append("%20");
+                    }
+
+                    query.setLength(query.length() - 3);
+                    query.append("&");
+                }
                 default -> query.append(option.getName()).append("=").append(option.getAsString()).append("&");
             }
         }
