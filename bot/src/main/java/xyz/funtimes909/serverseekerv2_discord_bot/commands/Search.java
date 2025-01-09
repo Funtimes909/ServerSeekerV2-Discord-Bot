@@ -26,8 +26,8 @@ import java.util.List;
 
 public class Search {
     private final SlashCommandInteractionEvent interaction;
-    private final String endpoint = "servers?";
     private StringBuilder query = new StringBuilder();
+    private long messageID;
     public int rowCount = 100;
     public int offset = 0;
     public int pointer = 0;
@@ -47,7 +47,7 @@ public class Search {
     }
 
     public void buildQuery(List<OptionMapping> options) {
-        query = new StringBuilder();
+        query = new StringBuilder("servers?");
 
         for (OptionMapping option : options) {
             switch (option.getName()) {
@@ -70,7 +70,7 @@ public class Search {
 
     public void runQuery(boolean firstRun) {
         query.replace(query.lastIndexOf("="), query.length(), "=" + offset);
-        JsonElement response = APIUtils.query(endpoint + query);
+        JsonElement response = APIUtils.query(query.toString());
         JsonArray array = APIUtils.getAsArray(response);
 
         if (array == null || array.isEmpty()) {
@@ -108,7 +108,10 @@ public class Search {
 
         // Send embed, update if already sent
         if (firstRun) {
-            interaction.getHook().sendMessageEmbeds(embed).setComponents(pageButtons).queue();
+            // Save message ID to reply to it with server embeds later
+            interaction.getHook().sendMessageEmbeds(embed).setComponents(pageButtons).queue(message -> {
+                messageID = message.getIdLong();
+            });
         } else {
             interaction.getHook().editOriginalEmbeds(embed).setComponents(pageButtons).queue();
         }
@@ -133,6 +136,7 @@ public class Search {
             ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server);
             MessageCreateAction embed = embedBuilder.build(event.getChannel(), false);
 
+            embed.setMessageReference(messageID);
             embed.queue();
         } catch (IOException e) {
             GenericErrorEmbed.errorEmbed(event.getChannel(), e.getMessage());
