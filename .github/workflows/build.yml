@@ -19,6 +19,12 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4
 
+    - name: Initialize Submodule
+      run: git submodule init
+
+    - name: Pull Submodule
+      run: git submodule update
+
     - name: Build with Gradle
       run: ./gradlew buildShadow
 
