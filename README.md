@@ -86,10 +86,12 @@ Docker usage is always encouraged since it always provides the same enviroment
 
 Create a file named `ServerSeekerV2-Discord.json` following the format in [here](https://raw.githubusercontent.com/Funtimes909/ServerSeekerV2-Discord-Bot/refs/heads/main/config.json)
 
+NOTE: You should run this in the directory that the scanner is in to that takedown actually works
+
 Run:
 
 ```sh
-docker run --mount type=bind,src=./ServerSeekerV2-Discord.json,dst=/usr/src/app/config.json -d nucceteere/serverseekerv2-discord-bot
+docker run --mount type=bind,src=./ServerSeekerV2-Discord.json,dst=/usr/src/app/config.json --mount type=bind,src=./exclude.txt,dst=/usr/src/app/exclude.txt -d nucceteere/serverseekerv2-discord-bot
 ```
 
 ### Manual
