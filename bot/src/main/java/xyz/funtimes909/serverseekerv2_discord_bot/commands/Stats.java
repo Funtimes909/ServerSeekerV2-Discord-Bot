@@ -15,7 +15,7 @@ public class Stats {
         JsonObject object = APIUtils.getAsObject(response);
 
         if (object == null) return;
-        int serverCount = object.get("servers").getAsInt();
+        int serverCount = object.get("all").getAsInt();
 
         MessageEmbed embed = new EmbedBuilder()
                 .setTitle("Stats")
