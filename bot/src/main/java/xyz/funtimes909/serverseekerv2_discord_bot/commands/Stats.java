@@ -16,6 +16,11 @@ public class Stats {
 
         if (object == null) return;
         int serverCount = object.get("all").getAsInt();
+        int vanilla = object.get("java").getAsInt();
+        int modded = aggregateServers(object.getAsJsonObject("modded"));
+        int bukkit = aggregateServers(object.getAsJsonObject("plugin"));
+        int proxies = aggregateServers(object.getAsJsonObject("proxies"));
+        int folia = object.getAsJsonObject("multi_threaded").get("folia").getAsInt();   // there are no other multi-threaded server types in the database rn, we can always change this later
 
         MessageEmbed embed = new EmbedBuilder()
                 .setTitle("Stats")
@@ -23,8 +28,20 @@ public class Stats {
                 .setAuthor("ServerSeekerV2", "https://discord.gg/WEErxAP8kz", "https://funtimes909.xyz/assets/images/serverseekerv2-icon-cropped.png")
                 .setFooter("Funtimes909", "https://funtimes909.xyz/avatar-gif")
                 .addField("Unique Servers Found", "**" + serverCount + "**", false)
+                .addField("Vanilla", "**" + vanilla + "**", false)
+                .addField("Forge-based", "**" + modded + "**", false)
+                .addField("Bukkit-based", "**" + bukkit + "**", false)
+                .addField("Folia", "**" + folia + "**", false)
+                .addField("Proxy", "**" + proxies + "**", false)
                 .build();
 
         event.getHook().sendMessageEmbeds(embed).queue();
+    }
+
+    private static int aggregateServers(JsonObject obj) {
+        return obj.entrySet()
+                .stream()
+                .mapToInt(entry -> entry.getValue().getAsInt())
+                .sum();
     }
 }
