@@ -27,12 +27,12 @@ public class Stats {
                 .setColor(new Color(0, 255, 0))
                 .setAuthor("ServerSeekerV2", "https://discord.gg/WEErxAP8kz", "https://funtimes909.xyz/assets/images/serverseekerv2-icon-cropped.png")
                 .setFooter("Funtimes909", "https://funtimes909.xyz/avatar-gif")
-                .addField("Unique Servers Found", "**" + serverCount + "**", false)
-                .addField("Vanilla", "**" + vanilla + "**", false)
-                .addField("Forge-based", "**" + modded + "**", false)
-                .addField("Bukkit-based", "**" + bukkit + "**", false)
-                .addField("Folia", "**" + folia + "**", false)
-                .addField("Proxy", "**" + proxies + "**", false)
+                .addField("**Unique Servers Found**", String.valueOf(serverCount), false)
+                .addField("**Vanilla**", String.valueOf(vanilla), false)
+                .addField("**Forge-based**", String.valueOf(modded), false)
+                .addField("**Bukkit-based**", String.valueOf(bukkit), false)
+                .addField("**Folia**", String.valueOf(folia), false)
+                .addField("**Proxy**", String.valueOf(proxies), false)
                 .build();
 
         event.getHook().sendMessageEmbeds(embed).queue();
