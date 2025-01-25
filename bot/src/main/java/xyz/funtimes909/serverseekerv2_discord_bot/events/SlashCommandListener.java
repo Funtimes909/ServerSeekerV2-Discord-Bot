@@ -29,21 +29,27 @@ public class SlashCommandListener extends ListenerAdapter {
         }
 
         Main.logger.info("Command: {} run by {} [{}] ({} options)", event.getName(), event.getUser().getName(), event.getUser().getId(), event.getOptions().size());
+
         event.deferReply().queue();
-        switch (event.getName()) {
-            case "search" -> {
-                Search command = new Search(event);
-                executor.execute(command::search);
-                searchCommands.put(event.getUser().getId(), command);
+        event.getHook().sendMessage(event.getName() + " command ran!").queue(message -> {
+            long messageID = message.getIdLong();
+
+            // Execute command accordingly
+            switch (event.getName()) {
+                case "stats" -> executor.execute(() -> Stats.stats(event));
+                case "random" -> executor.execute(() -> Random.random(event));
+                case "ping" -> executor.execute(() -> Ping.ping(event, messageID));
+                case "info" -> executor.execute(() -> Info.info(event));
+                case "takedown" -> executor.execute(() -> Takedown.takedown(event));
+                case "blacklist" -> executor.execute(() -> Blacklist.blacklist(event));
+                case "playerhistory" -> executor.execute(() -> Playerhistory.playerhistory(event));
+                case "track" -> executor.execute(() -> Track.track(event));
+                case "search" -> {
+                    Search command = new Search(event);
+                    executor.execute(command::search);
+                    searchCommands.put(event.getUser().getId(), command);
+                }
             }
-            case "stats" -> executor.execute(() -> Stats.stats(event));
-            case "random" -> executor.execute(() -> Random.random(event));
-            case "ping" -> executor.execute(() -> Ping.ping(event));
-            case "info" -> executor.execute(() -> Info.info(event));
-            case "takedown" -> executor.execute(() -> Takedown.takedown(event));
-            case "blacklist" -> executor.execute(() -> Blacklist.blacklist(event));
-            case "playerhistory" -> executor.execute(() -> Playerhistory.playerhistory(event));
-            case "track" -> executor.execute(() -> Track.track(event));
-        }
+        });
     }
 }

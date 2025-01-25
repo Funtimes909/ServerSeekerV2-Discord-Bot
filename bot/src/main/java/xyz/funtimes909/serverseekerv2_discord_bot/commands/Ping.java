@@ -2,7 +2,7 @@ package xyz.funtimes909.serverseekerv2_discord_bot.commands;
 
 import com.google.gson.JsonParser;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
+import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import xyz.funtimes909.serverseekerv2_core.database.Database;
 import xyz.funtimes909.serverseekerv2_core.records.Server;
 import xyz.funtimes909.serverseekerv2_core.util.ServerObjectBuilder;
@@ -18,7 +18,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public class Ping {
-    public static void ping(SlashCommandInteractionEvent event) {
+    public static void ping(SlashCommandInteractionEvent event, long messageID) {
         String address = event.getOption("address").getAsString();
         if (address.equals("localhost") || address.equals("0.0.0.0") || address.startsWith("127")) {
             event.getHook().sendMessage("You can't ping this address!").queue();
@@ -47,25 +47,24 @@ public class Ping {
             return;
         }
 
-        try {
+        // Attempt to connect to the database
+        try (Connection conn = ConnectionPool.getConnection()) {
             ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server);
-            MessageCreateAction embed = embedBuilder.build(event.getMessageChannel(), true);
+            MessageEditData embed = embedBuilder.build(event.getMessageChannel(), true);
 
             if (embed == null) {
                 event.getHook().sendMessage("Server did not connect!").queue();
                 return;
             }
 
-            embed.queue();
-        } catch (IOException e) {
-            GenericErrorEmbed.errorEmbed(event.getMessageChannel(), e.getMessage());
-        }
+            // Edit success message by ID
+            event.getMessageChannel().editMessageById(messageID, embed).queue();
 
-        try (Connection conn = ConnectionPool.getConnection()) {
+            // Update server if connection was a success
             if (conn != null) {
                 Database.updateServer(conn, server);
             }
-        } catch (SQLException e) {
+        } catch (IOException | SQLException e) {
             GenericErrorEmbed.errorEmbed(event.getMessageChannel(), e.getMessage());
         }
     }

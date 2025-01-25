@@ -14,7 +14,7 @@ public class ServerHistoryEmbedBuilder {
         if (response == null || !response.isJsonArray()) return null;
 
         EmbedBuilder embed = new EmbedBuilder()
-                .setAuthor("ServerSeekerV2", "https://discord.gg/WEErxAP8kz", "https://funtimes909.xyz/assets/images/serverseekerv2-icon-cropped.png")
+                .setAuthor("ServerSeekerV2", "https://discord.gg/wYTe2ZwD7g", "https://cdn.discordapp.com/app-icons/1300318661168594975/cb3825c45b033454cf027a878e96196c.png?size=512")
                 .setTitle("Showing player history for: " + address)
                 .setFooter("Funtimes909", "https://funtimes909.xyz/avatar-gif")
                 .setColor(new Color(0, 255, 0));

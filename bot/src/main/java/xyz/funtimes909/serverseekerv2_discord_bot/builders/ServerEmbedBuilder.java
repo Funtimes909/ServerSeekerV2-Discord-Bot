@@ -4,8 +4,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import xyz.funtimes909.serverseekerv2_core.records.Mod;
 import xyz.funtimes909.serverseekerv2_core.records.Player;
 import xyz.funtimes909.serverseekerv2_core.records.Server;
@@ -65,13 +66,14 @@ public class ServerEmbedBuilder {
         mods = server.getMods();
     }
 
-    public MessageCreateAction build(MessageChannel channel, boolean ping) throws IOException {
+    public MessageEditData build(MessageChannel channel, boolean ping) throws IOException {
         StringBuilder miscInfo = new StringBuilder();
         StringBuilder addressInfo = new StringBuilder();
         StringBuilder playerInfo = new StringBuilder();
         StringBuilder modInfo = new StringBuilder();
         StringBuilder versionInfo = new StringBuilder();
 
+        // Handle server software and version field
         if (description != null && description.contains("§")) {
             description = PingUtils.parseMOTD(description);
         }
@@ -91,11 +93,12 @@ public class ServerEmbedBuilder {
                     .append(")");
         }
 
+        // Handle timestamp field
         String timestamps =
                 "First Seen: <t:" + firstseen + ":R>\n" +
                 "Last Seen: <t:" + lastseen + ":R>";
 
-        // Address information
+        // If this is a ping, request address information, else use address information from the database
         if (ping) {
             String response = HTTPUtils.run(address);
             if (response != null) {
@@ -144,6 +147,7 @@ public class ServerEmbedBuilder {
             playerInfo.append("```");
         }
 
+        // Handle field for mods if they exist
         if (mods != null && !mods.isEmpty()) {
             modInfo.append("Mods: **").append(mods.size()).append("**\n");
             modInfo.append("```\n");
@@ -182,6 +186,7 @@ public class ServerEmbedBuilder {
                 .addField("** -- __Version__ -- **", versionInfo.toString(), false)
                 .addField("** -- __Description__ -- **", description != null ? "```ansi\n" + description + "```" : "```No description found!```", false);
 
+        // Add all the fields to the embed
         if (!ping) {
             embed.addField("** -- __Timestamps__ -- **", timestamps, false);
         }
@@ -191,6 +196,12 @@ public class ServerEmbedBuilder {
         if (mods != null && !mods.isEmpty()) embed.addField("** -- __Mods__ -- **",  modInfo.toString(), false);
         embed.addField("** -- __Address Information__ -- **", addressInfo.toString(), false);
 
-        return channel.sendFiles(FileUpload.fromData(image, "icon.png")).setEmbeds(embed.build());
+        // Return a MessageEditAction
+        return new MessageEditBuilder()
+                .setFiles(FileUpload.fromData(image, "icon.png"))
+                .setEmbeds(embed.build())
+                .setReplace(true)
+                .setContent("Success!")
+                .build();
     }
 }
