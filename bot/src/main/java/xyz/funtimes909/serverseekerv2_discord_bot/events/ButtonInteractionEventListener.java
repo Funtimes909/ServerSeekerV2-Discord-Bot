@@ -13,7 +13,7 @@ public class ButtonInteractionEventListener extends ListenerAdapter {
 
     @Override
     public void onButtonInteraction(ButtonInteractionEvent event) {
-        Search searchCommand = SlashCommandListener.searchCommands.get(event.getUser().getId());
+        Search searchCommand = SlashCommandListener.searchCommands.get(event.getMessageIdLong());
         if (event.getComponentId().startsWith("Search") && searchCommand == null) {
             return;
         }
@@ -45,12 +45,12 @@ public class ButtonInteractionEventListener extends ListenerAdapter {
             case "SearchPrevious":
                 searchCommand.offset -= 5;
                 searchCommand.pointer -= 5;
-                executor.execute(() -> searchCommand.runQuery(false));
+                executor.execute(searchCommand::runQuery);
                 break;
             case "SearchNext":
                 searchCommand.offset += 5;
                 searchCommand.pointer += 5;
-                executor.execute(() -> searchCommand.runQuery(false));
+                executor.execute(searchCommand::runQuery);
                 break;
         }
     }

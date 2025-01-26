@@ -12,8 +12,7 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.utils.messages.MessageEditData;
-import xyz.funtimes909.serverseekerv2_core.records.Server;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import xyz.funtimes909.serverseekerv2_core.util.ServerObjectBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.SearchEmbedBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.ServerEmbedBuilder;
@@ -27,10 +26,9 @@ import java.util.List;
 public class Search {
     private final SlashCommandInteractionEvent interaction;
     private StringBuilder query = new StringBuilder();
-    private long messageID;
     public int rowCount = 100;
     public int offset = 0;
-    public int pointer = 0;
+    public int pointer = 5;
 
     public Search(SlashCommandInteractionEvent event) {
         this.interaction = event;
@@ -38,12 +36,12 @@ public class Search {
 
     public void search() {
         if (interaction.getOptions().isEmpty()) {
-            interaction.getHook().sendMessage("You must provide some search queries!").queue();
+            interaction.getHook().editOriginal(":x: You must provide some search queries!").queue();
             return;
         }
 
         buildQuery(interaction.getOptions());
-        runQuery(true);
+        runQuery();
     }
 
     public void buildQuery(List<OptionMapping> options) {
@@ -53,6 +51,7 @@ public class Search {
             switch (option.getName()) {
                 case "preventsreports" -> query.append("prevents_reports=").append(option.getAsString()).append("&");
                 case "enforcessecurechat" -> query.append("enforce_secure_chat=").append(option.getAsString()).append("&");
+                case "playercount" -> query.append("onlineplayers=").append(option.getAsString()).append("&");
                 case "description" -> {
                     query.append("motd=");
                     for (String space : option.getAsString().split(" ")) {
@@ -68,17 +67,15 @@ public class Search {
         query.append("minimal=1&limit=5&offset=").append(offset);
     }
 
-    public void runQuery(boolean firstRun) {
+    public void runQuery() {
         query.replace(query.lastIndexOf("="), query.length(), "=" + offset);
         JsonElement response = APIUtils.query(query.toString());
         JsonArray array = APIUtils.getAsArray(response);
 
         if (array == null || array.isEmpty()) {
-            interaction.getHook().sendMessage("No results!").queue();
+            interaction.getHook().editOriginal(":x: No results!").queue();
             return;
         }
-
-        if (firstRun) pointer += 5;
 
         List<ItemComponent> buttons = new ArrayList<>();
         List<LayoutComponent> pageButtons = new ArrayList<>();
@@ -106,15 +103,8 @@ public class Search {
 
         MessageEmbed embed = SearchEmbedBuilder.parse(array, rowCount, rowCount <= 5 ? 1 : (pointer / 5));
 
-        // Send embed, update if already sent
-        if (firstRun) {
-            // Save message ID to reply to it with server embeds later
-            interaction.getHook().sendMessageEmbeds(embed).setComponents(pageButtons).queue(message -> {
-                messageID = message.getIdLong();
-            });
-        } else {
-            interaction.getHook().editOriginalEmbeds(embed).setComponents(pageButtons).queue();
-        }
+        // Send embed, overwriting initial message
+        interaction.getHook().editOriginalEmbeds(embed).setComponents(pageButtons).queue();
     }
 
     public void optionSelected(String address, short port, ButtonInteractionEvent event) {
@@ -125,17 +115,13 @@ public class Search {
                         port
         );
 
-        if (response == null || response.isEmpty()) {
-            event.getHook().sendMessage("No results!").queue();
-            return;
-        }
-
         try {
             JsonObject object = response.get(0).getAsJsonObject();
-            Server server = ServerObjectBuilder.buildServerFromApiResponse(object);
-            ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server);
-            MessageEditData embed = embedBuilder.build(event.getChannel(), false);
+            ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(
+                    ServerObjectBuilder.buildServerFromApiResponse(object));
+            MessageCreateData embed = embedBuilder.build(false);
 
+            event.getHook().sendMessage(embed).queue();
         } catch (IOException e) {
             GenericErrorEmbed.errorEmbed(event.getChannel(), e.getMessage());
         }

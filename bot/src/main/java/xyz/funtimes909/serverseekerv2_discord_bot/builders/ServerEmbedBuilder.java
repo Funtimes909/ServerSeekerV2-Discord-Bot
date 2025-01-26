@@ -3,10 +3,9 @@ package xyz.funtimes909.serverseekerv2_discord_bot.builders;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.utils.FileUpload;
-import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
-import net.dv8tion.jda.api.utils.messages.MessageEditData;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import xyz.funtimes909.serverseekerv2_core.records.Mod;
 import xyz.funtimes909.serverseekerv2_core.records.Player;
 import xyz.funtimes909.serverseekerv2_core.records.Server;
@@ -66,7 +65,7 @@ public class ServerEmbedBuilder {
         mods = server.getMods();
     }
 
-    public MessageEditData build(MessageChannel channel, boolean ping) throws IOException {
+    public MessageCreateData build(boolean ping) throws IOException {
         StringBuilder miscInfo = new StringBuilder();
         StringBuilder addressInfo = new StringBuilder();
         StringBuilder playerInfo = new StringBuilder();
@@ -177,7 +176,7 @@ public class ServerEmbedBuilder {
             image = Files.readAllBytes(new File("default_icon.png").toPath());
         }
 
-        // Send icon to discord and use that attachment link as icon
+        // Send icon to discord and use that attachment as the icon
         EmbedBuilder embed = new EmbedBuilder()
                 .setColor(new Color(0, 255, 0))
                 .setAuthor("ServerSeekerV2", "https://cdn.discordapp.com/app-icons/1300318661168594975/cb3825c45b033454cf027a878e96196c.png?size=512")
@@ -196,12 +195,10 @@ public class ServerEmbedBuilder {
         if (mods != null && !mods.isEmpty()) embed.addField("** -- __Mods__ -- **",  modInfo.toString(), false);
         embed.addField("** -- __Address Information__ -- **", addressInfo.toString(), false);
 
-        // Return a MessageEditAction
-        return new MessageEditBuilder()
+        return new MessageCreateBuilder()
                 .setFiles(FileUpload.fromData(image, "icon.png"))
                 .setEmbeds(embed.build())
-                .setReplace(true)
-                .setContent("Success!")
+                .setContent(":white_check_mark: Success!")
                 .build();
     }
 }

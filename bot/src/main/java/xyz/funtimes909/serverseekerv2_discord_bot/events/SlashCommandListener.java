@@ -11,7 +11,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class SlashCommandListener extends ListenerAdapter {
-    public static final HashMap<String, Search> searchCommands = new HashMap<>();
+    public static final HashMap<Long, Search> searchCommands = new HashMap<>();
     private static final Executor executor = Executors.newVirtualThreadPerTaskExecutor();
 
     @Override
@@ -31,13 +31,13 @@ public class SlashCommandListener extends ListenerAdapter {
         Main.logger.info("Command: {} run by {} [{}] ({} options)", event.getName(), event.getUser().getName(), event.getUser().getId(), event.getOptions().size());
 
         event.deferReply().queue();
-        event.getHook().sendMessage(event.getName() + " command ran!").queue(message -> {
+        event.getHook().sendMessage("Thinking...").queue(message -> {
             long messageID = message.getIdLong();
 
             // Execute command accordingly
             switch (event.getName()) {
                 case "stats" -> executor.execute(() -> Stats.stats(event));
-                case "random" -> executor.execute(() -> Random.random(event));
+                case "random" -> executor.execute(() -> Random.random(event, messageID));
                 case "ping" -> executor.execute(() -> Ping.ping(event, messageID));
                 case "info" -> executor.execute(() -> Info.info(event));
                 case "takedown" -> executor.execute(() -> Takedown.takedown(event));
@@ -47,7 +47,7 @@ public class SlashCommandListener extends ListenerAdapter {
                 case "search" -> {
                     Search command = new Search(event);
                     executor.execute(command::search);
-                    searchCommands.put(event.getUser().getId(), command);
+                    searchCommands.put(messageID, command);
                 }
             }
         });

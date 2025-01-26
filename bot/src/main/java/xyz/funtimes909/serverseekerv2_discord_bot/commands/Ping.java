@@ -2,7 +2,8 @@ package xyz.funtimes909.serverseekerv2_discord_bot.commands;
 
 import com.google.gson.JsonParser;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.utils.messages.MessageEditData;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import xyz.funtimes909.serverseekerv2_core.database.Database;
 import xyz.funtimes909.serverseekerv2_core.records.Server;
 import xyz.funtimes909.serverseekerv2_core.util.ServerObjectBuilder;
@@ -51,7 +52,7 @@ public class Ping {
         // Attempt to connect to the database
         try (Connection conn = ConnectionPool.getConnection()) {
             ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server);
-            MessageEditData embed = embedBuilder.build(event.getMessageChannel(), true);
+            MessageCreateData embed = embedBuilder.build(true);
 
             if (embed == null) {
                 event.getHook().sendMessage("Server did not connect!").queue();
@@ -59,7 +60,11 @@ public class Ping {
             }
 
             // Edit success message by ID
-            event.getMessageChannel().editMessageById(messageID, embed).queue();
+            event.getMessageChannel().editMessageById(messageID, new MessageEditBuilder()
+                    .applyCreateData(embed)
+                    .build()
+            ).queue();
+            embed.close();
 
             // Update server if connection was a success
             if (conn != null) {
