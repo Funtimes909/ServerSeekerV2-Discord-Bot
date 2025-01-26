@@ -22,7 +22,7 @@ public class SlashCommandListener extends ListenerAdapter {
             return;
         }
 
-        if (PermissionsManager.blacklistServerCheck(event.getGuild().getId())) {
+        if (event.isFromGuild() && PermissionsManager.blacklistServerCheck(event.getGuild().getId())) {
             Main.logger.warn("{} in blacklisted server, {} attempted to run {}", event.getUser().getName(), event.getGuild().getName(), event.getName());
             event.reply("This server is blacklisted!").queue();
             return;

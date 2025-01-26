@@ -22,7 +22,7 @@ public class Ping {
     public static void ping(SlashCommandInteractionEvent event, long messageID) {
         String address = event.getOption("address").getAsString();
         if (address.equals("localhost") || address.equals("0.0.0.0") || address.startsWith("127")) {
-            event.getHook().sendMessage("You can't ping this address!").queue();
+            event.getHook().editOriginal(":x: You can't ping this address!").queue();
             return;
         }
 
@@ -33,7 +33,7 @@ public class Ping {
         String response = PingUtils.ping(connect(address, port));
 
         if (response == null) {
-            event.getHook().sendMessage("Server did not connect!").queue();
+            event.getHook().editOriginal(":x: Server did not connect!").queue();
             return;
         }
 
@@ -45,7 +45,7 @@ public class Ping {
         );
 
         if (server == null) {
-            event.getHook().sendMessage("Server did not connect!").queue();
+            event.getHook().editOriginal(":x: Server did not connect!").queue();
             return;
         }
 
@@ -55,13 +55,13 @@ public class Ping {
             MessageCreateData embed = embedBuilder.build(true);
 
             if (embed == null) {
-                event.getHook().sendMessage("Server did not connect!").queue();
+                event.getHook().editOriginal(":x: Server did not connect!").queue();
                 return;
             }
 
             // Edit success message by ID
             event.getMessageChannel().editMessageById(messageID, new MessageEditBuilder()
-                    .applyCreateData(embed)
+                    .applyCreateData(embedBuilder.build(false))
                     .build()
             ).queue();
             embed.close();

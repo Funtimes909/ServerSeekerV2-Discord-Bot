@@ -20,7 +20,7 @@ public class Stats {
         int modded = aggregateServers(object.getAsJsonObject("modded"));
         int bukkit = aggregateServers(object.getAsJsonObject("plugin"));
         int proxies = aggregateServers(object.getAsJsonObject("proxies"));
-        int folia = object.getAsJsonObject("multi_threaded").get("folia").getAsInt();   // there are no other multi-threaded server types in the database rn, we can always change this later
+        int folia = object.getAsJsonObject("multi_threaded").get("folia").getAsInt();   // There are no other multithreaded server types in the database right now, we can always change this later
 
         MessageEmbed embed = new EmbedBuilder()
                 .setTitle("Stats")
