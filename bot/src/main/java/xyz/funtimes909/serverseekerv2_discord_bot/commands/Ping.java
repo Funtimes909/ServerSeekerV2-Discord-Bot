@@ -39,7 +39,8 @@ public class Ping {
         Server server = ServerObjectBuilder.buildServerFromPing(
                 address,
                 port,
-                JsonParser.parseString(response).getAsJsonObject()
+                JsonParser.parseString(response).getAsJsonObject(),
+                null
         );
 
         if (server == null) {
