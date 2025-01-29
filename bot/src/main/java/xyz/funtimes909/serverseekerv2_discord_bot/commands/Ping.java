@@ -19,7 +19,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public class Ping {
-    public static void ping(SlashCommandInteractionEvent event, long messageID) {
+    public static void ping(SlashCommandInteractionEvent event) {
         String address = event.getOption("address").getAsString();
         if (address.equals("localhost") || address.equals("0.0.0.0") || address.startsWith("127")) {
             event.getHook().editOriginal(":x: You can't ping this address!").queue();
@@ -60,7 +60,7 @@ public class Ping {
             }
 
             // Edit success message by ID
-            event.getMessageChannel().editMessageById(messageID, new MessageEditBuilder()
+            event.getHook().editOriginal(new MessageEditBuilder()
                     .applyCreateData(embedBuilder.build(false))
                     .build()
             ).queue();

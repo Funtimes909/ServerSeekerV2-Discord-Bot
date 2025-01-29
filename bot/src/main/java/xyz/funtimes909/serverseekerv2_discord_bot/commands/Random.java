@@ -13,7 +13,7 @@ import xyz.funtimes909.serverseekerv2_discord_bot.util.GenericErrorEmbed;
 import java.io.IOException;
 
 public class Random {
-    public static void random(SlashCommandInteractionEvent event, long messageID) {
+    public static void random(SlashCommandInteractionEvent event) {
         JsonElement response = APIUtils.query("random");
 
         if (response == null || !response.isJsonObject()) {
@@ -26,8 +26,7 @@ public class Random {
             Server server = ServerObjectBuilder.buildServerFromApiResponse(object);
             ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server);
 
-            // Edit success message by ID
-            event.getMessageChannel().editMessageById(messageID, new MessageEditBuilder()
+            event.getHook().editOriginal(new MessageEditBuilder()
                             .applyCreateData(embedBuilder.build(false))
                             .build()
             ).queue();

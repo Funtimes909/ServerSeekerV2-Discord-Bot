@@ -32,13 +32,12 @@ public class SlashCommandListener extends ListenerAdapter {
 
         event.deferReply().queue();
         event.getHook().sendMessage("Thinking...").queue(message -> {
-            long messageID = message.getIdLong();
 
             // Execute command accordingly
             switch (event.getName()) {
                 case "stats" -> executor.execute(() -> Stats.stats(event));
-                case "random" -> executor.execute(() -> Random.random(event, messageID));
-                case "ping" -> executor.execute(() -> Ping.ping(event, messageID));
+                case "random" -> executor.execute(() -> Random.random(event));
+                case "ping" -> executor.execute(() -> Ping.ping(event));
                 case "info" -> executor.execute(() -> Info.info(event));
                 case "takedown" -> executor.execute(() -> Takedown.takedown(event));
                 case "blacklist" -> executor.execute(() -> Blacklist.blacklist(event));
@@ -47,7 +46,7 @@ public class SlashCommandListener extends ListenerAdapter {
                 case "search" -> {
                     Search command = new Search(event);
                     executor.execute(command::search);
-                    searchCommands.put(messageID, command);
+                    searchCommands.put(message.getIdLong(), command);
                 }
             }
         });
