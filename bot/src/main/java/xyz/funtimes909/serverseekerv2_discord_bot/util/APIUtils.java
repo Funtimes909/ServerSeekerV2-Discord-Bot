@@ -28,7 +28,7 @@ public class APIUtils {
         }
     }
 
-    public static JsonElement post(String query) {
+    public static void post(String query) {
         System.out.println(Main.apiUrl + query);
         try (HttpClient client = HttpClient.newHttpClient()) {
 
@@ -38,10 +38,7 @@ public class APIUtils {
                     .header("X-Auth-Key",  Main.apiToken)
                     .build();
 
-            HttpResponse<String> response = client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).join();
-            if (response.statusCode() == 429) return null;
-            return JsonParser.parseString(response.body());
-
+            client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).join();
         }
     }
 
