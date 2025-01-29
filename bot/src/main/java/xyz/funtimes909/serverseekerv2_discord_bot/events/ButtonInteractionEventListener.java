@@ -2,7 +2,6 @@ package xyz.funtimes909.serverseekerv2_discord_bot.events;
 
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import xyz.funtimes909.serverseekerv2_discord_bot.commands.Playerhistory;
 import xyz.funtimes909.serverseekerv2_discord_bot.commands.Search;
 
 import java.util.concurrent.Executor;
@@ -28,15 +27,6 @@ public class ButtonInteractionEventListener extends ListenerAdapter {
                     (short) 25565,
                     event
             ));
-
-            return;
-        } else if (event.getComponentId().startsWith("PlayerHistory")) {
-            executor.execute(() ->
-                    Playerhistory.optionSelected(getAddress(event,
-                            Integer.parseInt(
-                                    event.getComponentId().split("PlayerHistory")[1]
-                            )), event
-                    ));
 
             return;
         }
