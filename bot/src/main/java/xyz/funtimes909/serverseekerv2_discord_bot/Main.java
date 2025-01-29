@@ -92,7 +92,7 @@ public class Main {
                 } catch (InterruptedException ignored) {}
             }
         } catch (IOException e) {
-            throw new RuntimeException("Failed to read config file: ");
+            throw new RuntimeException("Failed to read config file!");
         }
     }
 }

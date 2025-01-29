@@ -13,7 +13,6 @@ import java.net.http.HttpResponse;
 
 public class APIUtils {
     public static JsonElement query(String query) {
-        System.out.println(Main.apiUrl + query);
         try (HttpClient client = HttpClient.newHttpClient()) {
 
             HttpRequest request = HttpRequest.newBuilder()
