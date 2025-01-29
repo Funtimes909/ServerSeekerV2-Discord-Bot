@@ -23,7 +23,7 @@ public class Track {
         String webhook = event.getOption("webhook").getAsString();
 
         if (!PermissionsManager.ownerCheck(id) && !PermissionsManager.trustedUsersCheck(id)) {
-            event.getHook().sendMessage("Sorry! You are not authorized to run this command!").setEphemeral(true).queue();
+            event.getHook().editOriginal(":x: Sorry! You are not authorized to run this command!").queue();
             return;
         }
 
@@ -36,7 +36,7 @@ public class Track {
             List<TrackedPlayer> players = gson.fromJson(reader, playersType);
             players.add(new TrackedPlayer(player, webhook));
 
-            event.getHook().sendMessage("Tracking " + player + " on next scan").queue();
+            event.getHook().editOriginal("Tracking " + player + " on next scan").queue();
             gson.toJson(players, new FileWriter(Main.tracksFile));
 
         } catch (IOException e) {

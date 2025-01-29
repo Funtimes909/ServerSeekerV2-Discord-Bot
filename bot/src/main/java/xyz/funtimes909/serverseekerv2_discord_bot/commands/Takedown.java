@@ -17,12 +17,12 @@ public class Takedown {
         String address = event.getOption("address").getAsString();
 
         if (!PermissionsManager.ownerCheck(id) && !PermissionsManager.trustedUsersCheck(id)) {
-            event.getHook().sendMessage("Sorry! You are not authorized to run this command!").setEphemeral(true).queue();
+            event.getHook().editOriginal(":x: Sorry! You are not authorized to run this command!").queue();
             return;
         }
 
         if (Pattern.compile("[A-Za-z]").matcher(address).find()) {
-            event.getHook().sendMessage("Invalid address!").queue();
+            event.getHook().editOriginal(":x: Invalid address!").queue();
             return;
         }
 
@@ -36,9 +36,9 @@ public class Takedown {
                 APIUtils.post("takedown?address=" + address);
             }
 
-            event.getHook().sendMessage("Added " + address + " to the exclude file").queue();
+            event.getHook().editOriginal(":white_check_mark: Added " + address + " to the exclude file").queue();
         } catch (IOException e) {
-            event.getHook().sendMessage("Invalid address!").queue();
+            event.getHook().editOriginal(":x: Invalid address!").queue();
             Main.logger.error("Error writing to exclude.txt", e);
         }
     }

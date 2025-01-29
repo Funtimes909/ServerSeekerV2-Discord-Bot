@@ -5,6 +5,8 @@ import com.google.gson.JsonObject;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.APIUtils;
 
 import java.awt.*;
@@ -35,7 +37,12 @@ public class Stats {
                 .addField("**Proxy**", String.valueOf(proxies), false)
                 .build();
 
-        event.getHook().sendMessageEmbeds(embed).queue();
+        MessageEditData data = new MessageEditBuilder()
+                .setEmbeds(embed)
+                .setContent(":white_check_mark: Success!")
+                .build();
+
+        event.getHook().editOriginal(data).queue();
     }
 
     private static int aggregateServers(JsonObject obj) {
