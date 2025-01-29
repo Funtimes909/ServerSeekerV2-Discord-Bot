@@ -179,7 +179,7 @@ public class ServerEmbedBuilder {
         // Send icon to discord and use that attachment as the icon
         EmbedBuilder embed = new EmbedBuilder()
                 .setColor(new Color(0, 255, 0))
-                .setAuthor("ServerSeekerV2", "https://cdn.discordapp.com/app-icons/1300318661168594975/cb3825c45b033454cf027a878e96196c.png?size=512")
+                .setAuthor("ServerSeekerV2", "https://cdn.discordapp.com/avatars/1300318661168594975/1222800bc7003f89c849e55d274b2c52?size=256")
                 .setThumbnail("attachment://icon.png") // The icon file
                 .setTitle(address + ":" + port)
                 .addField("** -- __Version__ -- **", versionInfo.toString(), false)

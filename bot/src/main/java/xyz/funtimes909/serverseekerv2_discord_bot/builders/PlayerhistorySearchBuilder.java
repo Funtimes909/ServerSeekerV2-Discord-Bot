@@ -10,7 +10,7 @@ import java.awt.*;
 public class PlayerhistorySearchBuilder {
     public static MessageEmbed build(JsonArray array, String title) {
         EmbedBuilder embed = new EmbedBuilder()
-                .setAuthor("ServerSeekerV2", "https://discord.gg/wYTe2ZwD7g", "https://cdn.discordapp.com/app-icons/1300318661168594975/cb3825c45b033454cf027a878e96196c.png?size=512")
+                .setAuthor("ServerSeekerV2", "https://discord.gg/wYTe2ZwD7g", "https://cdn.discordapp.com/avatars/1300318661168594975/1222800bc7003f89c849e55d274b2c52?size=256")
                 .setTitle("Showing player history for: " + title)
                 .setFooter("Funtimes909", "https://funtimes909.xyz/avatar-gif")
                 .setColor(new Color(0, 255, 0));
