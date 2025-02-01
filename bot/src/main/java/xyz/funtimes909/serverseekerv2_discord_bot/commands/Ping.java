@@ -4,19 +4,15 @@ import com.google.gson.JsonParser;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
-import xyz.funtimes909.serverseekerv2_core.database.Database;
 import xyz.funtimes909.serverseekerv2_core.records.Server;
 import xyz.funtimes909.serverseekerv2_core.util.ServerObjectBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.ServerEmbedBuilder;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.ConnectionPool;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.GenericErrorEmbed;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PingUtils;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.sql.Connection;
-import java.sql.SQLException;
 
 public class Ping {
     public static void ping(SlashCommandInteractionEvent event) {
@@ -49,8 +45,7 @@ public class Ping {
             return;
         }
 
-        // Attempt to connect to the database
-        try (Connection conn = ConnectionPool.getConnection()) {
+        try {
             ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server);
             MessageCreateData embed = embedBuilder.build(true);
 
@@ -65,12 +60,7 @@ public class Ping {
                     .build()
             ).queue();
             embed.close();
-
-            // Update server if connection was a success
-            if (conn != null) {
-                Database.updateServer(conn, server);
-            }
-        } catch (IOException | SQLException e) {
+        } catch (IOException e) {
             GenericErrorEmbed.errorEmbed(event.getMessageChannel(), e.getMessage());
         }
     }

@@ -24,9 +24,6 @@ public class Main {
     public static String exclude;
     public static String tracksFile;
     public static String token;
-    public static String username;
-    public static String password;
-    public static String url;
     public static String apiUrl;
     public static String apiToken;
     public static String ownerId;
@@ -51,9 +48,6 @@ public class Main {
 
             // Set accordingly
             token = config.get("discord_token").getAsString();
-            username = config.get("postgres_user").getAsString();
-            password = config.get("postgres_password").getAsString();
-            url = config.get("postgres_url").getAsString();
             apiUrl = config.get("api_url").getAsString();
             apiToken = config.get("api_token").getAsString();
             exclude = config.get("masscan_exclude_file").getAsString();
@@ -61,9 +55,8 @@ public class Main {
             ownerId = config.get("owner_id").getAsString();
 
             // Warn user about configs should some of them not exist
-            if (url.isBlank()) throw new RuntimeException("Error! No postgres URL specified!");
-            if (username.isBlank()) logger.warn("Warning! No postgres username specified. Attempting to use default username \"postgres\"");
-            if (password.isBlank()) logger.warn("Warning! No postgres password specified. You should setup a password for your database");
+            if (token.isBlank()) throw new RuntimeException("Error! No Discord token provided!");
+            if (ownerId.isBlank()) throw new RuntimeException("Error! No owner ID provided!");
 
             File blacklist = new File("blacklist.txt");
             File trusted = new File("trusted_users.txt");
@@ -88,7 +81,7 @@ public class Main {
                     int stats = response.get("all").getAsInt();
                     client.getPresence().setActivity(Activity.watching(stats + " unique servers!"));
                     logger.info("Updating status for {}", client.getSelfUser().getName());
-                    TimeUnit.MINUTES.sleep(3);
+                    TimeUnit.MINUTES.sleep(10);
                 } catch (InterruptedException ignored) {}
             }
         } catch (IOException e) {
