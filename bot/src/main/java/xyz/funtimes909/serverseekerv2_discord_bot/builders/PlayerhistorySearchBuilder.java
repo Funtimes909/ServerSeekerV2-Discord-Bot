@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
-import java.awt.*;
+import java.awt.Color;
 
 public class PlayerhistorySearchBuilder {
     public static MessageEmbed build(JsonArray array, String title) {
@@ -15,13 +15,13 @@ public class PlayerhistorySearchBuilder {
                 .setFooter("Funtimes909", "https://funtimes909.xyz/avatar-gif")
                 .setColor(new Color(0, 255, 0));
 
-        for (int i = 1; i < array.size(); i++) {
+        for (int i = 0; i < array.size(); i++) {
             JsonObject object = array.get(i).getAsJsonObject();
             StringBuilder address = new StringBuilder(object.get("address").getAsString());
             address.setLength(16);
 
             // Add a field for every player
-            embed.addField(i + ". ``" +
+            embed.addField(i + 1 + ". ``" +
                     address + "`` ``" +
                     object.get("playername").getAsString() + "``  <t:" +
                     object.get("lastseen").getAsString() + ":R>", "_ _", false);
