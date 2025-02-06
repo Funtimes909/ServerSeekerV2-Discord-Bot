@@ -1,3 +1,5 @@
+[![Forgejo](https://img.shields.io/badge/forgejo-%23F2712B.svg?style=for-the-badge&logo=forgejo&logoColor=white)](https://git.funtimes909.xyz/ServerSeekerV2/ServerSeekerV2-PyAPI)
+[![Docker](https://img.shields.io/badge/Docker-%232496ED?style=for-the-badge&logo=docker&logoColor=white&labelColor=%232496ED)](https://hub.docker.com/r/nucceteere/serverseekerv2-discord-bot)
 [![Gradle](https://img.shields.io/badge/Gradle-02303A.svg?style=for-the-badge&logo=gradle&logoColor=white)](https://gradle.org/)
 [![JDA](https://img.shields.io/badge/JDA-%235865F2?style=for-the-badge&logo=discord&logoColor=white)](https://jda.wiki/)
 [![Java](https://img.shields.io/badge/java-21-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)](https://adoptium.net/)
