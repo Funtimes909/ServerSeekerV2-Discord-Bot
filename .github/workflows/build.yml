@@ -41,7 +41,7 @@ jobs:
       - name: Clone the Docker Image Base
         uses: https://github.com/actions/checkout@v3
         with:
-          repository: 'EngurRuzgar/ServerSeekerV2-Discord-Docker'
+          repository: 'ServerSeekerV2/ServerSeekerV2-Discord-Docker'
           path: ./discord
 
       - name: Download JAR
