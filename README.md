@@ -4,9 +4,11 @@
 
 # ServerSeekerV2 Discord Bot
 
-This is the code for a Discord bot to communicate with the [ServerSeekerV2 API](https://git.funtimes909.xyz/Funtimes909/ServerSeekerV2-PyAPI), if you are looking for the project that scans Minecraft servers and adds them to a database, the code is available [here](https://git.funtimes909.xyz/Funtimes909/ServerSeekerV2)
+This is the code for a Discord bot to communicate with the [ServerSeekerV2 API](https://git.funtimes909.xyz/ServerSeekerV2/ServerSeekerV2-PyAPI), if you are looking for the project that scans Minecraft servers and adds them to a database, the code is available [here](https://git.funtimes909.xyz/Funtimes909/ServerSeekerV2)
 
 ServerSeekerV2-Discord-Bot is a Discord bot to fetch results about Minecraft servers from the ServerSeekerV2 API.
+
+There is currently no public instance of this bot, you can ask for support hosting your own scanner and discord bot [here](https://matrix.to/#/#projects:funtimes909.xyz)
 
 This is the official repository, a mirror of the repository can be found [here](https://github.com/Funtimes909/ServerSeekerV2-Discord-Bot) on GitHub where it is synced every few hours.
 Pull requests will only be accepted here, not on GitHub.
