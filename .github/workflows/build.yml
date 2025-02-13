@@ -42,7 +42,9 @@ jobs:
         uses: https://github.com/actions/checkout@v4
         with:
           repository: 'ServerSeekerV2/ServerSeekerV2-Discord-Docker'
+          ref: 'main'
           path: ./discord
+          github-server-url: 'https://git.funtimes909.xyz'
 
       - name: Download JAR
         uses: https://code.forgejo.org/forgejo/download-artifact@v4
