@@ -2,8 +2,8 @@ package xyz.funtimes909.serverseekerv2_discord_bot.commands;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import xyz.funtimes909.serverseekerv2_discord_bot.Main;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.APIUtils;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PermissionsManager;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.Utils;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -31,10 +31,7 @@ public class Takedown {
             Inet4Address.getByName(address);
             writer.write(address + "\n");
 
-            // Remove entries from the database if requested
-            if (event.getOption("remove-entries") != null && event.getOption("remove-entries").getAsBoolean()) {
-                APIUtils.post("takedown?address=" + address);
-            }
+            Utils.post("api/v1/takedown?address=" + address);
 
             event.getHook().editOriginal(":white_check_mark: Added " + address + " to the exclude file").queue();
         } catch (IOException e) {

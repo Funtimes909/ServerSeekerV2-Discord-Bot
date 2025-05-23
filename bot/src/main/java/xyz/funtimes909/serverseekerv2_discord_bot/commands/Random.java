@@ -4,17 +4,16 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
-import xyz.funtimes909.serverseekerv2_core.records.Server;
-import xyz.funtimes909.serverseekerv2_core.util.ServerObjectBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.ServerEmbedBuilder;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.APIUtils;
+import xyz.funtimes909.serverseekerv2_discord_bot.types.Server;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.GenericErrorEmbed;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.Utils;
 
 import java.io.IOException;
 
 public class Random {
     public static void random(SlashCommandInteractionEvent event) {
-        JsonElement response = APIUtils.query("random");
+        JsonElement response = Utils.query("api/v1/random");
 
         if (response == null || !response.isJsonObject()) {
             event.getHook().sendMessage("No results!").queue();
@@ -23,7 +22,7 @@ public class Random {
 
         try {
             JsonObject object = response.getAsJsonObject();
-            Server server = ServerObjectBuilder.buildServerFromApiResponse(object);
+            Server server = Utils.buildServerFromApiResponse(object);
             ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server);
 
             event.getHook().editOriginal(new MessageEditBuilder()

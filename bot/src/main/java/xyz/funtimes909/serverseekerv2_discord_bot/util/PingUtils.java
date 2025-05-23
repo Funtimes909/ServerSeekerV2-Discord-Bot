@@ -1,6 +1,6 @@
 package xyz.funtimes909.serverseekerv2_discord_bot.util;
 
-import xyz.funtimes909.serverseekerv2_core.types.AnsiCodes;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.Utils.AnsiCodes;
 
 import java.io.InputStream;
 import java.io.OutputStream;

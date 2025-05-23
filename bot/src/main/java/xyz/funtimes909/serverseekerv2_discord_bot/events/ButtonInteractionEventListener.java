@@ -4,6 +4,8 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import xyz.funtimes909.serverseekerv2_discord_bot.commands.Search;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -19,14 +21,18 @@ public class ButtonInteractionEventListener extends ListenerAdapter {
 
         event.deferEdit().queue();
 
-        // Handle selection buttons for searches and playerhistory
+        // Handle selection buttons for searches and player history
         if (event.getComponentId().startsWith("SearchButton")) {
-            executor.execute(() ->
-                    searchCommand.optionSelected(
-                    getAddress(event, Integer.parseInt(event.getComponentId().split("SearchButton")[1])),
-                    (short) 25565,
-                    event
-            ));
+            executor.execute(() -> {
+                HashMap<String, Short> map = getAddress(event, Integer.parseInt(event.getComponentId().split("SearchButton")[1]));
+                Map.Entry<String, Short> entry = map.entrySet().iterator().next();
+
+                searchCommand.optionSelected(
+                        entry.getKey(),
+                        entry.getValue(),
+                        event
+                );
+            });
 
             return;
         }
@@ -45,8 +51,8 @@ public class ButtonInteractionEventListener extends ListenerAdapter {
         }
     }
 
-    private static String getAddress(ButtonInteractionEvent event, int fieldNumber) {
-        return event.getMessage()
+    private static HashMap<String, Short> getAddress(ButtonInteractionEvent event, int fieldNumber) {
+        String[] field = event.getMessage()
                 .getEmbeds()
                 .getFirst()
                 .getFields()
@@ -57,6 +63,10 @@ public class ButtonInteractionEventListener extends ListenerAdapter {
                 .getName()
                 .split("``")[1]
                 .split("``")[0]
-                .replaceAll(" ", "");
+                .split(":");
+
+        HashMap<String, Short> server = new HashMap<>();
+        server.put(field[0], Short.valueOf(field[1].replaceAll(" ", "")));
+        return server;
     }
 }

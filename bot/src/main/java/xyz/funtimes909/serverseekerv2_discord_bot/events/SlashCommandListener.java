@@ -31,7 +31,7 @@ public class SlashCommandListener extends ListenerAdapter {
         Main.logger.info("Command: {} run by {} [{}] ({} options)", event.getName(), event.getUser().getName(), event.getUser().getId(), event.getOptions().size());
 
         event.deferReply().queue();
-        event.getHook().sendMessage("Thinking...").queue(message -> {
+        event.getHook().sendMessage(":thinking: Thinking...").queue(message -> {
 
             // Execute command accordingly
             switch (event.getName()) {

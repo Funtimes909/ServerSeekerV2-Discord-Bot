@@ -4,17 +4,17 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.APIUtils;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.Utils;
 
 import java.awt.*;
 
 public class ServerHistoryEmbedBuilder {
     public static MessageEmbed build(String address) {
-        JsonElement response = APIUtils.query("history?address=" + address);
+        JsonElement response = Utils.query("history?address=" + address);
         if (response == null || !response.isJsonArray()) return null;
 
         EmbedBuilder embed = new EmbedBuilder()
-                .setAuthor("ServerSeekerV2", "https://discord.gg/wYTe2ZwD7g", "https://cdn.discordapp.com/avatars/1300318661168594975/1222800bc7003f89c849e55d274b2c52?size=256")
+                .setAuthor("ServerSeekerV2", "https://discord.gg/UA5kyprunc", "https://cdn.discordapp.com/avatars/1300318661168594975/1222800bc7003f89c849e55d274b2c52?size=256")
                 .setTitle("Showing player history for: " + address)
                 .setFooter("Funtimes909", "https://funtimes909.xyz/avatar-gif")
                 .setColor(new Color(0, 255, 0));

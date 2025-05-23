@@ -18,7 +18,7 @@ public class GenericErrorEmbed {
                     .addField("Error Message", error + "\n This is a bug! please report it at the link below!", false)
                     .build();
 
-            channel.sendMessageEmbeds(embed).addActionRow(Button.link("https://github.com/Funtimes909/ServerSeekerV2-Discord-Bot/issues", "Report Bug")).queue();
+            channel.sendMessageEmbeds(embed).addActionRow(Button.link("https://git.funtimes909.xyz/ServerSeekerV2/ServerSeekerV2-Discord-Bot/issues", "Report Bug")).queue();
         }
     }
 }

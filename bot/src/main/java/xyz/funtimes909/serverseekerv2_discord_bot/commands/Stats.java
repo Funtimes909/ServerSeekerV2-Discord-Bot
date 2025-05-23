@@ -7,14 +7,14 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageEditData;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.APIUtils;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.Utils;
 
 import java.awt.*;
 
 public class Stats {
     public static void stats(SlashCommandInteractionEvent event) {
-        JsonElement response = APIUtils.query("stats");
-        JsonObject object = APIUtils.getAsObject(response);
+        JsonElement response = Utils.query("stats");
+        JsonObject object = Utils.getAsObject(response);
 
         if (object == null) return;
         int serverCount = object.get("all").getAsInt();

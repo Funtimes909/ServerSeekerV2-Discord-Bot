@@ -4,11 +4,11 @@ import com.google.gson.JsonParser;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
-import xyz.funtimes909.serverseekerv2_core.records.Server;
-import xyz.funtimes909.serverseekerv2_core.util.ServerObjectBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.ServerEmbedBuilder;
+import xyz.funtimes909.serverseekerv2_discord_bot.types.Server;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.GenericErrorEmbed;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PingUtils;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.Utils;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -33,11 +33,10 @@ public class Ping {
             return;
         }
 
-        Server server = ServerObjectBuilder.buildServerFromPing(
+        Server server = Utils.buildServerFromPing(
                 address,
                 port,
-                JsonParser.parseString(response).getAsJsonObject(),
-                null
+                JsonParser.parseString(response).getAsJsonObject()
         );
 
         if (server == null) {

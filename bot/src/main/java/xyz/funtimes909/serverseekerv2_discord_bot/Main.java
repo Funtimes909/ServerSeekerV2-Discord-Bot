@@ -4,13 +4,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.funtimes909.serverseekerv2_discord_bot.events.AutoCompleteBot;
 import xyz.funtimes909.serverseekerv2_discord_bot.events.ButtonInteractionEventListener;
 import xyz.funtimes909.serverseekerv2_discord_bot.events.SlashCommandListener;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.APIUtils;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.CommandRegisterer;
 
 import java.io.File;
@@ -18,7 +16,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.concurrent.TimeUnit;
 
 public class Main {
     public static String exclude;
@@ -73,17 +70,6 @@ public class Main {
                     .build();
 
             CommandRegisterer.registerCommands(client);
-
-            // Update status every 3 minutes with new server count
-            while (true) {
-                try {
-                    JsonObject response = APIUtils.query("stats").getAsJsonObject();
-                    int stats = response.get("all").getAsInt();
-                    client.getPresence().setActivity(Activity.watching(stats + " unique servers!"));
-                    logger.info("Updating status for {}", client.getSelfUser().getName());
-                    TimeUnit.MINUTES.sleep(10);
-                } catch (InterruptedException ignored) {}
-            }
         } catch (IOException e) {
             throw new RuntimeException("Failed to read config file!");
         }

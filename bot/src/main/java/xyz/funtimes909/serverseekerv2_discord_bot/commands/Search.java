@@ -13,11 +13,10 @@ import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import xyz.funtimes909.serverseekerv2_core.util.ServerObjectBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.SearchEmbedBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.ServerEmbedBuilder;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.APIUtils;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.GenericErrorEmbed;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.Utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,17 +44,17 @@ public class Search {
     }
 
     public void buildQuery(List<OptionMapping> options) {
-        query = new StringBuilder("servers?");
+        query = new StringBuilder("api/v1/servers?");
 
         for (OptionMapping option : options) {
             switch (option.getName()) {
-                case "preventsreports" -> query.append("prevents_reports=").append(option.getAsString()).append("&");
-                case "enforcessecurechat" -> query.append("enforce_secure_chat=").append(option.getAsString()).append("&");
-                case "playercount" -> query.append("onlineplayers=").append(option.getAsString()).append("&");
+                case "prevents_reports" -> query.append("prevents_chat_reports=").append(option.getAsString()).append("&");
+                case "enforces_secure_chat" -> query.append("enforces_secure_chat=").append(option.getAsString()).append("&");
+                case "online_players" -> query.append("online_players=").append(option.getAsString()).append("&");
                 case "description" -> {
-                    query.append("motd=");
-                    for (String space : option.getAsString().split(" ")) {
-                        query.append(space).append("%20");
+                    query.append("description=");
+                    for (String text : option.getAsString().split(" ")) {
+                        query.append(text).append("%20");
                     }
 
                     query.setLength(query.length() - 3);
@@ -64,13 +63,14 @@ public class Search {
                 default -> query.append(option.getName()).append("=").append(option.getAsString()).append("&");
             }
         }
-        query.append("minimal=1&limit=5&offset=").append(offset);
+        query.append("minimal=true");
     }
 
     public void runQuery() {
         query.replace(query.lastIndexOf("="), query.length(), "=" + offset);
-        JsonElement response = APIUtils.query(query.toString());
-        JsonArray array = APIUtils.getAsArray(response);
+        JsonElement response = Utils.query(query.toString());
+        JsonObject results = Utils.getAsObject(response);
+        JsonArray array = results.get("results").getAsJsonArray();
 
         if (array == null || array.isEmpty()) {
             interaction.getHook().editOriginal(":x: No results!").queue();
@@ -108,17 +108,17 @@ public class Search {
     }
 
     public void optionSelected(String address, short port, ButtonInteractionEvent event) {
-        JsonArray response = (JsonArray) APIUtils.query(
-                "servers?address=" +
+        JsonObject response = Utils.query(
+                "api/v1/servers?address=" +
                         address +
                         "&port=" +
                         port
-        );
+        ).getAsJsonObject();
 
         try {
-            JsonObject object = response.get(0).getAsJsonObject();
-            ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(
-                    ServerObjectBuilder.buildServerFromApiResponse(object));
+            JsonArray array = response.get("results").getAsJsonArray();
+            JsonObject object = array.get(0).getAsJsonObject();
+            ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(Utils.buildServerFromApiResponse(object));
             MessageCreateData embed = embedBuilder.build(false);
 
             event.getHook().sendMessage(embed).queue();

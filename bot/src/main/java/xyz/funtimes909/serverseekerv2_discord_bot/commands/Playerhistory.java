@@ -5,7 +5,7 @@ import com.google.gson.JsonElement;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.PlayerhistorySearchBuilder;
-import xyz.funtimes909.serverseekerv2_discord_bot.util.APIUtils;
+import xyz.funtimes909.serverseekerv2_discord_bot.util.Utils;
 
 public class Playerhistory {
     public static void playerhistory(SlashCommandInteractionEvent event) {
@@ -20,11 +20,11 @@ public class Playerhistory {
         }
 
         String query = event.getOption("player") != null ?
-                "history?player=" + event.getOption("player").getAsString() :
-                "history?address=" + event.getOption("address").getAsString();
+                "api/v1/history?player=" + event.getOption("player").getAsString() :
+                "api/v1/history?address=" + event.getOption("address").getAsString();
 
-        JsonElement response = APIUtils.query(query);
-        JsonArray array = APIUtils.getAsArray(response);
+        JsonElement response = Utils.query(query);
+        JsonArray array = Utils.getAsArray(response);
 
         if (array == null || array.isEmpty()) {
             event.getHook().editOriginal(":x: No results!").queue();

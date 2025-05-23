@@ -1,16 +1,13 @@
 package xyz.funtimes909.serverseekerv2_discord_bot.builders;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import xyz.funtimes909.serverseekerv2_core.records.Mod;
-import xyz.funtimes909.serverseekerv2_core.records.Player;
-import xyz.funtimes909.serverseekerv2_core.records.Server;
-import xyz.funtimes909.serverseekerv2_core.types.ServerType;
-import xyz.funtimes909.serverseekerv2_core.util.HTTPUtils;
+import xyz.funtimes909.serverseekerv2_discord_bot.types.Mod;
+import xyz.funtimes909.serverseekerv2_discord_bot.types.Player;
+import xyz.funtimes909.serverseekerv2_discord_bot.types.Server;
+import xyz.funtimes909.serverseekerv2_discord_bot.types.ServerType;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PingUtils;
 
 import java.awt.*;
@@ -23,7 +20,7 @@ import java.util.List;
 public class ServerEmbedBuilder {
     private final String address;
     private final short port;
-    private final ServerType type;
+    private final ServerType software;
     private String description;
     private final String version;
     private final String icon;
@@ -32,12 +29,11 @@ public class ServerEmbedBuilder {
     private final String asn;
     private final String hostname;
     private final String organization;
-    private final long firstseen;
-    private final long lastseen;
-    private final Boolean whitelist;
+    private final long first_seen;
+    private final long last_seen;
     private final Boolean enforceSecure;
-    private final Boolean cracked;
     private final Boolean preventsReports;
+    private final Integer onlinePlayers;
     private final Integer maxPlayers;
     private final List<Player> players;
     private final List<Mod> mods;
@@ -45,7 +41,7 @@ public class ServerEmbedBuilder {
     public ServerEmbedBuilder(Server server) {
         address = server.getAddress();
         port = server.getPort();
-        type = server.getServerType();
+        software = server.getServerType();
         description = server.getMotd();
         version = server.getVersion();
         icon = server.getIcon();
@@ -54,12 +50,11 @@ public class ServerEmbedBuilder {
         asn = server.getAsn();
         hostname = server.getReverseDns();
         organization = server.getOrganization();
-        firstseen = server.getFirstSeen();
-        lastseen = server.getLastSeen();
-        whitelist = server.getWhitelist();
+        first_seen = server.getFirstSeen();
+        last_seen = server.getLastSeen();
         enforceSecure = server.getEnforceSecure();
-        cracked = server.getCracked();
         preventsReports = server.getPreventsReports();
+        onlinePlayers = server.getOnlinePlayers();
         maxPlayers = server.getMaxPlayers();
         players = server.getPlayers();
         mods = server.getMods();
@@ -67,7 +62,7 @@ public class ServerEmbedBuilder {
 
     public MessageCreateData build(boolean ping) throws IOException {
         StringBuilder miscInfo = new StringBuilder();
-        StringBuilder addressInfo = new StringBuilder();
+        String addressInfo = "";
         StringBuilder playerInfo = new StringBuilder();
         StringBuilder modInfo = new StringBuilder();
         StringBuilder versionInfo = new StringBuilder();
@@ -77,9 +72,9 @@ public class ServerEmbedBuilder {
             description = PingUtils.parseMOTD(description);
         }
 
-        if (Character.isDigit(version.charAt(0)) && type != null) {
-            versionInfo.append(type.name().charAt(0))
-                    .append(type.name().substring(1).toLowerCase())
+        if (Character.isDigit(version.charAt(0)) && software != null) {
+            versionInfo.append(software.name().charAt(0))
+                    .append(software.name().substring(1).toLowerCase())
                     .append(" ")
                     .append(version)
                     .append(" (")
@@ -94,42 +89,11 @@ public class ServerEmbedBuilder {
 
         // Handle timestamp field
         String timestamps =
-                "First Seen: <t:" + firstseen + ":R>\n" +
-                "Last Seen: <t:" + lastseen + ":R>";
-
-        // If this is a ping, request address information, else use address information from the database
-        if (ping) {
-            String response = HTTPUtils.run(address);
-            if (response != null) {
-                JsonObject parsed = JsonParser.parseString(response).getAsJsonObject();
-
-                addressInfo.append(parsed.get("countryCode").getAsString().isBlank() ?
-                        "Country: **N/A** \n" :
-                        "Country: **" + parsed.get("countryCode").getAsString() + " :flag_" + country.toLowerCase() + ":**\n");
-
-                addressInfo.append(parsed.get("reverse").getAsString().isBlank() ?
-                        "Hostname: **N/A** \n" :
-                        "Hostname: **" + parsed.get("reverse").getAsString() + "**\n");
-
-                addressInfo.append(parsed.get("org").getAsString().isBlank() ?
-                        "Organization: **N/A** \n" :
-                        "Organization: **" + parsed.get("org").getAsString() + "**\n");
-
-                addressInfo.append(parsed.get("as").getAsString().isBlank() ?
-                        "ASN: **N/A**" :
-                        "ASN: **" + parsed.get("as").getAsString() + "**");
-            }
-        } else {
-            addressInfo.append("Country: **").append(country != null ?
-                    country + " :flag_" + country.toLowerCase() + ":" :
-                    "N/A").append("**\n");
-            addressInfo.append("Hostname: **").append(hostname != null ? hostname + "**\n" : "N/A**\n");
-            addressInfo.append("Organization: **").append(organization != null ? organization + "**\n" : "N/A**\n");
-            addressInfo.append("ASN: **").append(asn != null ? asn + "**" : "N/A**");
-        }
+                "First Seen: <t:" + first_seen + ":R>\n" +
+                "Last Seen: <t:" + last_seen + ":R>";
 
         // Create field for players
-        playerInfo.append("Players: **").append(players != null ? players.size() + "/" + maxPlayers : 0).append("**\n");
+        playerInfo.append("Players: **").append(onlinePlayers).append("**\n");
         if (players == null || players.isEmpty()) {
             playerInfo.append("```No players found!```");
         } else {
@@ -164,8 +128,6 @@ public class ServerEmbedBuilder {
         }
 
         // Miscellaneous info
-        miscInfo.append("Whitelist: **").append(whitelist != null ? whitelist + "**\n" : "N/A**\n");
-        miscInfo.append("Cracked: **").append(cracked != null ? cracked + "**\n" : "N/A**\n");
         miscInfo.append("Prevents Chat Reports: **").append(preventsReports != null ? preventsReports + "**\n" : "N/A**\n");
         miscInfo.append("Enforces Secure Chat: **").append(enforceSecure != null ? enforceSecure + "**\n" : "N/A**\n");
 
@@ -179,7 +141,7 @@ public class ServerEmbedBuilder {
         // Send icon to discord and use that attachment as the icon
         EmbedBuilder embed = new EmbedBuilder()
                 .setColor(new Color(0, 255, 0))
-                .setAuthor("ServerSeekerV2", "https://cdn.discordapp.com/avatars/1300318661168594975/1222800bc7003f89c849e55d274b2c52?size=256")
+                .setAuthor("ServerSeekerV2", "https://cdn.discordapp.com/app-icons/1375333922765930556/bcc3069c7e9fdb44107faeb74477127d.png?size=256")
                 .setThumbnail("attachment://icon.png") // The icon file
                 .setTitle(address + ":" + port)
                 .addField("** -- __Version__ -- **", versionInfo.toString(), false)
@@ -193,7 +155,7 @@ public class ServerEmbedBuilder {
         embed.addField("** -- __Miscellaneous__ -- **", miscInfo.toString(), false);
         embed.addField("** -- __Players__ -- **",  playerInfo.toString(), false);
         if (mods != null && !mods.isEmpty()) embed.addField("** -- __Mods__ -- **",  modInfo.toString(), false);
-        embed.addField("** -- __Address Information__ -- **", addressInfo.toString(), false);
+        embed.addField("** -- __Address Information__ -- **", addressInfo, false);
 
         return new MessageCreateBuilder()
                 .setFiles(FileUpload.fromData(image, "icon.png"))
