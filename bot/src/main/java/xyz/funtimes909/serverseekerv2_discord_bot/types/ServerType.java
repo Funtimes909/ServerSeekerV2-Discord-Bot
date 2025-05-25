@@ -23,4 +23,23 @@ public enum ServerType {
     ServerType(String versionName) {
         this.versionName = versionName;
     }
+
+    public static ServerType fromVersionName(String software) {
+        return switch (software) {
+            case "Java" -> JAVA;
+            case "Bedrock" -> BEDROCK;
+            case "Neoforge" -> NEOFORGE;
+            case "Paper" -> PAPER;
+            case "Spigot" -> SPIGOT;
+            case "Purpur" -> PURPUR;
+            case "Folia" -> FOLIA;
+            case "Velocity" -> VELOCITY;
+            case "Leaves" -> LEAVES;
+            case "Waterfall" -> WATERFALL;
+            case "BungeeCord" -> BUNGEECORD;
+            case "Legacy" -> LEGACY;
+            case "Any" -> ANY;
+            default -> null;
+        };
+    }
 }

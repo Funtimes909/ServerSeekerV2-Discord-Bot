@@ -1,6 +1,5 @@
 package xyz.funtimes909.serverseekerv2_discord_bot.util;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -39,26 +38,10 @@ public class Utils {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(Main.apiUrl + query))
                     .POST(HttpRequest.BodyPublishers.noBody())
-                    .header("Authorization",  Main.apiToken)
+                    .header("Authorization", Main.apiToken)
                     .build();
 
             client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).join();
-        }
-    }
-
-    public static JsonArray getAsArray(JsonElement response) {
-        if (response == null || !response.isJsonArray()) {
-            return null;
-        } else {
-            return response.getAsJsonArray();
-        }
-    }
-
-    public static JsonObject getAsObject(JsonElement response) {
-        if (response == null || !response.isJsonObject()) {
-            return null;
-        } else {
-            return response.getAsJsonObject();
         }
     }
 
@@ -66,6 +49,7 @@ public class Utils {
         return new Server.Builder()
                 .setAddress(response.get("address").getAsString())
                 .setPort(response.get("port").getAsShort())
+                .setServerType(!response.get("software").isJsonNull() ? ServerType.fromVersionName(response.get("software").getAsString()) : null)
                 .setMotd(!response.get("description_formatted").isJsonNull() ? response.get("description_formatted").getAsString() : null)
                 .setIcon(!response.get("icon").isJsonNull() ? response.get("icon").getAsString() : null)
                 .setVersion(!response.get("version").isJsonNull() ? response.get("version").getAsString() : null)

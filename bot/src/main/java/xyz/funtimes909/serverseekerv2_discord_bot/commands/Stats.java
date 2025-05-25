@@ -14,7 +14,7 @@ import java.awt.*;
 public class Stats {
     public static void stats(SlashCommandInteractionEvent event) {
         JsonElement response = Utils.query("stats");
-        JsonObject object = Utils.getAsObject(response);
+        JsonObject object = response.getAsJsonObject();
 
         if (object == null) return;
         int serverCount = object.get("all").getAsInt();

@@ -69,7 +69,7 @@ public class Search {
     public void runQuery() {
         query.replace(query.lastIndexOf("="), query.length(), "=" + offset);
         JsonElement response = Utils.query(query.toString());
-        JsonObject results = Utils.getAsObject(response);
+        JsonObject results = response.getAsJsonObject();
         JsonArray array = results.get("results").getAsJsonArray();
 
         if (array == null || array.isEmpty()) {

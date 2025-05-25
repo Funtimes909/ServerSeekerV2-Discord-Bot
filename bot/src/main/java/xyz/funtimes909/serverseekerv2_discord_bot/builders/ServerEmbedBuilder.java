@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import org.jetbrains.annotations.NotNull;
 import xyz.funtimes909.serverseekerv2_discord_bot.types.Mod;
 import xyz.funtimes909.serverseekerv2_discord_bot.types.Player;
 import xyz.funtimes909.serverseekerv2_discord_bot.types.Server;
@@ -127,7 +126,7 @@ public class ServerEmbedBuilder {
                 .setContent(":white_check_mark: Success!")
                 .build();
     }
-    
+
     private StringBuilder handlePlayers() {
         StringBuilder playersFieldFormat = new StringBuilder("Players: **%d/%d**\n");
         if (players == null || players.isEmpty()) {
