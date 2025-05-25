@@ -20,13 +20,12 @@ public class PlayerhistorySearchBuilder {
             JsonObject object = array.get(i).getAsJsonObject();
 
             // Add a field for every player
-            String format_string = "%h. ``%s:%s`` ``%s`` <t:%s:R>";
-            String field = String.format(format_string,
+            String field = String.format("%d. ``%s:%d`` ``%s`` <t:%d:R>",
                     (i + 1),
                     object.get("address").getAsString(),
-                    object.get("port").getAsString(),
+                    object.get("port").getAsInt(),
                     object.get("name").getAsString(),
-                    object.get("last_seen").getAsString()
+                    object.get("last_seen").getAsInt()
             );
             embed.addField(field, "_ _", false);
         }

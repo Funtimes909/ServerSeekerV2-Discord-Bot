@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import org.jetbrains.annotations.NotNull;
 import xyz.funtimes909.serverseekerv2_discord_bot.types.Mod;
 import xyz.funtimes909.serverseekerv2_discord_bot.types.Player;
 import xyz.funtimes909.serverseekerv2_discord_bot.types.Server;
@@ -25,8 +26,8 @@ public class ServerEmbedBuilder {
     private final String version;
     private final String icon;
     private final Integer protocol;
-    private final long first_seen;
-    private final long last_seen;
+    private final long firstSeen;
+    private final long lastSeen;
     private final Boolean enforceSecure;
     private final Boolean preventsReports;
     private final Integer onlinePlayers;
@@ -42,8 +43,8 @@ public class ServerEmbedBuilder {
         version = server.getVersion();
         icon = server.getIcon();
         protocol = server.getProtocol();
-        first_seen = server.getFirstSeen();
-        last_seen = server.getLastSeen();
+        firstSeen = server.getFirstSeen();
+        lastSeen = server.getLastSeen();
         enforceSecure = server.getEnforceSecure();
         preventsReports = server.getPreventsReports();
         onlinePlayers = server.getOnlinePlayers();
@@ -53,53 +54,28 @@ public class ServerEmbedBuilder {
     }
 
     public MessageCreateData build(boolean ping) throws IOException {
-        StringBuilder miscInfo = new StringBuilder();
-        StringBuilder playerInfo = new StringBuilder();
         StringBuilder modInfo = new StringBuilder();
-        StringBuilder versionInfo = new StringBuilder();
 
         // Handle server software and version field
         if (description != null && description.contains("§")) {
             description = PingUtils.parseMOTD(description);
         }
 
-        if (Character.isDigit(version.charAt(0)) && software != null) {
-            versionInfo.append(software.name().charAt(0))
-                    .append(software.name().substring(1).toLowerCase())
-                    .append(" ")
-                    .append(version)
-                    .append(" (")
-                    .append(protocol)
-                    .append(")");
-        } else {
-            versionInfo.append(version)
-                    .append(" (")
-                    .append(protocol)
-                    .append(")");
-        }
+        // Version field
+        String versionField = String.format("Version: **%s** **(%d)**\nSoftware: **%s**", version, protocol, software);
 
-        // Handle timestamp field
-        String timestamps =
-                "First Seen: <t:" + first_seen + ":R>\n" +
-                "Last Seen: <t:" + last_seen + ":R>";
+        // Timestamp field
+        String timestampField = String.format("First Seen: <t:%d:R>\nLast Seen: <t:%d:R>", firstSeen, lastSeen);
 
-        // Create field for players
-        playerInfo.append("Players: **").append(onlinePlayers + "/" + maxPlayers).append("**\n");
-        if (players == null || players.isEmpty()) {
-            playerInfo.append("```No players found!```");
-        } else {
-            playerInfo.append("```\n");
+        // Misc field
+        String miscField = String.format("Prevents Chat Reports: **%s**\nEnforces Secure Chat: **%s**",
+                preventsReports == null ? "N/A" : preventsReports,
+                enforceSecure == null ? "N/A" : enforceSecure
+        );
 
-            int count = 0;
-            for (Player player : players) {
-                playerInfo.append("\n").append(player.name()).append("\n").append(player.uuid()).append("\n");
-                count++;
-                if (count == 5) break;
-            }
-
-            if (players.size() > 5) playerInfo.append("\n").append(players.size() - 5).append(" Players not shown...\n");
-            playerInfo.append("```");
-        }
+        // Player field
+        StringBuilder playersFieldFormat = handlePlayers();
+        String playerField = String.format(playersFieldFormat.toString(), onlinePlayers, maxPlayers);
 
         // Handle field for mods if they exist
         if (mods != null && !mods.isEmpty()) {
@@ -118,10 +94,7 @@ public class ServerEmbedBuilder {
             modInfo.append("```");
         }
 
-        // Miscellaneous info
-        miscInfo.append("Prevents Chat Reports: **").append(preventsReports != null ? preventsReports + "**\n" : "N/A**\n");
-        miscInfo.append("Enforces Secure Chat: **").append(enforceSecure != null ? enforceSecure + "**\n" : "N/A**\n");
-
+        // If an image is present use that, use the default image if not
         byte[] image;
         if (icon != null && !icon.isBlank()) {
             image = Base64.getDecoder().decode(icon.split(",")[1]);
@@ -133,19 +106,19 @@ public class ServerEmbedBuilder {
         EmbedBuilder embed = new EmbedBuilder()
                 .setColor(new Color(0, 255, 0))
                 .setAuthor("ServerSeekerV2", "https://discord.gg/UA5kyprunc", "https://cdn.discordapp.com/app-icons/1375333922765930556/bcc3069c7e9fdb44107faeb74477127d.png?size=256")
-                .setFooter("Funtimes909", "https://funtimes909.xyz/assets/images/floppa.png")
+                .setFooter("Made with <3 by Funtimes909", "https://funtimes909.xyz/assets/images/floppa.png")
                 .setThumbnail("attachment://icon.png") // The icon file
                 .setTitle(address + ":" + port)
-                .addField("** -- __Version__ -- **", versionInfo.toString(), false)
+                .addField("** -- __Version__ -- **", versionField, false)
                 .addField("** -- __Description__ -- **", description != null ? "```ansi\n" + description + "```" : "```No description found!```", false);
 
         // Add all the fields to the embed
         if (!ping) {
-            embed.addField("** -- __Timestamps__ -- **", timestamps, false);
+            embed.addField("** -- __Timestamps__ -- **", timestampField, false);
         }
 
-        embed.addField("** -- __Miscellaneous__ -- **", miscInfo.toString(), false);
-        embed.addField("** -- __Players__ -- **",  playerInfo.toString(), false);
+        embed.addField("** -- __Miscellaneous__ -- **", miscField, false);
+        embed.addField("** -- __Players__ -- **",  playerField, false);
         if (mods != null && !mods.isEmpty()) embed.addField("** -- __Mods__ -- **",  modInfo.toString(), false);
 
         return new MessageCreateBuilder()
@@ -153,5 +126,23 @@ public class ServerEmbedBuilder {
                 .setEmbeds(embed.build())
                 .setContent(":white_check_mark: Success!")
                 .build();
+    }
+    
+    private StringBuilder handlePlayers() {
+        StringBuilder playersFieldFormat = new StringBuilder("Players: **%d/%d**\n");
+        if (players == null || players.isEmpty()) {
+            playersFieldFormat.append("```No players found!```");
+        } else {
+            playersFieldFormat.append("```\n");
+
+            for (int i = 0; i < Integer.max(players.size(), 5); i++) {
+                playersFieldFormat.append(String.format("\n%s\n%s\n", players.get(i).name(), players.get(i).uuid()));
+            }
+
+            if (players.size() > 5) playersFieldFormat.append(String.format("\n%d Players not shown...\n", players.size() - 5));
+
+            playersFieldFormat.append("```");
+        }
+        return playersFieldFormat;
     }
 }
