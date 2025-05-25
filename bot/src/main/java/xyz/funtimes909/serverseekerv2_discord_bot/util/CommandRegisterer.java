@@ -70,7 +70,7 @@ public class CommandRegisterer {
                                 .addChoice("Add", "Add")
                                 .addChoice("Remove", "Remove")),
 
-                Commands.slash("player_history", "Search for player history of a specific player")
+                Commands.slash("playerhistory", "Search for player history of a specific player")
                         .addOption(OptionType.STRING, "player", "The player you want to search for", false)
                         .addOption(OptionType.STRING, "address", "The server you want to search history for", false),
 

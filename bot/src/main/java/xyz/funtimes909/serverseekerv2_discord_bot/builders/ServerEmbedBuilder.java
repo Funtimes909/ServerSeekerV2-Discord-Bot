@@ -25,10 +25,6 @@ public class ServerEmbedBuilder {
     private final String version;
     private final String icon;
     private final Integer protocol;
-    private final String country;
-    private final String asn;
-    private final String hostname;
-    private final String organization;
     private final long first_seen;
     private final long last_seen;
     private final Boolean enforceSecure;
@@ -46,10 +42,6 @@ public class ServerEmbedBuilder {
         version = server.getVersion();
         icon = server.getIcon();
         protocol = server.getProtocol();
-        country = server.getCountry();
-        asn = server.getAsn();
-        hostname = server.getReverseDns();
-        organization = server.getOrganization();
         first_seen = server.getFirstSeen();
         last_seen = server.getLastSeen();
         enforceSecure = server.getEnforceSecure();
@@ -62,7 +54,6 @@ public class ServerEmbedBuilder {
 
     public MessageCreateData build(boolean ping) throws IOException {
         StringBuilder miscInfo = new StringBuilder();
-        String addressInfo = "";
         StringBuilder playerInfo = new StringBuilder();
         StringBuilder modInfo = new StringBuilder();
         StringBuilder versionInfo = new StringBuilder();
@@ -93,7 +84,7 @@ public class ServerEmbedBuilder {
                 "Last Seen: <t:" + last_seen + ":R>";
 
         // Create field for players
-        playerInfo.append("Players: **").append(onlinePlayers).append("**\n");
+        playerInfo.append("Players: **").append(onlinePlayers + "/" + maxPlayers).append("**\n");
         if (players == null || players.isEmpty()) {
             playerInfo.append("```No players found!```");
         } else {
@@ -141,7 +132,8 @@ public class ServerEmbedBuilder {
         // Send icon to discord and use that attachment as the icon
         EmbedBuilder embed = new EmbedBuilder()
                 .setColor(new Color(0, 255, 0))
-                .setAuthor("ServerSeekerV2", "https://cdn.discordapp.com/app-icons/1375333922765930556/bcc3069c7e9fdb44107faeb74477127d.png?size=256")
+                .setAuthor("ServerSeekerV2", "https://discord.gg/UA5kyprunc", "https://cdn.discordapp.com/app-icons/1375333922765930556/bcc3069c7e9fdb44107faeb74477127d.png?size=256")
+                .setFooter("Funtimes909", "https://funtimes909.xyz/assets/images/floppa.png")
                 .setThumbnail("attachment://icon.png") // The icon file
                 .setTitle(address + ":" + port)
                 .addField("** -- __Version__ -- **", versionInfo.toString(), false)
@@ -155,7 +147,6 @@ public class ServerEmbedBuilder {
         embed.addField("** -- __Miscellaneous__ -- **", miscInfo.toString(), false);
         embed.addField("** -- __Players__ -- **",  playerInfo.toString(), false);
         if (mods != null && !mods.isEmpty()) embed.addField("** -- __Mods__ -- **",  modInfo.toString(), false);
-        embed.addField("** -- __Address Information__ -- **", addressInfo, false);
 
         return new MessageCreateBuilder()
                 .setFiles(FileUpload.fromData(image, "icon.png"))

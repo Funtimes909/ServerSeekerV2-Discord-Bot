@@ -2,8 +2,10 @@ package xyz.funtimes909.serverseekerv2_discord_bot.commands;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.PlayerhistorySearchBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.Utils;
 
@@ -20,18 +22,17 @@ public class Playerhistory {
         }
 
         String query = event.getOption("player") != null ?
-                "api/v1/history?player=" + event.getOption("player").getAsString() :
-                "api/v1/history?address=" + event.getOption("address").getAsString();
+                "api/v1/playerhistory?player=" + event.getOption("player").getAsString() :
+                "api/v1/playerhistory?address=" + event.getOption("address").getAsString();
 
-        JsonElement response = Utils.query(query);
-        JsonArray array = Utils.getAsArray(response);
+        JsonArray response = Utils.query(query).getAsJsonObject().get("results").getAsJsonArray();
 
-        if (array == null || array.isEmpty()) {
+        if (response == null || response.isEmpty()) {
             event.getHook().editOriginal(":x: No results!").queue();
             return;
         }
 
-        MessageEmbed embed = PlayerhistorySearchBuilder.build(array, query.split("=")[1]);
+        MessageEmbed embed = PlayerhistorySearchBuilder.build(response, query.split("=")[1]);
         event.getHook().editOriginalEmbeds(embed).queue();
     }
 }

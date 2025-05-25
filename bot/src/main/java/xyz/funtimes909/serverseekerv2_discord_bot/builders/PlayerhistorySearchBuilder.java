@@ -10,21 +10,25 @@ import java.awt.*;
 public class PlayerhistorySearchBuilder {
     public static MessageEmbed build(JsonArray array, String title) {
         EmbedBuilder embed = new EmbedBuilder()
-                .setAuthor("ServerSeekerV2", "https://discord.gg/UA5kyprunc", "https://cdn.discordapp.com/avatars/1300318661168594975/1222800bc7003f89c849e55d274b2c52?size=256")
+                .setAuthor("ServerSeekerV2", "https://discord.gg/UA5kyprunc", "https://cdn.discordapp.com/app-icons/1375333922765930556/bcc3069c7e9fdb44107faeb74477127d.png?size=256")
+                .setFooter("Funtimes909", "https://funtimes909.xyz/assets/images/floppa.png")
                 .setTitle("Showing player history for: " + title)
-                .setFooter("Funtimes909", "https://funtimes909.xyz/avatar-gif")
                 .setColor(new Color(0, 255, 0));
 
         for (int i = 0; i < array.size(); i++) {
+            if (i > 9) break;
             JsonObject object = array.get(i).getAsJsonObject();
-            StringBuilder address = new StringBuilder(object.get("address").getAsString());
-            address.setLength(16);
 
             // Add a field for every player
-            embed.addField(i + 1 + ". ``" +
-                    address + "`` ``" +
-                    object.get("name").getAsString() + "``  <t:" +
-                    object.get("last_seen").getAsString() + ":R>", "_ _", false);
+            String format_string = "%h. ``%s:%s`` ``%s`` <t:%s:R>";
+            String field = String.format(format_string,
+                    (i + 1),
+                    object.get("address").getAsString(),
+                    object.get("port").getAsString(),
+                    object.get("name").getAsString(),
+                    object.get("last_seen").getAsString()
+            );
+            embed.addField(field, "_ _", false);
         }
 
         return embed.build();
