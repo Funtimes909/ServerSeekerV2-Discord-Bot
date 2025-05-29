@@ -14,7 +14,7 @@ public class SearchEmbedBuilder {
                 .setColor(new Color(0, 255, 0))
                 .setTitle("Page: " + page + " (Total Results: " + rowCount + ")")
                 .setAuthor("ServerSeekerV2", "https://discord.gg/UA5kyprunc", "https://cdn.discordapp.com/app-icons/1375333922765930556/bcc3069c7e9fdb44107faeb74477127d.png?size=256")
-                .setFooter("Funtimes909", "https://funtimes909.xyz/assets/images/floppa.png");
+                .setFooter("Made with <3 by Funtimes909", "https://funtimes909.xyz/assets/images/floppa.png");
 
         int index = 1;
         for (JsonElement server : servers) {

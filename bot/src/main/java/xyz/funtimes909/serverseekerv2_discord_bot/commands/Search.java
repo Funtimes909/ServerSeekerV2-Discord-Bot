@@ -25,7 +25,6 @@ import java.util.List;
 public class Search {
     private final SlashCommandInteractionEvent interaction;
     private StringBuilder query = new StringBuilder();
-    public int rowCount = 100;
     public int offset = 0;
     public int pointer = 5;
 
@@ -63,13 +62,20 @@ public class Search {
                 default -> query.append(option.getName()).append("=").append(option.getAsString()).append("&");
             }
         }
-        query.append("minimal=true&limit=5&offset=").append(offset);
+        query.append("limit=5&offset=").append(offset);
     }
 
     public void runQuery() {
         query.replace(query.lastIndexOf("="), query.length(), "=" + offset);
         JsonElement response = Utils.query(query.toString());
+
+        if (response == null || response.isJsonNull()) {
+            interaction.getHook().editOriginal(":x: No results!").queue();
+            return;
+        }
+
         JsonObject results = response.getAsJsonObject();
+        int rowCount = results.get("total_results").getAsInt();
         JsonArray array = results.get("results").getAsJsonArray();
 
         if (array == null || array.isEmpty()) {
