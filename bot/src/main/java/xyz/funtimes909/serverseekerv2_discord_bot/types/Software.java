@@ -1,6 +1,6 @@
 package xyz.funtimes909.serverseekerv2_discord_bot.types;
 
-public enum ServerType {
+public enum Software {
     JAVA("Java"),
     BEDROCK("Bedrock"),
     NEOFORGE("Neoforge"),
@@ -20,15 +20,16 @@ public enum ServerType {
 
     public final String versionName;
 
-    ServerType(String versionName) {
+    Software(String versionName) {
         this.versionName = versionName;
     }
 
-    public static ServerType fromVersionName(String software) {
+    public static Software fromVersionName(String software) {
         return switch (software) {
             case "Java" -> JAVA;
             case "Bedrock" -> BEDROCK;
             case "Neoforge" -> NEOFORGE;
+            case "Lexforge" -> LEXFORGE;
             case "Paper" -> PAPER;
             case "Spigot" -> SPIGOT;
             case "Purpur" -> PURPUR;

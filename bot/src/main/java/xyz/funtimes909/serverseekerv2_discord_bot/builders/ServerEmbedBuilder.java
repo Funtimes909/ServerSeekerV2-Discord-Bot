@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import xyz.funtimes909.serverseekerv2_discord_bot.types.Mod;
 import xyz.funtimes909.serverseekerv2_discord_bot.types.Player;
 import xyz.funtimes909.serverseekerv2_discord_bot.types.Server;
-import xyz.funtimes909.serverseekerv2_discord_bot.types.ServerType;
+import xyz.funtimes909.serverseekerv2_discord_bot.types.Software;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.PingUtils;
 
 import java.awt.*;
@@ -20,7 +20,7 @@ import java.util.List;
 public class ServerEmbedBuilder {
     private final String address;
     private final short port;
-    private final ServerType software;
+    private final Software software;
     private String description;
     private final String version;
     private final String icon;
@@ -37,7 +37,7 @@ public class ServerEmbedBuilder {
     public ServerEmbedBuilder(Server server) {
         address = server.getAddress();
         port = server.getPort();
-        software = server.getServerType();
+        software = server.getSoftware();
         description = server.getMotd();
         version = server.getVersion();
         icon = server.getIcon();
@@ -96,7 +96,12 @@ public class ServerEmbedBuilder {
         // If an image is present use that, use the default image if not
         byte[] image;
         if (icon != null && !icon.isBlank()) {
-            image = Base64.getDecoder().decode(icon.split(",")[1]);
+            // Some base64 icons fail to decode
+            try {
+                image = Base64.getDecoder().decode(icon.split(",")[1]);
+            } catch (IllegalArgumentException e) {
+                image = Files.readAllBytes(new File("default_icon.png").toPath());
+            }
         } else {
             image = Files.readAllBytes(new File("default_icon.png").toPath());
         }
@@ -134,8 +139,11 @@ public class ServerEmbedBuilder {
         } else {
             playersFieldFormat.append("```\n");
 
-            for (int i = 0; i < Integer.max(players.size(), 5); i++) {
-                playersFieldFormat.append(String.format("\n%s\n%s\n", players.get(i).name(), players.get(i).uuid()));
+            int i = 0;
+            for (Player player : players) {
+                if (i == 5) break;
+                playersFieldFormat.append(String.format("\n%s\n%s\n", player.name(), player.uuid()));
+                i++;
             }
 
             if (players.size() > 5) playersFieldFormat.append(String.format("\n%d Players not shown...\n", players.size() - 5));

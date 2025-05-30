@@ -5,13 +5,13 @@ import java.util.List;
 public class Server {
     private final List<Player> players;
     private final List<Mod> mods;
-    private final ServerType serverType;
+    private final Software software;
     private final String version;
     private final String motd;
     private final String icon;
     private final String country;
     private final String asn;
-    private final String reverseDns;
+    private final String hostname;
     private final String organization;
     private final String address;
     private final Integer maxPlayers;
@@ -20,8 +20,8 @@ public class Server {
     private final Integer protocol;
     private final Integer fmlNetworkVersion;
     private final int timesSeen;
-    private final long first_seen;
-    private final long last_seen;
+    private final long firstSeen;
+    private final long lastSeen;
     private final Boolean preventsReports;
     private final Boolean enforceSecure;
 
@@ -33,8 +33,8 @@ public class Server {
         return mods;
     }
 
-    public ServerType getServerType() {
-        return serverType;
+    public Software getSoftware() {
+        return software;
     }
 
     public String getVersion() {
@@ -57,8 +57,8 @@ public class Server {
         return asn;
     }
 
-    public String getReverseDns() {
-        return reverseDns;
+    public String getHostname() {
+        return hostname;
     }
 
     public String getOrganization() {
@@ -94,11 +94,11 @@ public class Server {
     }
 
     public long getFirstSeen() {
-        return first_seen;
+        return firstSeen;
     }
 
     public long getLastSeen() {
-        return last_seen;
+        return lastSeen;
     }
 
     public Boolean getPreventsReports() {
@@ -112,13 +112,13 @@ public class Server {
     private Server(Builder builder) {
         this.players = builder.players;
         this.mods = builder.mods;
-        this.serverType = builder.serverType;
+        this.software = builder.software;
         this.version = builder.version;
         this.motd = builder.motd;
         this.icon = builder.icon;
         this.country = builder.country;
         this.asn = builder.asn;
-        this.reverseDns = builder.reverseDns;
+        this.hostname = builder.hostname;
         this.organization = builder.organization;
         this.address = builder.address;
         this.maxPlayers = builder.maxPlayers;
@@ -127,8 +127,8 @@ public class Server {
         this.protocol = builder.protocol;
         this.fmlNetworkVersion = builder.fmlNetworkVersion;
         this.timesSeen = builder.timesSeen;
-        this.first_seen = builder.first_seen;
-        this.last_seen = builder.last_seen;
+        this.firstSeen = builder.firstSeen;
+        this.lastSeen = builder.lastSeen;
         this.preventsReports = builder.preventsReports;
         this.enforceSecure = builder.enforceSecure;
     }
@@ -136,13 +136,13 @@ public class Server {
     public static class Builder {
         private List<Player> players;
         private List<Mod> mods;
-        private ServerType serverType;
+        private Software software;
         private String version;
         private String motd;
         private String icon;
         private String country;
         private String asn;
-        private String reverseDns;
+        private String hostname;
         private String organization;
         private String address;
         private Integer maxPlayers;
@@ -151,8 +151,8 @@ public class Server {
         private Integer protocol;
         private Integer fmlNetworkVersion;
         private int timesSeen;
-        private long first_seen;
-        private long last_seen;
+        private long firstSeen;
+        private long lastSeen;
         private Boolean preventsReports;
         private Boolean enforceSecure;
 
@@ -167,8 +167,8 @@ public class Server {
             return this;
         }
 
-        public Builder setServerType(ServerType serverType) {
-            this.serverType = serverType;
+        public Builder setSoftware(Software software) {
+            this.software = software;
             return this;
         }
 
@@ -197,8 +197,8 @@ public class Server {
             return this;
         }
 
-        public Builder setReverseDns(String reverseDns) {
-            this.reverseDns = reverseDns;
+        public Builder setHostname(String hostname) {
+            this.hostname = hostname;
             return this;
         }
 
@@ -242,13 +242,13 @@ public class Server {
             return this;
         }
 
-        public Builder setFirstSeen(long first_seen) {
-            this.first_seen = first_seen;
+        public Builder setFirstSeen(long firstSeen) {
+            this.firstSeen = firstSeen;
             return this;
         }
 
-        public Builder setLastSeen(long last_seen) {
-            this.last_seen = last_seen;
+        public Builder setLastSeen(long lastSeen) {
+            this.lastSeen = lastSeen;
             return this;
         }
 

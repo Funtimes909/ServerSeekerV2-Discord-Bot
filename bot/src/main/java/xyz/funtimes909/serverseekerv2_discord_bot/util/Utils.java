@@ -1,5 +1,6 @@
 package xyz.funtimes909.serverseekerv2_discord_bot.util;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -11,7 +12,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,11 +45,36 @@ public class Utils {
         }
     }
 
-    public static Server buildServerFromApiResponse(JsonObject response) {
+    public static Server buildLargeServer(JsonObject response) {
+        ArrayList<Mod> mods = new ArrayList<>();
+        ArrayList<Player> players = new ArrayList<>();
+
+        if (response.get("players") != null) {
+            JsonArray playersList = response.get("players").getAsJsonArray();
+            if (!playersList.isEmpty()) {
+                playersList.forEach(e -> {
+                    JsonObject i = e.getAsJsonObject();
+                    players.add(new Player(i.get("name").getAsString(), i.get("uuid").getAsString()));
+                });
+            }
+        }
+
+        if (response.get("mods") != null) {
+            JsonArray modsList = response.get("mods").getAsJsonArray();
+            if (!modsList.isEmpty()) {
+                modsList.forEach(e -> {
+                    JsonObject i = e.getAsJsonObject();
+                    mods.add(new Mod(i.get("id").getAsString(), i.get("version").getAsString()));
+                });
+            }
+        }
+
         return new Server.Builder()
+                // Address and port will never be null
                 .setAddress(response.get("address").getAsString())
                 .setPort(response.get("port").getAsShort())
-                .setServerType(!response.get("software").isJsonNull() ? ServerType.fromVersionName(response.get("software").getAsString()) : null)
+
+                .setSoftware(!response.get("software").isJsonNull() ? Software.fromVersionName(response.get("software").getAsString()) : null)
                 .setMotd(!response.get("description_formatted").isJsonNull() ? response.get("description_formatted").getAsString() : null)
                 .setIcon(!response.get("icon").isJsonNull() ? response.get("icon").getAsString() : null)
                 .setVersion(!response.get("version").isJsonNull() ? response.get("version").getAsString() : null)
@@ -57,68 +82,44 @@ public class Utils {
                 .setLastSeen(!response.get("last_seen").isJsonNull() ? response.get("last_seen").getAsLong() : 0)
                 .setProtocol(!response.get("protocol").isJsonNull() ? response.get("protocol").getAsInt() : null)
                 .setCountry(!response.get("country").isJsonNull() ? response.get("country").getAsString() : null)
-                .setReverseDns(!response.get("hostname").isJsonNull() ? response.get("hostname").getAsString() : null)
+                .setHostname(!response.get("hostname").isJsonNull() ? response.get("hostname").getAsString() : null)
                 .setEnforceSecure(!response.get("enforces_secure_chat").isJsonNull() ? response.get("enforces_secure_chat").getAsBoolean() : null)
                 .setPreventsReports(!response.get("prevents_chat_reports").isJsonNull() ? response.get("prevents_chat_reports").getAsBoolean() : null)
                 .setOnlinePlayers(!response.get("online_players").isJsonNull() ? response.get("online_players").getAsInt() : 0)
                 .setMaxPlayers(!response.get("max_players").isJsonNull() ? response.get("max_players").getAsInt() : 0)
+                .setMods(mods)
+                .setPlayers(players)
                 .build();
     }
 
-    public enum AnsiCodes {
-        BLACK('0', "black", 30),
-        DARK_BLUE('1', "dark_blue", 34),
-        DARK_GREEN('2', "dark_green", 32),
-        DARK_AQUA('3', "dark_aqua", 36),
-        DARK_RED('4', "dark_red", 31),
-        PURPLE('5', "dark_purple", 35),
-        GOLD('6', "gold", 33),
-        GRAY('7', "gray", 37),
-        DARK_GRAY('8', "dark_gray", 30),
-        BLUE('9', "blue", 34),
-        GREEN('a', "green", 32),
-        AQUA('b', "aqua", 36),
-        RED('c', "red", 31),
-        PINK('d', "light_purple", 35),
-        YELLOW('e', "yellow", 33),
-        WHITE('f', "white", 37),
-        BOLD('l', "bold", 1),
-        UNDERLINE('n', "underline", 4),
-        RESET('r', "reset", 50);
+    public static Server buildSmallServer(JsonObject response) {
+        String country = null;
 
-        public static final HashMap<String, AnsiCodes> codes = new HashMap<>();
-        public static final HashMap<Character, AnsiCodes> colors = new HashMap<>();
-
-        static {
-            for (AnsiCodes v: AnsiCodes.values()) {
-                codes.put(v.name, v);
-                colors.put(v.c, v);
+        if (response.has("country")) {
+            if (!response.get("country").isJsonNull()) {
+                country = response.get("country").getAsString();
             }
         }
 
-        public final char c;
-        public final String name;
-        public final int ansi;
-
-        AnsiCodes(char c, String name, Integer ansi) {
-            this.c = c;
-            this.name = name;
-            this.ansi = ansi;
-        }
+        return new Server.Builder()
+                .setAddress(response.get("address").getAsString())
+                .setPort(response.get("port").getAsShort())
+                .setCountry(country)
+                .setMotd(response.get("description").isJsonNull() ? response.get("description").getAsString() : null)
+                .setLastSeen(response.get("last_seen").isJsonNull() ? response.get("last_seen").getAsLong() : 0)
+                .setOnlinePlayers(response.get("online_players").isJsonNull() ? response.get("online_players").getAsInt() : 0)
+                .setVersion(response.get("version").isJsonNull() ? response.get("version").getAsString() : null)
+                .build();
     }
 
     public static Server buildServerFromPing(String address, short port, JsonObject parsedJson) {
         try {
             String version = null;
-            String asn = null;
-            String country = null;
-            String hostname = null;
-            String organization = null;
             Integer protocol = null;
             Integer fmlNetworkVersion = null;
             Integer maxPlayers = null;
             Integer onlinePlayers = null;
-            ServerType type = null;
+            Software type = null;
             StringBuilder motd = new StringBuilder();
             List<Player> playerList = new ArrayList<>();
             List<Mod> modsList = new ArrayList<>();
@@ -162,9 +163,7 @@ public class Utils {
                     for (JsonElement playerJson : parsedJson.get("players").getAsJsonObject().get("sample").getAsJsonArray().asList()) {
                         playerList.add(new Player(
                                 playerJson.getAsJsonObject().get("name").getAsString(),
-                                playerJson.getAsJsonObject().get("id").getAsString(),
-                                timestamp,
-                                timestamp
+                                playerJson.getAsJsonObject().get("id").getAsString()
                         ));
                     }
                 }
@@ -174,13 +173,9 @@ public class Utils {
             Server.Builder server = new Server.Builder()
                     .setAddress(address)
                     .setPort(port)
-                    .setServerType(type)
+                    .setSoftware(type)
                     .setFirstSeen(timestamp)
                     .setLastSeen(timestamp)
-                    .setAsn(asn)
-                    .setCountry(country)
-                    .setReverseDns(hostname)
-                    .setOrganization(organization)
                     .setVersion(version)
                     .setProtocol(protocol)
                     .setFmlNetworkVersion(fmlNetworkVersion)
@@ -204,29 +199,29 @@ public class Utils {
         JsonObject object = parsedJson.get("version").getAsJsonObject();
         String version = object.get("name").getAsString();
         int protocol = object.get("protocol").getAsInt();
-        ServerType type = ServerType.JAVA;
+        Software type = Software.JAVA;
 
         if (parsedJson.has("isModded")) {
-            type = ServerType.NEOFORGE;
+            type = Software.NEOFORGE;
             return new Version(version, protocol, type);
         } else if (parsedJson.has("forgeData")) {
-            type = ServerType.LEXFORGE;
+            type = Software.LEXFORGE;
             return new Version(version, protocol, type);
         }
 
         if (!Character.isDigit(version.charAt(0))) {
             type = switch (version.split(" ")[0]) {
-                case "Paper" -> ServerType.PAPER;
-                case "Velocity" -> ServerType.VELOCITY;
-                case "BungeeCord" -> ServerType.BUNGEECORD;
-                case "Spigot" -> ServerType.SPIGOT;
-                case "CraftBukkit" -> ServerType.BUKKIT;
-                case "Folia" -> ServerType.FOLIA;
-                case "Pufferfish" -> ServerType.PUFFERFISH;
-                case "Purpur" -> ServerType.PURPUR;
-                case "Waterfall" -> ServerType.WATERFALL;
-                case "Leaves" -> ServerType.LEAVES;
-                default -> ServerType.JAVA;
+                case "Paper" -> Software.PAPER;
+                case "Velocity" -> Software.VELOCITY;
+                case "BungeeCord" -> Software.BUNGEECORD;
+                case "Spigot" -> Software.SPIGOT;
+                case "CraftBukkit" -> Software.BUKKIT;
+                case "Folia" -> Software.FOLIA;
+                case "Pufferfish" -> Software.PUFFERFISH;
+                case "Purpur" -> Software.PURPUR;
+                case "Waterfall" -> Software.WATERFALL;
+                case "Leaves" -> Software.LEAVES;
+                default -> Software.JAVA;
             };
         }
 

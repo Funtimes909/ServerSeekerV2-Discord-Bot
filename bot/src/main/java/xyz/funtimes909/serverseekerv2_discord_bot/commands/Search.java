@@ -115,16 +115,14 @@ public class Search {
 
     public void optionSelected(String address, short port, ButtonInteractionEvent event) {
         JsonObject response = Utils.query(
-                "api/v1/servers?address=" +
+                "api/v1/server?address=" +
                         address +
                         "&port=" +
                         port
         ).getAsJsonObject();
 
         try {
-            JsonArray array = response.get("results").getAsJsonArray();
-            JsonObject object = array.get(0).getAsJsonObject();
-            ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(Utils.buildServerFromApiResponse(object));
+            ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(Utils.buildLargeServer(response));
             MessageCreateData embed = embedBuilder.build(false);
 
             event.getHook().sendMessage(embed).queue();

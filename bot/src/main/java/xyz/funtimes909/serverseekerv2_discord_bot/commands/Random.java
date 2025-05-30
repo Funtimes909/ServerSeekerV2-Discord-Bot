@@ -13,7 +13,7 @@ import java.io.IOException;
 
 public class Random {
     public static void random(SlashCommandInteractionEvent event) {
-        JsonElement response = Utils.query("api/v1/random");
+        JsonElement response = Utils.query("api/v1/server?random=true");
 
         if (response == null || !response.isJsonObject()) {
             event.getHook().sendMessage("No results!").queue();
@@ -22,7 +22,7 @@ public class Random {
 
         try {
             JsonObject object = response.getAsJsonObject();
-            Server server = Utils.buildServerFromApiResponse(object);
+            Server server = Utils.buildLargeServer(object);
             ServerEmbedBuilder embedBuilder = new ServerEmbedBuilder(server);
 
             event.getHook().editOriginal(new MessageEditBuilder()
