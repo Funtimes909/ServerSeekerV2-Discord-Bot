@@ -20,8 +20,10 @@ public class PlayerhistorySearchBuilder {
 
         // The longest length name must be known before we create the embed
         // First we have to iterate over all the elements to get the length
-        for (JsonElement element : array) {
-            JsonObject object = element.getAsJsonObject();
+        for (int i = 0; i < array.size(); i++) {
+            // Only iterate over the results that will actually be seen on the page
+            if (i > 9) break;
+            JsonObject object = array.get(i).getAsJsonObject();
 
             String name = object.get("name").getAsString();
             if (name.length() > longestName) longestName = name.length();
