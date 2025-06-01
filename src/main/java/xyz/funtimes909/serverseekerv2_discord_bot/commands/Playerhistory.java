@@ -22,8 +22,8 @@ public class Playerhistory {
         }
 
         String query = event.getOption("player") != null ?
-                "api/v1/playerhistory?player=" + event.getOption("player").getAsString() :
-                "api/v1/playerhistory?address=" + event.getOption("address").getAsString();
+                "api/v1/playerhistory?limit=10&player=" + event.getOption("player").getAsString() :
+                "api/v1/playerhistory?limit=10&address=" + event.getOption("address").getAsString();
 
         JsonArray response = Utils.query(query).getAsJsonObject().get("results").getAsJsonArray();
 
