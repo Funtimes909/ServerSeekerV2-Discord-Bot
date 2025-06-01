@@ -89,7 +89,7 @@ public class CommandRegisterer {
                         .setContexts(InteractionContextType.ALL)
                         .setIntegrationTypes(IntegrationType.ALL)
                         .addOption(OptionType.STRING, "address", "Address of the server", true)
-                        .addOption(OptionType.INTEGER, "port", "Port of the server")
+                        .addOption(OptionType.INTEGER, "port", "Port of the server"),
 
                 Commands.slash("takedown", "Add an ip address to the exclude list, optionally remove it from the database")
                         .setContexts(InteractionContextType.ALL)
