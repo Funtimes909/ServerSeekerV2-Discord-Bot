@@ -10,7 +10,7 @@ This is the code for a Discord bot to communicate with the [ServerSeekerV2 API](
 
 ServerSeekerV2-Discord-Bot is a Discord bot to fetch results about Minecraft servers from the ServerSeekerV2 API.
 
-There is currently no public instance of this bot, you can ask for support hosting your own scanner and discord bot [here](https://matrix.to/#/#projects:funtimes909.xyz)
+You can try this bot out for free in my public discord server [here](https://discord.gg/UA5kyprunc)
 
 This is the official repository, a mirror of the repository can be found [here](https://github.com/Funtimes909/ServerSeekerV2-Discord-Bot) on GitHub where it is synced every few hours.
 Pull requests will only be accepted here, not on GitHub.
