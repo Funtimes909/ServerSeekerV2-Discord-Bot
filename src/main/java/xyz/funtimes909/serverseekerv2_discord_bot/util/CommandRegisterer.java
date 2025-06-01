@@ -3,6 +3,8 @@ package xyz.funtimes909.serverseekerv2_discord_bot.util;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.interactions.IntegrationType;
+import net.dv8tion.jda.api.interactions.InteractionContextType;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -33,6 +35,9 @@ public class CommandRegisterer {
     public static void registerCommands(JDA client) {
         client.updateCommands().addCommands(
                 Commands.slash("search", "Searches for servers with advanced filters")
+                        // Allows the command to be used everywhere
+                        .setContexts(InteractionContextType.ALL)
+                        .setIntegrationTypes(IntegrationType.ALL)
                         .addOption(OptionType.STRING, "version", "Search for servers using a specific minecraft version")
                         .addOption(OptionType.INTEGER, "protocol", "Search for servers using a specific protocol")
                         .addOption(OptionType.STRING, "description", "Search for servers with a specific description")
@@ -43,8 +48,10 @@ public class CommandRegisterer {
                         .addOption(OptionType.INTEGER, "port", "Search for servers running on a specific port")
                         .addOption(OptionType.STRING, "country", "Search for servers running in a specific country", false, true)
                         .addOption(OptionType.STRING, "asn", "Search for servers running from a specific ASN")
-                        .addOption(OptionType.INTEGER, "seen_before", "Search for servers scanned before a specific unix timestamp")
-                        .addOption(OptionType.INTEGER, "seen_after", "Search for servers scanned after a specific unix timestamp")
+                        .addOption(OptionType.INTEGER, "first_seen_before", "Search for servers first scanned before a specific unix timestamp")
+                        .addOption(OptionType.INTEGER, "first_seen_after", "Search for servers first scanned after a specific unix timestamp")
+                        .addOption(OptionType.INTEGER, "last_seen_before", "Search for servers last scanned after a specific unix timestamp")
+                        .addOption(OptionType.INTEGER, "last_seen_after", "Search for servers last scanned after a specific unix timestamp")
                         .addOption(OptionType.BOOLEAN, "icon", "Search for servers that have an icon")
                         .addOption(OptionType.BOOLEAN, "full", "Search for servers with a full player count")
                         .addOption(OptionType.BOOLEAN, "empty", "Search for servers that have no players online")
@@ -65,24 +72,41 @@ public class CommandRegisterer {
                                 .addChoice("BungeeCord", "Bungeecord")),
 
                 Commands.slash("blacklist", "Blacklist a user from using the bot")
+                        .setContexts(InteractionContextType.ALL)
+                        .setIntegrationTypes(IntegrationType.ALL)
                         .addOption(OptionType.USER, "user", "Which user add/remove from the blacklist", true)
                         .addOptions(new OptionData(OptionType.STRING, "operation", "Whether to add or remove a user from the blacklist", true)
                                 .addChoice("Add", "Add")
                                 .addChoice("Remove", "Remove")),
 
                 Commands.slash("playerhistory", "Search for player history of a specific player")
+                        .setContexts(InteractionContextType.ALL)
+                        .setIntegrationTypes(IntegrationType.ALL)
                         .addOption(OptionType.STRING, "player", "The player you want to search for", false)
                         .addOption(OptionType.STRING, "address", "The server you want to search history for", false),
 
-                Commands.slash("takedown", "Add an ip address to the exclude list, optionally remove it from the database")
-                        .addOption(OptionType.STRING, "address", "IP address of the server you want to takedown", true),
-
-                Commands.slash("random", "Finds a random server"),
-                Commands.slash("info", "Displays information about the bot, source code, author and credits"),
-                Commands.slash("stats", "Shows stats about the bot"),
                 Commands.slash("ping", "Ping a specific server.")
+                        .setContexts(InteractionContextType.ALL)
+                        .setIntegrationTypes(IntegrationType.ALL)
                         .addOption(OptionType.STRING, "address", "Address of the server", true)
                         .addOption(OptionType.INTEGER, "port", "Port of the server")
+
+                Commands.slash("takedown", "Add an ip address to the exclude list, optionally remove it from the database")
+                        .setContexts(InteractionContextType.ALL)
+                        .setIntegrationTypes(IntegrationType.ALL)
+                        .addOption(OptionType.STRING, "address", "IP address of the server you want to takedown", true),
+
+                Commands.slash("random", "Finds a random server")
+                        .setContexts(InteractionContextType.ALL)
+                        .setIntegrationTypes(IntegrationType.ALL),
+
+                Commands.slash("info", "Displays information about the bot, source code, author and credits")
+                        .setContexts(InteractionContextType.ALL)
+                        .setIntegrationTypes(IntegrationType.ALL),
+
+                Commands.slash("stats", "Shows stats about the bot")
+                        .setContexts(InteractionContextType.ALL)
+                        .setIntegrationTypes(IntegrationType.ALL)
         ).queue();
     }
 }
