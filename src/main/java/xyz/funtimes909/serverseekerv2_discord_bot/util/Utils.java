@@ -26,12 +26,11 @@ public class Utils {
                     .build();
 
             HttpResponse<String> response = client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).join();
-            if (response.statusCode() == 429) return null;
             return JsonParser.parseString(response.body());
         }
     }
 
-    public static void post(String query) {
+    public static HttpResponse<String> post(String query) {
         System.out.println(Main.apiUrl + query);
         try (HttpClient client = HttpClient.newHttpClient()) {
 
@@ -41,7 +40,7 @@ public class Utils {
                     .header("Authorization", Main.apiToken)
                     .build();
 
-            client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).join();
+            return client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).join();
         }
     }
 
