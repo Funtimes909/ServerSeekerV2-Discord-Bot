@@ -21,18 +21,32 @@ public class Playerhistory {
             return;
         }
 
+        String pageName;
+        if (event.getOption("player") != null) {
+            pageName = event.getOption("player").getAsString();
+        } else {
+            pageName = event.getOption("address").getAsString();
+        }
+
         String query = event.getOption("player") != null ?
                 "api/v1/playerhistory?limit=10&player=" + event.getOption("player").getAsString() :
                 "api/v1/playerhistory?limit=10&address=" + event.getOption("address").getAsString();
 
-        JsonArray response = Utils.query(query).getAsJsonObject().get("results").getAsJsonArray();
+        JsonElement response = Utils.query(query);
 
-        if (response == null || response.isEmpty()) {
+        if (response == null) {
             event.getHook().editOriginal(":x: No results!").queue();
             return;
         }
 
-        MessageEmbed embed = PlayerhistorySearchBuilder.build(response, query.split("=")[1]);
+        JsonArray array = response.getAsJsonObject().getAsJsonArray("results");
+
+        if (array.isEmpty()) {
+            event.getHook().editOriginal(":x: No results!").queue();
+            return;
+        }
+
+        MessageEmbed embed = PlayerhistorySearchBuilder.build(array, pageName);
         event.getHook().editOriginalEmbeds(embed).queue();
     }
 }

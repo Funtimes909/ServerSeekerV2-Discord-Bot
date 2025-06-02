@@ -24,7 +24,7 @@ Below is a list of every currently implemented command and what it does
 Searches for servers and return all that match specified parameters, supports combining advanced filters to precisely pinpoint exact servers.
 
 **Example:**
-/search country:NZ version:1.21.4 whitelist:false cracked:true software:paper
+/search country:NZ version:1.21.4 software:paper
 
 ### /ping
 
