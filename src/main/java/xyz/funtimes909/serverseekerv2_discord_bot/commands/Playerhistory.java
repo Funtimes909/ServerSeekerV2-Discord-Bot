@@ -2,10 +2,8 @@ package xyz.funtimes909.serverseekerv2_discord_bot.commands;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import xyz.funtimes909.serverseekerv2_discord_bot.Main;
 import xyz.funtimes909.serverseekerv2_discord_bot.builders.PlayerhistorySearchBuilder;
 import xyz.funtimes909.serverseekerv2_discord_bot.util.Utils;
 
